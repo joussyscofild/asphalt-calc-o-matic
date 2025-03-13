@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,12 @@ const AdminLogin: React.FC = () => {
   // These credentials should be stored securely in a real application
   // This is a simple implementation for demonstration purposes
   const validUsername = 'admin';
-  const validPassword = 'admin123';
+  
+  // Check if we have a saved password
+  const getSavedPassword = () => {
+    const savedPassword = localStorage.getItem('adminPassword');
+    return savedPassword || 'admin123'; // Default fallback
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +31,8 @@ const AdminLogin: React.FC = () => {
 
     // Simulate API call delay
     setTimeout(() => {
+      const validPassword = getSavedPassword();
+      
       if (username === validUsername && password === validPassword) {
         // Store authentication in localStorage (use a more secure method in production)
         localStorage.setItem('adminAuthenticated', 'true');

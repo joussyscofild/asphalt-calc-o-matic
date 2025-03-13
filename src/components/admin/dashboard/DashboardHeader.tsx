@@ -1,37 +1,24 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { LogOut } from 'lucide-react';
+import PasswordChange from './PasswordChange';
 
 interface DashboardHeaderProps {
   handleLogout: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ handleLogout }) => {
-  const navigate = useNavigate();
-  
   return (
-    <div className="mb-8 flex items-center justify-between">
-      <div className="flex items-center">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="mr-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Site
+    <div className="flex justify-between items-center mb-8">
+      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+      <div className="flex gap-4">
+        <PasswordChange />
+        <Button variant="outline" onClick={handleLogout} className="flex gap-2">
+          <LogOut className="h-4 w-4" />
+          Logout
         </Button>
-        <h1 className="text-3xl font-bold">Site Administration</h1>
       </div>
-      <Button 
-        variant="outline" 
-        onClick={handleLogout}
-        className="flex items-center"
-      >
-        <LogOut className="mr-2 h-4 w-4" />
-        Logout
-      </Button>
     </div>
   );
 };
