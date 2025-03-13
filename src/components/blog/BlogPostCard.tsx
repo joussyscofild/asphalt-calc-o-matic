@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, ChevronRight, Tag } from 'lucide-react';
 import { BlogPost } from '@/utils/blogPosts';
@@ -10,13 +10,32 @@ interface BlogPostCardProps {
 }
 
 const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {
+  // Use state to potentially update the post data if it changes in localStorage
+  const [currentPost, setCurrentPost] = useState<BlogPost>(post);
+  
+  // Check localStorage for updated post data
+  useEffect(() => {
+    try {
+      const storedPosts = localStorage.getItem('blogPosts');
+      if (storedPosts) {
+        const posts = JSON.parse(storedPosts);
+        const updatedPost = posts.find((p: BlogPost) => p.id === post.id);
+        if (updatedPost && updatedPost.status === 'published') {
+          setCurrentPost(updatedPost);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading post from localStorage:", error);
+    }
+  }, [post.id]);
+  
   return (
     <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 h-full flex flex-col">
-      {post.imageUrl && (
+      {currentPost.imageUrl && (
         <div className="aspect-video overflow-hidden">
           <img 
-            src={post.imageUrl} 
-            alt={post.title} 
+            src={currentPost.imageUrl} 
+            alt={currentPost.title} 
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" 
           />
         </div>
@@ -25,28 +44,28 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {
       <div className="p-6 flex flex-col flex-grow">
         <div className="flex justify-between items-center mb-3">
           <Badge variant="outline" className="text-xs font-medium text-concrete">
-            {post.category}
+            {currentPost.category}
           </Badge>
           
-          {post.featured && (
+          {currentPost.featured && (
             <Badge className="bg-safety/10 text-safety-dark hover:bg-safety/20">
               Featured
             </Badge>
           )}
         </div>
         
-        <Link to={`/blog/${post.id}`} className="group">
+        <Link to={`/blog/${currentPost.id}`} className="group">
           <h3 className="text-xl font-bold text-asphalt mb-3 group-hover:text-safety-dark transition-colors line-clamp-2">
-            {post.title}
+            {currentPost.title}
           </h3>
         </Link>
         
         <p className="text-concrete-dark mb-4 line-clamp-3 flex-grow">
-          {post.excerpt}
+          {currentPost.excerpt}
         </p>
         
         <div className="flex flex-wrap gap-2 mb-4">
-          {post.tags.slice(0, 3).map((tag) => (
+          {currentPost.tags.slice(0, 3).map((tag) => (
             <Link 
               key={tag} 
               to={`/blog/tag/${tag.toLowerCase().replace(' ', '-')}`}
@@ -61,14 +80,14 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {
         <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-auto">
           <div className="flex items-center text-sm text-concrete">
             <User size={14} className="mr-1" />
-            <span className="truncate max-w-[100px]">{post.author}</span>
+            <span className="truncate max-w-[100px]">{currentPost.author}</span>
             <span className="mx-2">•</span>
             <Calendar size={14} className="mr-1" />
-            <span>{post.date}</span>
+            <span>{currentPost.date}</span>
           </div>
           
           <Link 
-            to={`/blog/${post.id}`}
+            to={`/blog/${currentPost.id}`}
             className="inline-flex items-center text-sm font-medium text-asphalt hover:text-safety-dark transition-colors"
           >
             Read

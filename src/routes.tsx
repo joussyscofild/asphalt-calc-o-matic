@@ -10,6 +10,7 @@ import BlogTagResults from './pages/BlogTagResults';
 import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
+import BlogPostEditPage from './pages/BlogPostEditPage';
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
   {
     path: '/admin/dashboard',
     element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>,
+  },
+  {
+    path: '/admin/blog/edit/:id?',
+    element: <ProtectedRoute><BlogPostEditPage /></ProtectedRoute>,
   },
   {
     path: '*',

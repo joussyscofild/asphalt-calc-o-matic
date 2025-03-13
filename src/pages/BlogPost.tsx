@@ -1,302 +1,187 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getBlogPostById, getRecentBlogPosts, BlogPost as BlogPostType } from '@/utils/blogPosts';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Calendar, User, ChevronLeft, Tag, Clock } from 'lucide-react';
+import { BlogPost as IBlogPost, getBlogPostById, getRecentBlogPosts } from '@/utils/blogPosts';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Calendar, Clock, Tag, User, Share2, Heart, Bookmark, Award } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { Separator } from '@/components/ui/separator';
+import BlogPostCard from '@/components/blog/BlogPostCard';
 
 const BlogPost = () => {
-  const { id = '' } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [post, setPost] = useState<BlogPostType | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
-  const [relatedPosts, setRelatedPosts] = useState<BlogPostType[]>([]);
+  const [post, setPost] = useState<IBlogPost | null>(null);
+  const [recentPosts, setRecentPosts] = useState<IBlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // Load post data
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate a database fetch with a small delay
-    const timer = setTimeout(() => {
-      const currentPost = getBlogPostById(id);
-      
-      if (currentPost) {
-        console.log("BlogPost page loaded post:", id, "Content length:", currentPost.content.length);
-        
-        // Make sure the post is either published or draft
-        if (currentPost.status !== 'published' && currentPost.status !== 'draft') {
-          currentPost.status = 'published';
-        }
-        
-        setPost(currentPost);
-        
-        // Get related posts (recent posts excluding current one)
-        const recent = getRecentBlogPosts(4).filter(p => p.id !== id);
-        setRelatedPosts(recent);
-      }
-      
-      setIsLoading(false);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [id]);
-
-  // Handle share functionality
-  const handleShare = () => {
-    if (navigator.share && post) {
-      navigator.share({
-        title: post.title,
-        text: post.excerpt,
-        url: window.location.href,
-      })
-      .catch((error) => console.log('Error sharing:', error));
-    } else {
-      // Fallback for browsers that don't support navigator.share
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link Copied",
-        description: "Post link copied to clipboard",
-      });
+    if (!id) {
+      navigate('/blog');
+      return;
     }
-  };
-
-  if (isLoading) {
+    
+    // First try to load from localStorage
+    try {
+      const storedPosts = localStorage.getItem('blogPosts');
+      if (storedPosts) {
+        const posts = JSON.parse(storedPosts);
+        const foundPost = posts.find((p: IBlogPost) => p.id === id);
+        if (foundPost && foundPost.status === 'published') {
+          console.log("BlogPost page loaded post from localStorage:", foundPost.id, "Content length:", foundPost.content.length);
+          setPost(foundPost);
+          
+          // Get recent posts excluding current one
+          const recent = posts
+            .filter((p: IBlogPost) => p.id !== id && p.status === 'published')
+            .sort((a: IBlogPost, b: IBlogPost) => {
+              return new Date(b.date).getTime() - new Date(a.date).getTime();
+            })
+            .slice(0, 3);
+            
+          setRecentPosts(recent);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error loading post from localStorage:", error);
+    }
+    
+    // Fallback to default post data
+    const postData = getBlogPostById(id);
+    if (postData) {
+      console.log("BlogPost page loaded post from defaults:", postData.id, "Content length:", postData.content.length);
+      setPost(postData);
+      
+      // Get recent posts excluding current one
+      const recent = getRecentBlogPosts(4).filter(p => p.id !== id).slice(0, 3);
+      setRecentPosts(recent);
+    } else {
+      navigate('/blog');
+    }
+    
+    setLoading(false);
+  }, [id, navigate]);
+  
+  if (loading) {
     return (
-      <div className="container-custom py-12">
-        <div className="w-full h-64 flex items-center justify-center">
-          <div className="animate-pulse flex flex-col items-center">
-            <BookOpen size={48} className="text-gray-300 mb-4" />
-            <div className="h-4 bg-gray-200 rounded w-48 mb-2.5"></div>
-            <div className="h-3 bg-gray-200 rounded w-32"></div>
-          </div>
+      <div className="py-12 container-custom">
+        <div className="text-center">
+          <div className="h-6 w-32 bg-gray-200 animate-pulse rounded mx-auto mb-4"></div>
+          <div className="h-12 w-3/4 bg-gray-200 animate-pulse rounded mx-auto mb-8"></div>
+          <div className="h-64 bg-gray-200 animate-pulse rounded mb-6"></div>
+          <div className="h-4 bg-gray-200 animate-pulse rounded mb-3"></div>
+          <div className="h-4 bg-gray-200 animate-pulse rounded mb-3"></div>
+          <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
         </div>
       </div>
     );
   }
-
-  if (!post) {
-    return (
-      <div className="container-custom py-20 text-center">
-        <BookOpen size={48} className="mx-auto text-concrete mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Blog Post Not Found</h1>
-        <p className="mb-6">The article you're looking for doesn't exist or may have been moved.</p>
-        <Link to="/blog">
-          <Button>
-            Browse All Articles
-          </Button>
-        </Link>
-      </div>
-    );
-  }
-
+  
+  if (!post) return null;
+  
   return (
-    <div className="bg-gray-50 py-12">
+    <div className="py-8 bg-gray-50">
       <div className="container-custom">
-        <Breadcrumb className="mb-6">
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/">Home</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/blog">Blog</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <BreadcrumbLink>{post.title}</BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
-
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="mb-6" 
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft size={16} className="mr-2" /> Back to Blog
-        </Button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              {post.imageUrl && (
-                <div className="w-full h-72 sm:h-96 overflow-hidden relative">
-                  <img 
-                    src={post.imageUrl} 
-                    alt={post.title} 
-                    className="w-full h-full object-cover"
-                  />
-                  {post.featured && (
-                    <div className="absolute top-4 left-4">
-                      <Badge className="bg-safety text-white">
-                        <Award size={14} className="mr-1" />
-                        Featured
-                      </Badge>
-                    </div>
-                  )}
-                  {post.status === 'draft' && (
-                    <div className="absolute top-4 right-4">
-                      <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200">
-                        Draft
-                      </Badge>
-                    </div>
-                  )}
-                </div>
-              )}
+        <Link to="/blog" className="inline-flex items-center text-sm font-medium text-concrete hover:text-concrete-dark mb-6">
+          <ChevronLeft size={16} className="mr-1" />
+          Back to all posts
+        </Link>
+        
+        <article className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-12">
+          {post.imageUrl && (
+            <div className="aspect-video w-full overflow-hidden">
+              <img 
+                src={post.imageUrl} 
+                alt={post.title} 
+                className="w-full h-full object-cover" 
+              />
+            </div>
+          )}
+          
+          <div className="p-6 md:p-10">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <Link 
+                to={`/blog/category/${post.category.toLowerCase().replace(/\s+/g, '-')}`}
+                className="text-sm bg-gray-100 text-concrete-dark px-3 py-1 rounded-full hover:bg-safety/10 hover:text-safety-dark transition-colors"
+              >
+                {post.category}
+              </Link>
               
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="outline">
-                    {post.category}
-                  </Badge>
-                  <div className="flex items-center text-sm text-concrete-dark ml-auto">
-                    <Calendar size={14} className="mr-1" />
-                    <span>{post.date}</span>
-                    {post.readTime && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <Clock size={14} className="mr-1" />
-                        <span>{post.readTime}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <h1 className="text-3xl sm:text-4xl font-bold text-asphalt mb-6">{post.title}</h1>
-                
-                <div className="flex items-center mb-6">
-                  <Avatar className="h-10 w-10 mr-3">
-                    <AvatarImage src={post.authorAvatar} alt={post.author} />
-                    <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium">{post.author}</span>
-                </div>
-
-                <div className="flex gap-2 mb-8">
-                  <Button variant="outline" size="sm" onClick={handleShare}>
-                    <Share2 size={14} className="mr-1" />
-                    Share
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Heart size={14} className="mr-1" />
-                    Like
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Bookmark size={14} className="mr-1" />
-                    Save
-                  </Button>
-                </div>
-
-                <Separator className="mb-8" />
-
-                <div 
-                  className="prose prose-slate max-w-none"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
-                />
-
-                <Separator className="my-8" />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map(tag => (
-                      <Link 
-                        key={tag} 
-                        to={`/blog/tag/${tag.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-concrete-dark transition-colors"
-                      >
-                        {tag}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+              {post.tags.map(tag => (
+                <Link 
+                  key={tag}
+                  to={`/blog/tag/${tag.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="inline-flex items-center text-sm bg-gray-100 text-concrete-dark px-3 py-1 rounded-full hover:bg-safety/10 hover:text-safety-dark transition-colors"
+                >
+                  <Tag size={14} className="mr-1" />
+                  {tag}
+                </Link>
+              ))}
+            </div>
+            
+            <h1 className="text-3xl md:text-4xl font-bold text-asphalt mb-6">
+              {post.title}
+            </h1>
+            
+            <div className="flex items-center text-concrete-dark mb-8 flex-wrap gap-y-2">
+              <div className="flex items-center">
+                {post.authorAvatar ? (
+                  <img 
+                    src={post.authorAvatar} 
+                    alt={post.author} 
+                    className="w-10 h-10 rounded-full mr-3 border border-gray-200"
+                  />
+                ) : (
+                  <User size={24} className="mr-3 p-1 bg-gray-100 rounded-full" />
+                )}
+                <span className="font-medium text-asphalt">{post.author}</span>
               </div>
-            </article>
-          </div>
-
-          <div className="lg:col-span-1">
-            <div className="sticky top-20 space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-semibold mb-4 flex items-center">
-                  <User size={18} className="mr-2 text-safety" />
-                  About the Author
-                </h2>
-                <div className="flex items-center mb-4">
-                  {post.authorAvatar ? (
-                    <Avatar className="h-16 w-16 mr-4">
-                      <AvatarImage src={post.authorAvatar} alt={post.author} />
-                      <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-200 mr-4 flex items-center justify-center">
-                      <User size={24} className="text-gray-400" />
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="font-medium">{post.author}</h3>
-                    <p className="text-sm text-concrete-dark">Construction Specialist</p>
-                  </div>
-                </div>
-                <p className="text-sm text-concrete-dark">
-                  Expert in construction materials and techniques with over 10 years of industry experience.
-                </p>
+              
+              <span className="mx-3">•</span>
+              
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-1" />
+                <span>{post.date}</span>
               </div>
-
-              {relatedPosts.length > 0 && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                  <h2 className="text-lg font-semibold mb-4 flex items-center">
-                    <BookOpen size={18} className="mr-2 text-safety" />
-                    Related Articles
-                  </h2>
-                  <div className="space-y-4">
-                    {relatedPosts.map(relatedPost => (
-                      <RelatedArticleLink 
-                        key={relatedPost.id}
-                        post={relatedPost} 
-                      />
-                    ))}
+              
+              {post.readTime && (
+                <>
+                  <span className="mx-3">•</span>
+                  <div className="flex items-center">
+                    <Clock size={16} className="mr-1" />
+                    <span>{post.readTime}</span>
                   </div>
-                </div>
+                </>
               )}
             </div>
+            
+            <div 
+              className="prose prose-lg max-w-none"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            ></div>
           </div>
-        </div>
+        </article>
+        
+        {recentPosts.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-asphalt">More Articles</h2>
+              <Link to="/blog" className="text-sm font-medium text-concrete hover:text-concrete-dark">
+                View all posts
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentPosts.map(recentPost => (
+                <BlogPostCard key={recentPost.id} post={recentPost} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-interface RelatedArticleLinkProps {
-  post: {
-    id: string;
-    title: string;
-    imageUrl?: string;
-    readTime?: string;
-  };
-}
-
-const RelatedArticleLink = ({ post }: RelatedArticleLinkProps) => (
-  <Link to={`/blog/${post.id}`} className="flex items-center gap-3 group">
-    {post.imageUrl ? (
-      <img src={post.imageUrl} alt="" className="w-16 h-12 object-cover rounded-md" />
-    ) : (
-      <div className="w-16 h-12 bg-gray-100 rounded-md flex items-center justify-center">
-        <BookOpen size={16} className="text-gray-400" />
-      </div>
-    )}
-    <div>
-      <h3 className="text-sm font-medium text-asphalt group-hover:text-safety-dark transition-colors line-clamp-2">
-        {post.title}
-      </h3>
-      {post.readTime && <span className="text-xs text-concrete-dark">{post.readTime}</span>}
-    </div>
-  </Link>
-);
 
 export default BlogPost;

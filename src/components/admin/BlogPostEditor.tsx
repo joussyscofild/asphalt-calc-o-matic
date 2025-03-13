@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Edit, FileText, Image, Wand2, Plus, Save, Send, Eye } from 'lucide-react';
+import { Edit, FileText, Image, Wand2, Plus, Save, Send, Eye, Trash } from 'lucide-react';
 import SEOHelper from './SEOHelper';
 import { BlogPostEditorProps } from './editor/types';
 import { useBlogPostForm } from './editor/useBlogPostForm';
@@ -11,16 +12,45 @@ import ContentTab from './editor/ContentTab';
 import MediaTab from './editor/MediaTab';
 import { BlogPost, blogPosts } from '@/utils/blogPosts';
 import { useToast } from "@/hooks/use-toast";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const BlogPostEditor: React.FC<BlogPostEditorProps> = ({ 
   post,
   onSave,
-  onCancel
+  onCancel,
+  onDelete
 }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState<BlogPost | undefined>(post);
   const [isCreating, setIsCreating] = useState<boolean>(!post);
   const [editorKey, setEditorKey] = useState<number>(0);
+  const [postsList, setPostsList] = useState<BlogPost[]>([]);
+  
+  // Load posts from localStorage or default to blogPosts
+  useEffect(() => {
+    try {
+      const storedPosts = localStorage.getItem('blogPosts');
+      if (storedPosts) {
+        setPostsList(JSON.parse(storedPosts));
+      } else {
+        setPostsList(blogPosts);
+      }
+    } catch (error) {
+      console.error("Error loading posts:", error);
+      setPostsList(blogPosts);
+    }
+  }, []);
   
   useEffect(() => {
     console.log("BlogPostEditor initialized with post:", post?.id || "new post");
@@ -82,10 +112,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
       title: "Loading post for editing",
       description: `Loading "${blogPost.title}" for editing`,
     });
-    setSelectedPost(blogPost);
-    setIsCreating(true);
-    // Force re-render of the editor
-    setEditorKey(prev => prev + 1);
+    navigate(`/admin/blog/edit/${blogPost.id}`);
   };
 
   const handleCreateNew = () => {
@@ -93,10 +120,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
       title: "Create New Post",
       description: "Starting with a blank post",
     });
-    resetFormData();
-    setSelectedPost(undefined);
-    setIsCreating(true);
-    setEditorKey(prev => prev + 1);
+    navigate('/admin/blog/edit');
   };
 
   const handleCancelEdit = () => {
@@ -105,6 +129,12 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     }
     setIsCreating(false);
     setSelectedPost(undefined);
+  };
+
+  const handleDeletePost = (postId: string) => {
+    if (onDelete) {
+      onDelete(postId);
+    }
   };
 
   const handlePreview = () => {
@@ -153,7 +183,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
         </div>
         
         <div className="grid grid-cols-1 gap-4">
-          {blogPosts.map((blogPost) => (
+          {postsList.map((blogPost) => (
             <div
               key={blogPost.id}
               className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-center"
@@ -172,9 +202,34 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
                   <p className="text-sm text-muted-foreground">{blogPost.date} • {blogPost.category}</p>
                 </div>
               </div>
-              <Button variant="outline" onClick={() => handleEditPost(blogPost)}>
-                Edit
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => handleEditPost(blogPost)}>
+                  Edit
+                </Button>
+                {onDelete && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="icon">
+                        <Trash size={16} />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Blog Post</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete "{blogPost.title}"? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeletePost(blogPost.id)}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
             </div>
           ))}
         </div>

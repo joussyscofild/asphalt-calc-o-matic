@@ -15,10 +15,27 @@ const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   
-  // Load all published posts when the component mounts
+  // Load posts when the component mounts
   useEffect(() => {
+    // First try to get posts from localStorage
+    try {
+      const storedPosts = localStorage.getItem('blogPosts');
+      if (storedPosts) {
+        const parsedPosts = JSON.parse(storedPosts);
+        // Filter for only published posts
+        const publishedPosts = parsedPosts.filter((post: BlogPost) => post.status === 'published');
+        console.log("Blog page loaded, published posts from localStorage:", publishedPosts.length);
+        setPosts(publishedPosts);
+        setFilteredPosts(publishedPosts);
+        return;
+      }
+    } catch (error) {
+      console.error("Error loading posts from localStorage:", error);
+    }
+    
+    // Fall back to the default posts if localStorage failed
     const publishedPosts = getAllPublishedPosts();
-    console.log("Blog page loaded, published posts:", publishedPosts.length);
+    console.log("Blog page loaded, published posts from defaults:", publishedPosts.length);
     setPosts(publishedPosts);
     setFilteredPosts(publishedPosts);
   }, []);

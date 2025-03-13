@@ -15,12 +15,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 interface DashboardTabsProps {
   handleSaveBlogPost: (post: BlogPost) => void;
   handleCancelBlogPost: () => void;
+  handleDeleteBlogPost?: (postId: string) => void;
   refreshTrigger?: number;
 }
 
 const DashboardTabs: React.FC<DashboardTabsProps> = ({
   handleSaveBlogPost,
   handleCancelBlogPost,
+  handleDeleteBlogPost,
   refreshTrigger
 }) => {
   const location = useLocation();
@@ -103,6 +105,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             <BlogPostEditor 
               onSave={handleSaveBlogPost}
               onCancel={handleCancelBlogPost}
+              onDelete={handleDeleteBlogPost}
               key={`blog-editor-${tabKey}`}
             />
           </CardContent>
