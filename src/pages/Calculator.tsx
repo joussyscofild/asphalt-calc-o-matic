@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getCalculatorById } from '../utils/calculators';
@@ -29,7 +28,6 @@ const Calculator = () => {
     const { id, value, type } = e.target;
     let parsedValue: string | number = value;
     
-    // Convert to number if it's a number input
     if (type === 'number' && value) {
       parsedValue = parseFloat(value);
     }
@@ -43,12 +41,9 @@ const Calculator = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple example calculation for asphalt tonnage
     if (id === 'asphalt-tonnage' && calculator.fields) {
       const { length, width, thickness, density } = formData;
       if (length && width && thickness && density) {
-        // Formula: (L × W × T × D) ÷ 2000
-        // Convert thickness from inches to feet
         const thicknessInFeet = thickness / 12;
         const cubicFeet = length * width * thicknessInFeet;
         const pounds = cubicFeet * density;
@@ -56,7 +51,6 @@ const Calculator = () => {
         setResult(tons.toFixed(2));
       }
     } 
-    // Example for paving cost calculator
     else if (id === 'paving-cost' && calculator.fields) {
       const { area, materialCost, laborCost, additionalCosts } = formData;
       if (area && materialCost) {
@@ -67,14 +61,11 @@ const Calculator = () => {
         setResult(totalCost.toFixed(2));
       }
     }
-    // Simple example calculation for concrete volume
     else if (id === 'concrete-volume' && calculator.fields) {
       const { length, width, thickness } = formData;
       if (length && width && thickness) {
-        // Convert thickness from inches to feet
         const thicknessInFeet = thickness / 12;
         const cubicFeet = length * width * thicknessInFeet;
-        // Convert to cubic yards (27 cubic feet = 1 cubic yard)
         const cubicYards = cubicFeet / 27;
         setResult(cubicYards.toFixed(2));
       }
@@ -84,7 +75,6 @@ const Calculator = () => {
     }
   };
 
-  // Add default fields for paving cost calculator if they don't exist
   const calculatorFields = calculator.fields || (id === 'paving-cost' ? [
     {
       id: 'area',
@@ -138,10 +128,14 @@ const Calculator = () => {
     <div className="container-custom py-12">
       <Breadcrumb className="mb-8">
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/">Home</BreadcrumbLink>
+          <BreadcrumbLink asChild>
+            <Link to="/">Home</Link>
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/calculators">Calculators</BreadcrumbLink>
+          <BreadcrumbLink asChild>
+            <Link to="/calculators">Calculators</Link>
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem>
           <BreadcrumbLink>{calculator.title}</BreadcrumbLink>
