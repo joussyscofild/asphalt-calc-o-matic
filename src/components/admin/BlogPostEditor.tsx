@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     handleSEOUpdate,
     calculateReadTime,
     handleSubmit
-  } = useBlogPostForm(post, onSave);
+  } = useBlogPostForm(onSave, post);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

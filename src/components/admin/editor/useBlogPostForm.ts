@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { BlogPost } from '@/utils/blogPosts';
 import { useToast } from "@/components/ui/use-toast";
 import { FormData } from './types';
 
-export const useBlogPostForm = (post?: BlogPost, onSave: (post: BlogPost) => void) => {
+export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPost) => {
   const { toast } = useToast();
   const isNew = !post?.id;
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -61,14 +60,11 @@ export const useBlogPostForm = (post?: BlogPost, onSave: (post: BlogPost) => voi
   };
 
   const calculateReadTime = () => {
-    // Remove HTML tags to get plain text
     const plainText = formData.content?.replace(/<[^>]*>?/gm, '') || '';
     
-    // Average reading speed: 200 words per minute
     const words = plainText.trim().split(/\s+/).length;
     const minutes = Math.ceil(words / 200);
     
-    // Update read time
     setFormData(prev => ({ 
       ...prev, 
       readTime: `${minutes} min read`
@@ -83,7 +79,6 @@ export const useBlogPostForm = (post?: BlogPost, onSave: (post: BlogPost) => voi
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (!formData.id || !formData.title || !formData.excerpt || !formData.content) {
       toast({
         title: "Validation Error",
@@ -93,10 +88,8 @@ export const useBlogPostForm = (post?: BlogPost, onSave: (post: BlogPost) => voi
       return;
     }
 
-    // Generate ID from title if not provided
     const postId = formData.id || formData.title.toLowerCase().replace(/\s+/g, '-');
     
-    // Generate a complete post object
     const completedPost: BlogPost = {
       id: postId,
       title: formData.title || '',
