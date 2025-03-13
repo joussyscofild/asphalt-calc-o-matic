@@ -10,6 +10,7 @@ import CalculatorForm from '@/components/calculator/CalculatorForm';
 import CalculatorSidebar from '@/components/calculator/CalculatorSidebar';
 import CalculatorLoader from '@/components/calculator/CalculatorLoader';
 import CalculatorNotFound from '@/components/calculator/CalculatorNotFound';
+import { supabase } from '@/integrations/supabase/client';
 
 const Calculator = () => {
   const { id = '' } = useParams<{ id: string }>();

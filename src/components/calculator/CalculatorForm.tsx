@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { CalculatorField } from '@/utils/calculatorTypes';
 import { Info } from 'lucide-react';
 import { calculateResult, formatCalculatorResult } from '@/utils/calculatorFunctions';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface CalculatorFormProps {
   calculatorId: string;
@@ -18,6 +20,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
   const [formData, setFormData] = useState<Record<string, any>>(initialFormData);
   const [result, setResult] = useState<null | string | number>(null);
   const [showingHelp, setShowingHelp] = useState<string | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value, type } = e.target;
@@ -33,10 +37,40 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const calculatedResult = calculateResult(calculatorId, formData);
-    setResult(calculatedResult);
+    setIsCalculating(true);
+    
+    try {
+      // Calculate the result
+      const calculatedResult = calculateResult(calculatorId, formData);
+      setResult(calculatedResult);
+      
+      // Log this calculation to Supabase for analytics (if needed)
+      try {
+        await supabase
+          .from('calculator_usage')
+          .insert({
+            calculator_id: calculatorId,
+            input_data: formData,
+            result: calculatedResult,
+            timestamp: new Date().toISOString()
+          })
+          .select();
+      } catch (error) {
+        // Just log the error but don't interrupt the user experience
+        console.error('Error logging calculator usage:', error);
+      }
+    } catch (error) {
+      console.error('Error calculating result:', error);
+      toast({
+        title: 'Calculation Error',
+        description: 'There was an error performing the calculation. Please check your inputs.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   // Convert result to string to ensure it's compatible with formatCalculatorResult
@@ -111,8 +145,12 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
           </div>
         ))}
 
-        <button type="submit" className="btn-primary w-full">
-          Calculate
+        <button 
+          type="submit" 
+          className="btn-primary w-full"
+          disabled={isCalculating}
+        >
+          {isCalculating ? 'Calculating...' : 'Calculate'}
         </button>
       </form>
 

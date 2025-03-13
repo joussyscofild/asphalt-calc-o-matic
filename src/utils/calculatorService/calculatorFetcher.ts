@@ -7,6 +7,8 @@ import * as LucideIcons from 'lucide-react';
 // Fetch all calculators
 export const fetchCalculators = async (): Promise<Calculator[]> => {
   try {
+    console.log("Fetching calculators from Supabase...");
+    
     const { data: calculatorsData, error: calculatorsError } = await supabase
       .from('calculators')
       .select('*')
@@ -18,8 +20,11 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
     }
 
     if (!calculatorsData || calculatorsData.length === 0) {
+      console.log("No calculators found in database");
       return [];
     }
+
+    console.log(`Found ${calculatorsData.length} calculators`);
 
     // Convert the calculators data to our Calculator type
     const calculators: Calculator[] = await Promise.all(
