@@ -23,7 +23,7 @@ export interface CalculatorField {
   label: string;
   type: 'number' | 'select' | 'radio' | 'checkbox';
   placeholder?: string;
-  defaultValue?: string | number | Json;
+  defaultValue?: string | number | boolean | Json;
   required?: boolean;
   options?: { value: string; label: string }[] | Json;
   unit?: string;

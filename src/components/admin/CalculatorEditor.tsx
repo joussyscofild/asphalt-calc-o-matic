@@ -15,6 +15,7 @@ import SEOHelper from './SEOHelper';
 import RichTextEditor from './RichTextEditor';
 import { useToast } from "@/components/ui/use-toast";
 import { categories } from '../../utils/calculators';
+import { Json } from '@/integrations/supabase/types';
 
 interface CalculatorEditorProps {
   calculator?: Calculator;
@@ -621,7 +622,7 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
                               <Label>Default Value</Label>
                               <Input 
                                 type="number"
-                                value={field.defaultValue || ''} 
+                                value={typeof field.defaultValue === 'number' ? field.defaultValue : ''}
                                 onChange={(e) => updateField(index, { 
                                   defaultValue: e.target.value ? Number(e.target.value) : undefined 
                                 })}
@@ -721,7 +722,7 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
                         <div className="flex items-center space-x-2 mt-4">
                           <Switch 
                             id={`${field.id}-required`}
-                            checked={field.required}
+                            checked={!!field.required}
                             onCheckedChange={(checked) => updateField(index, { required: checked })}
                           />
                           <Label htmlFor={`${field.id}-required`}>Required Field</Label>
