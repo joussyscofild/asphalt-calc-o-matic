@@ -11,7 +11,8 @@ import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import BlogPostEditPage from './pages/BlogPostEditPage';
-import Page from './pages/Page'; // Import the new Page component
+import Page from './pages/Page';
+import Sitemap from './pages/Sitemap';
 
 export const router = createBrowserRouter([
   {
@@ -55,8 +56,12 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute><BlogPostEditPage /></ProtectedRoute>,
   },
   {
-    path: '/page/:slug', // Add custom page route
+    path: '/page/:slug',
     element: <Page />,
+  },
+  {
+    path: '/sitemap.xml',
+    element: <Sitemap />,
   },
   {
     path: '*',
