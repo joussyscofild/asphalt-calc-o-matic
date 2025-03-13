@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Calculator, CalculatorField } from '@/utils/calculatorTypes';
 import { FormData } from './types';
 import { useToast } from '@/components/ui/use-toast';
-import { CalcIcon, Calculator as CalcIcon2 } from 'lucide-react';
+import { Calculator as CalculatorIcon } from 'lucide-react';
 import { Json } from '@/integrations/supabase/types';
 
 export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator: Calculator) => void) => {
@@ -21,7 +20,7 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
     featured: calculator?.featured || false,
     formula: calculator?.formula || '',
     fields: calculator?.fields || [],
-    icon: calculator?.icon || CalcIcon,
+    icon: calculator?.icon || CalculatorIcon,
     relatedCalculators: calculator?.relatedCalculators || [],
     relatedArticles: calculator?.relatedArticles || [],
   });
@@ -315,7 +314,7 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
       title: formData.title || '',
       description: formData.description || '',
       longDescription: formData.longDescription,
-      icon: formData.icon || CalcIcon2,
+      icon: formData.icon || CalculatorIcon,
       category: formData.category || 'Asphalt',
       timeEstimate: formData.timeEstimate || '1 min',
       featured: formData.featured || false,
