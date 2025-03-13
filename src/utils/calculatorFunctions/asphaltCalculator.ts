@@ -10,6 +10,8 @@ type AsphaltCalculatorInputs = {
 };
 
 export const calculateAsphalt = (formData: Record<string, any>): CalculatorResults => {
+  console.log("Running asphalt calculator with data:", formData);
+  
   // Extract and convert the form values
   const inputs: AsphaltCalculatorInputs = {
     length: Number(formData.length) || 0,
@@ -37,6 +39,13 @@ export const calculateAsphalt = (formData: Record<string, any>): CalculatorResul
   } else if (inputs.thickness > 3) {
     mixType = "Heavy-Duty Hot Mix Asphalt";
   }
+
+  console.log("Asphalt calculator results:", {
+    cubicFeet,
+    tons,
+    cost,
+    mixType
+  });
 
   return {
     results: [

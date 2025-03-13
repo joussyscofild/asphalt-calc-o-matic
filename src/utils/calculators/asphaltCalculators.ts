@@ -1,6 +1,6 @@
-import { Navigation, Ruler } from 'lucide-react';
+
+import { Navigation, Ruler, HardHat } from 'lucide-react';
 import { Calculator } from '@/utils/calculatorTypes';
-import { HardHat } from 'lucide-react';
 
 export const asphaltCalculators: Calculator[] = [
   {
@@ -140,7 +140,6 @@ export const asphaltCalculators: Calculator[] = [
     longDescription: 'This calculator helps you determine the amount of asphalt needed for your paving project in tons, cubic feet, or cubic yards. It also estimates the cost based on the current price per ton of asphalt in your area. Perfect for contractors, project managers, and DIY enthusiasts planning paving projects.',
     icon: HardHat,
     category: 'Asphalt',
-    subCategory: 'Tonnage',
     timeEstimate: '1 min',
     featured: true,
     formula: 'Volume (cu ft) = Length (ft) × Width (ft) × Thickness (in) ÷ 12\nWeight (tons) = Volume (cu ft) × Density (lb/cu ft) ÷ 2000\nCost = Weight (tons) × Cost per ton',

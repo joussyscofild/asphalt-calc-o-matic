@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calculator, CalculatorField } from '../calculatorTypes';
 import { LucideIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { calculators as localCalculators } from '../calculators'; // Import local calculator definitions for fallback
 
 // Fetch all calculators
 export const fetchCalculators = async (): Promise<Calculator[]> => {
@@ -20,11 +21,11 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
     }
 
     if (!calculatorsData || calculatorsData.length === 0) {
-      console.log("No calculators found in database");
-      return [];
+      console.log("No calculators found in database, using local calculator definitions instead");
+      return localCalculators;
     }
 
-    console.log(`Found ${calculatorsData.length} calculators`);
+    console.log(`Found ${calculatorsData.length} calculators in database`);
 
     // Convert the calculators data to our Calculator type
     const calculators: Calculator[] = await Promise.all(
@@ -93,14 +94,31 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           formula: calc.formula,
           fields: fields,
           relatedCalculators: relatedCalculators,
-          relatedArticles: relatedArticles
+          relatedArticles: relatedArticles,
+          tags: calc.tags
         };
       })
     );
 
+    console.log(`Successfully processed ${calculators.length} calculators from database`);
+    
+    // Check for the specific calculator we're looking for
+    const hasAsphaltCalc = calculators.some(calc => calc.id === 'asphalt-calculator');
+    console.log(`Has asphalt-calculator: ${hasAsphaltCalc}`);
+    
+    if (!hasAsphaltCalc) {
+      // If the asphalt calculator is not in the database, find it from local calculators and add it
+      const localAsphaltCalc = localCalculators.find(calc => calc.id === 'asphalt-calculator');
+      if (localAsphaltCalc) {
+        console.log("Adding asphalt-calculator from local definitions");
+        calculators.push(localAsphaltCalc);
+      }
+    }
+
     return calculators;
   } catch (error) {
     console.error("Error in fetchCalculators:", error);
-    throw error;
+    console.log("Falling back to local calculator definitions");
+    return localCalculators;
   }
 };

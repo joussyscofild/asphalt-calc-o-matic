@@ -29,16 +29,19 @@ export const calculateDefault = (formData: Record<string, any>): CalculatorResul
 // Map calculator IDs to their respective calculation functions
 export const calculatorFunctions: Record<string, (formData: Record<string, any>) => CalculatorResults> = {
   // Add custom calculator functions here
-  'asphalt-calculator': calculateAsphalt
+  'asphalt-calculator': calculateAsphalt,
+  'asphalt-tonnage': calculateAsphalt // For backward compatibility
 };
 
 // Function to get the appropriate calculator function by ID
 export const getCalculatorFunction = (calculatorId: string) => {
+  console.log(`Getting calculator function for: ${calculatorId}`);
   return calculatorFunctions[calculatorId] || calculateDefault;
 };
 
 // Function to get default fields for a calculator if not defined in the calculator object
 export const getDefaultFields = (calculatorId: string) => {
+  console.log(`Getting default fields for: ${calculatorId}`);
   // Add default fields for specific calculators here
   if (calculatorId === 'asphalt-calculator') {
     return [

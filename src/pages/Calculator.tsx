@@ -24,10 +24,14 @@ const Calculator = () => {
     const loadCalculator = async () => {
       setIsLoading(true);
       try {
+        console.log(`Looking for calculator with id: ${id}`);
         const calculators = await fetchCalculators();
+        console.log(`Fetched ${calculators.length} calculators`);
+        
         const found = calculators.find(calc => calc.id === id);
         
         if (found) {
+          console.log(`Found calculator: ${found.title}`);
           setCalculator(found);
           
           // Initialize form data with default values
@@ -40,6 +44,8 @@ const Calculator = () => {
             });
             setFormData(initialFormData);
           }
+        } else {
+          console.log(`Calculator with id ${id} not found`);
         }
       } catch (error) {
         console.error('Error loading calculator:', error);
