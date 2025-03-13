@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BlogPostEditor } from "@/components/admin/BlogPostEditor";
+import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import SiteCustomizer from "@/components/admin/SiteCustomizer";
 import PagesManager from "@/components/admin/PagesManager";
 import { Button } from "@/components/ui/button";
