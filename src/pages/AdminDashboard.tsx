@@ -10,7 +10,9 @@ const AdminDashboard = () => {
     handleCancelBlogPost, 
     handleDeleteBlogPost,
     handleLogout,
-    refreshTrigger 
+    refreshTrigger,
+    posts,
+    isLoading
   } = useAdminDashboard();
   
   return (
@@ -21,6 +23,8 @@ const AdminDashboard = () => {
         handleCancelBlogPost={handleCancelBlogPost}
         handleDeleteBlogPost={handleDeleteBlogPost}
         refreshTrigger={refreshTrigger}
+        posts={posts}
+        isLoading={isLoading}
       />
     </div>
   );

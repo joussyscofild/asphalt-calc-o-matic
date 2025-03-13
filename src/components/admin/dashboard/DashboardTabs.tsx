@@ -17,13 +17,17 @@ interface DashboardTabsProps {
   handleCancelBlogPost: () => void;
   handleDeleteBlogPost?: (postId: string) => void;
   refreshTrigger?: number;
+  posts?: BlogPost[];
+  isLoading?: boolean;
 }
 
 const DashboardTabs: React.FC<DashboardTabsProps> = ({
   handleSaveBlogPost,
   handleCancelBlogPost,
   handleDeleteBlogPost,
-  refreshTrigger
+  refreshTrigger,
+  posts = [],
+  isLoading = false
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -111,6 +115,8 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
               onCancel={handleCancelBlogPost}
               onDelete={handleDeleteBlogPost}
               key={`blog-editor-${tabKey}`}
+              posts={posts}
+              isLoading={isLoading}
             />
           </CardContent>
         </Card>
