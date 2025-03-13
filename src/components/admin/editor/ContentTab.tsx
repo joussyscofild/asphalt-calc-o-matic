@@ -28,6 +28,12 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
     }
   }, [content]);
   
+  const handleContentUpdate = (newContent: string) => {
+    console.log(`Content updated in ContentTab, length: ${newContent.length}`);
+    contentRef.current = newContent;
+    handleContentChange(newContent);
+  };
+  
   const handleOpenPreview = () => {
     const previewWindow = window.open('', '_blank');
     if (previewWindow) {
@@ -46,7 +52,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
         </head>
         <body>
           <div class="content prose">
-            ${content || '<p>No content to preview</p>'}
+            ${contentRef.current || '<p>No content to preview</p>'}
           </div>
         </body>
         </html>
@@ -72,7 +78,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
       <CardContent>
         <RichTextEditor 
           initialValue={content} 
-          onChange={handleContentChange}
+          onChange={handleContentUpdate}
           minHeight="600px"
           placeholder="Start writing your blog post content here..."
           key={`editor-${editorKey}`}

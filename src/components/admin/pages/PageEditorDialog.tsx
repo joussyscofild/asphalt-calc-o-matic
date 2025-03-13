@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import RichTextEditor from '../RichTextEditor';
 import { Page } from './types';
+import { Loader2 } from 'lucide-react';
 
 interface PageEditorDialogProps {
   isOpen: boolean;
@@ -36,7 +37,21 @@ const PageEditorDialog: React.FC<PageEditorDialogProps> = ({
   onTitleChange,
   onSlugChange
 }) => {
+  const [isSaving, setIsSaving] = useState(false);
+  
   if (!currentPage) return null;
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await onSave();
+      // Let the saving indicator show for a moment so user sees feedback
+      setTimeout(() => setIsSaving(false), 500);
+    } catch (error) {
+      console.error('Error saving page:', error);
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -83,7 +98,16 @@ const PageEditorDialog: React.FC<PageEditorDialogProps> = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={onSave}>Save Changes</Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

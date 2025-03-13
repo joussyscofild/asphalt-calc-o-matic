@@ -66,6 +66,21 @@ const BlogPostEditPage: React.FC = () => {
     loadPost();
   }, [id, navigate, toast]);
   
+  const handleSave = async (updatedPost: BlogPost) => {
+    try {
+      console.log("Saving post with content length:", updatedPost.content.length);
+      await handleSaveBlogPost(updatedPost);
+      navigate('/admin/dashboard#blog');
+    } catch (error) {
+      console.error("Error saving post:", error);
+      toast({
+        title: "Error Saving Post",
+        description: "There was a problem saving your post. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  
   if (isLoading) {
     return (
       <div className="container-custom py-8">
@@ -91,7 +106,7 @@ const BlogPostEditPage: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <BlogPostEditor
           post={post}
-          onSave={handleSaveBlogPost}
+          onSave={handleSave}
           onCancel={handleCancelBlogPost}
           onDelete={handleDeleteBlogPost}
         />

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { BlogPost, blogPosts, getAllPublishedPosts, addBlogPostToSupabase, deleteBlogPostFromSupabase, fetchBlogPosts } from '@/utils/blogPosts';
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAdminDashboard = () => {
   const navigate = useNavigate();
@@ -41,7 +42,32 @@ export const useAdminDashboard = () => {
     
     try {
       // Save post to Supabase
-      await addBlogPostToSupabase(post);
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .upsert({
+          id: post.id.includes('-') ? post.id : undefined, // Only use ID if it looks like a UUID
+          title: post.title,
+          excerpt: post.excerpt,
+          content: post.content,
+          image_url: post.imageUrl,
+          author: post.author,
+          author_avatar: post.authorAvatar,
+          date: post.date,
+          read_time: post.readTime,
+          category: post.category,
+          tags: post.tags,
+          featured: post.featured,
+          status: post.status,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id',
+          defaultToNull: false
+        });
+      
+      if (error) {
+        console.error("Error saving blog post to Supabase:", error);
+        throw error;
+      }
       
       // Update local blogPosts array
       const existingPostIndex = blogPosts.findIndex(p => p.id === post.id);
@@ -67,11 +93,6 @@ export const useAdminDashboard = () => {
       
       // Force a refresh to show updated posts
       setRefreshTrigger(prev => prev + 1);
-      
-      // Navigate back to dashboard after a brief delay to allow state updates
-      setTimeout(() => {
-        navigate('/admin/dashboard#blog');
-      }, 500);
     } catch (error) {
       console.error("Error saving blog post:", error);
       toast({
@@ -79,6 +100,7 @@ export const useAdminDashboard = () => {
         description: "There was an error saving your blog post. Please try again.",
         variant: "destructive"
       });
+      throw error;
     }
   };
   
