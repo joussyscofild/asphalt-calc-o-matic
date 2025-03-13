@@ -1,24 +1,48 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ImagePlus, Palette, Type, Layout, Save } from 'lucide-react';
+import { ImagePlus, Palette, Type, Layout, Save, Image } from 'lucide-react';
 import { useSiteCustomizer } from './site-customizer/useSiteCustomizer';
 import BrandingTab from './site-customizer/BrandingTab';
 import ColorsTab from './site-customizer/ColorsTab';
 import TypographyTab from './site-customizer/TypographyTab';
 import LayoutTab from './site-customizer/LayoutTab';
+import FaviconTab from './site-customizer/FaviconTab';
+import { Loader2 } from 'lucide-react';
 
 const SiteCustomizer: React.FC = () => {
   const {
     settings,
     setSettings,
     previewLogo,
+    previewFavicon,
+    loading,
     handleChange,
     handleLogoChange,
+    handleFaviconChange,
     handleSave
   } = useSiteCustomizer();
+
+  // Update favicon when component mounts
+  useEffect(() => {
+    if (settings.favicon) {
+      const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+      if (link) {
+        link.href = settings.favicon;
+      }
+    }
+  }, [settings.favicon]);
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+        <div>Loading site settings...</div>
+      </div>
+    );
+  }
   
   return (
     <div>
@@ -39,6 +63,10 @@ const SiteCustomizer: React.FC = () => {
           <TabsTrigger value="layout">
             <Layout className="mr-2 h-4 w-4" />
             Layout
+          </TabsTrigger>
+          <TabsTrigger value="favicon">
+            <Image className="mr-2 h-4 w-4" />
+            Favicon
           </TabsTrigger>
         </TabsList>
         
@@ -66,6 +94,14 @@ const SiteCustomizer: React.FC = () => {
           <LayoutTab 
             settings={settings}
             setSettings={setSettings}
+          />
+        </TabsContent>
+        
+        <TabsContent value="favicon">
+          <FaviconTab 
+            settings={settings}
+            previewFavicon={previewFavicon}
+            handleFaviconChange={handleFaviconChange}
           />
         </TabsContent>
       </Tabs>

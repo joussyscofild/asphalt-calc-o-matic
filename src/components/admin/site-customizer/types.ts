@@ -12,6 +12,7 @@ export interface SiteSettings {
   bodyFont?: string;
   baseFontSize?: number;
   lineHeight?: number;
+  favicon?: string;
 }
 
 export const defaultSettings: SiteSettings = {
@@ -26,5 +27,6 @@ export const defaultSettings: SiteSettings = {
   headingFont: 'inter',
   bodyFont: 'roboto',
   baseFontSize: 16,
-  lineHeight: 1.5
+  lineHeight: 1.5,
+  favicon: '/favicon.ico'
 };
