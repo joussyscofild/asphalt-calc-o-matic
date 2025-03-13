@@ -54,7 +54,11 @@ const Sitemap = () => {
         setXml(sitemapXml);
         
         // Set content type to XML
-        document.querySelector('html')?.setAttribute('content-type', 'text/xml');
+        document.querySelector('html')?.setAttribute('content-type', 'application/xml');
+        // Create a style to hide other page elements
+        const style = document.createElement('style');
+        style.textContent = 'body > *:not(pre) { display: none !important; }';
+        document.head.appendChild(style);
       } catch (error) {
         console.error('Error generating sitemap:', error);
       } finally {
@@ -63,6 +67,12 @@ const Sitemap = () => {
     };
     
     generateSitemap();
+    
+    // Cleanup function to remove style when component unmounts
+    return () => {
+      const style = document.querySelector('style');
+      if (style) style.remove();
+    };
   }, []);
   
   // Helper function to fetch custom pages
@@ -85,10 +95,21 @@ const Sitemap = () => {
     return `  <url>\n    <loc>${url}</loc>\n    <changefreq>weekly</changefreq>\n  </url>\n`;
   };
   
-  // Return XML content
+  // Use useEffect to set the document content type
+  useEffect(() => {
+    if (!isLoading) {
+      // Set response headers for XML
+      const contentTypeMetaTag = document.createElement('meta');
+      contentTypeMetaTag.httpEquiv = 'Content-Type';
+      contentTypeMetaTag.content = 'application/xml; charset=UTF-8';
+      document.head.appendChild(contentTypeMetaTag);
+    }
+  }, [isLoading]);
+  
+  // Return XML content as plain text
   return (
-    <pre style={{ display: 'none' }}>
-      {isLoading ? 'Generating sitemap...' : xml}
+    <pre style={{ display: 'block', whiteSpace: 'pre', margin: 0, padding: 0 }}>
+      {isLoading ? '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>Generating sitemap...</loc>\n  </url>\n</urlset>' : xml}
     </pre>
   );
 };
