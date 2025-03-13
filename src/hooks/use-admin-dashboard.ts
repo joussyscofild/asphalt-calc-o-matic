@@ -30,6 +30,22 @@ export const useAdminDashboard = () => {
     loadPosts();
   }, [refreshTrigger]);
   
+  // Helper function to generate a UUID
+  const generateUUID = () => {
+    return crypto.randomUUID ? crypto.randomUUID() : 
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+  };
+  
+  // Check if a string is a valid UUID
+  const isValidUUID = (id: string) => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(id);
+  };
+  
   // Handler for saving blog posts
   const handleSaveBlogPost = async (post: BlogPost) => {
     // Ensure post has a valid status
@@ -41,11 +57,14 @@ export const useAdminDashboard = () => {
     console.log("Post status:", post.status);
     
     try {
+      // Ensure we have a valid UUID for the post ID
+      const postId = isValidUUID(post.id) ? post.id : generateUUID();
+      
       // Save post to Supabase
       const { data, error } = await supabase
         .from('blog_posts')
         .upsert({
-          id: post.id,
+          id: postId,
           title: post.title,
           excerpt: post.excerpt,
           content: post.content,
@@ -71,6 +90,11 @@ export const useAdminDashboard = () => {
           variant: "destructive"
         });
         throw error;
+      }
+      
+      // Update post ID if it was generated
+      if (post.id !== postId) {
+        post.id = postId;
       }
       
       // Update local blogPosts array

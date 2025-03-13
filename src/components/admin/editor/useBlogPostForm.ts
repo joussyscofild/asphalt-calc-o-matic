@@ -9,6 +9,16 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
   const isNew = !post?.id;
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+  // Generate a UUID
+  const generateUUID = () => {
+    return crypto.randomUUID ? crypto.randomUUID() : 
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+  };
+
   const initialFormState: FormData = {
     id: '',
     title: '',
@@ -141,8 +151,8 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
       return;
     }
 
-    // Generate ID from title if not provided
-    const postId = formData.id || formData.title.toLowerCase().replace(/\s+/g, '-');
+    // Generate a valid UUID if not provided or not valid
+    const postId = formData.id || generateUUID();
     
     const completedPost: BlogPost = {
       id: postId,
