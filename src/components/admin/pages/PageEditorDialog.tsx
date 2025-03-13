@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -38,8 +38,20 @@ const PageEditorDialog: React.FC<PageEditorDialogProps> = ({
   onSlugChange
 }) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [localContent, setLocalContent] = useState('');
+  
+  useEffect(() => {
+    if (currentPage?.content) {
+      setLocalContent(currentPage.content);
+    }
+  }, [currentPage]);
   
   if (!currentPage) return null;
+
+  const handleContentChange = (content: string) => {
+    setLocalContent(content);
+    setPageContent(content);
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -88,8 +100,8 @@ const PageEditorDialog: React.FC<PageEditorDialogProps> = ({
           <Label htmlFor="content" className="mb-2 block">Content</Label>
           <div className="border rounded-md h-full">
             <RichTextEditor 
-              initialValue={currentPage.content}
-              onChange={setPageContent}
+              initialValue={localContent}
+              onChange={handleContentChange}
             />
           </div>
         </div>

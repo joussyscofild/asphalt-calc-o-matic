@@ -60,8 +60,7 @@ export const useAdminDashboard = () => {
           status: post.status,
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'id',
-          defaultToNull: false
+          onConflict: 'id'
         });
       
       if (error) {

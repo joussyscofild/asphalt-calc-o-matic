@@ -12,9 +12,10 @@ interface ContentTabProps {
 
 const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange }) => {
   const [editorKey, setEditorKey] = useState(Date.now());
+  const [localContent, setLocalContent] = useState(content);
   const contentRef = useRef(content);
   
-  // Force re-initialize editor when content from parent changes significantly
+  // Update local content when parent content changes
   useEffect(() => {
     console.log("ContentTab received content:", content ? 
       `${content.substring(0, 50)}... (${content.length} chars)` : 
@@ -24,12 +25,14 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
     if (content !== contentRef.current) {
       console.log("Content changed significantly, reinitializing editor");
       contentRef.current = content;
+      setLocalContent(content);
       setEditorKey(Date.now());
     }
   }, [content]);
   
   const handleContentUpdate = (newContent: string) => {
     console.log(`Content updated in ContentTab, length: ${newContent.length}`);
+    setLocalContent(newContent);
     contentRef.current = newContent;
     handleContentChange(newContent);
   };
@@ -52,7 +55,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
         </head>
         <body>
           <div class="content prose">
-            ${contentRef.current || '<p>No content to preview</p>'}
+            ${localContent || '<p>No content to preview</p>'}
           </div>
         </body>
         </html>
@@ -77,7 +80,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
       </CardHeader>
       <CardContent>
         <RichTextEditor 
-          initialValue={content} 
+          initialValue={localContent} 
           onChange={handleContentUpdate}
           minHeight="600px"
           placeholder="Start writing your blog post content here..."
