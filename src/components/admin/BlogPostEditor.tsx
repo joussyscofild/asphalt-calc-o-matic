@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Edit, FileText, Image, Wand2, Plus } from 'lucide-react';
+import { Edit, FileText, Image, Wand2, Plus, Save, Send, Eye } from 'lucide-react';
 import SEOHelper from './SEOHelper';
 import { BlogPostEditorProps } from './editor/types';
 import { useBlogPostForm } from './editor/useBlogPostForm';
@@ -10,7 +10,7 @@ import GeneralTab from './editor/GeneralTab';
 import ContentTab from './editor/ContentTab';
 import MediaTab from './editor/MediaTab';
 import { BlogPost, blogPosts } from '@/utils/blogPosts';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const BlogPostEditor: React.FC<BlogPostEditorProps> = ({ 
   post,
@@ -21,6 +21,23 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const [selectedPost, setSelectedPost] = useState<BlogPost | undefined>(post);
   const [isCreating, setIsCreating] = useState<boolean>(!post);
   const [editorKey, setEditorKey] = useState<number>(0);
+  
+  const handleSaveComplete = (post: BlogPost, isPublished: boolean) => {
+    // Add the status to the post object
+    const updatedPost = {
+      ...post,
+      status: isPublished ? 'published' : 'draft'
+    };
+    
+    // Call the parent component's onSave function
+    onSave(updatedPost);
+    
+    // If we were creating a new post, reset the form for another new post
+    if (!selectedPost) {
+      resetFormData();
+      setEditorKey(prev => prev + 1);
+    }
+  };
   
   const {
     formData,
@@ -34,9 +51,10 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     handleTagsChange,
     handleSEOUpdate,
     calculateReadTime,
-    handleSubmit,
+    handleSaveDraft,
+    handlePublish,
     resetFormData
-  } = useBlogPostForm(onSave, selectedPost);
+  } = useBlogPostForm(handleSaveComplete, selectedPost);
 
   // When editing a post, update the editorKey to force a re-render
   useEffect(() => {
@@ -77,6 +95,40 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     setSelectedPost(undefined);
   };
 
+  const handlePreview = () => {
+    // Open a new window with the blog post preview
+    const previewWindow = window.open('', '_blank');
+    if (previewWindow) {
+      previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Preview: ${formData.title}</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-gray-100 p-8">
+          <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
+            <h1 class="text-3xl font-bold mb-4">${formData.title}</h1>
+            <p class="text-gray-600 mb-6">
+              By ${formData.author} • ${formData.date} • ${formData.readTime}
+            </p>
+            <div class="prose max-w-none">
+              ${formData.content}
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+      previewWindow.document.close();
+    }
+    
+    toast({
+      title: "Preview Opened",
+      description: "A preview of your blog post has been opened in a new tab",
+    });
+  };
+
   if (!isCreating) {
     return (
       <div className="space-y-6">
@@ -95,11 +147,16 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
               className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-center"
             >
               <div className="flex items-center gap-3">
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <FileText className="h-5 w-5 text-primary" />
+                <div className={`p-2 rounded-full ${blogPost.status === 'draft' ? 'bg-orange-100' : 'bg-primary/10'}`}>
+                  <FileText className={`h-5 w-5 ${blogPost.status === 'draft' ? 'text-orange-500' : 'text-primary'}`} />
                 </div>
                 <div>
-                  <h3 className="font-medium">{blogPost.title}</h3>
+                  <h3 className="font-medium">
+                    {blogPost.title}
+                    {blogPost.status === 'draft' && (
+                      <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded">Draft</span>
+                    )}
+                  </h3>
                   <p className="text-sm text-muted-foreground">{blogPost.date} • {blogPost.category}</p>
                 </div>
               </div>
@@ -114,17 +171,44 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">
           {isNew ? "Create New Blog Post" : `Edit: ${selectedPost?.title}`}
         </h2>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={handleCancelEdit}>
+          <Button 
+            type="button"
+            variant="outline" 
+            className="flex items-center gap-1"
+            onClick={handlePreview}
+          >
+            <Eye size={14} />
+            Preview
+          </Button>
+          <Button 
+            type="button"
+            variant="outline" 
+            onClick={handleCancelEdit}
+          >
             Cancel
           </Button>
-          <Button type="submit">
-            {isNew ? "Create Post" : "Save Changes"}
+          <Button 
+            type="button"
+            variant="outline"
+            className="flex items-center gap-1"
+            onClick={handleSaveDraft}
+          >
+            <Save size={14} />
+            Save Draft
+          </Button>
+          <Button 
+            type="button"
+            className="flex items-center gap-1"
+            onClick={handlePublish}
+          >
+            <Send size={14} />
+            {isNew ? "Publish" : "Update"}
           </Button>
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 export interface BlogPost {
   id: string;
   title: string;
@@ -12,6 +11,7 @@ export interface BlogPost {
   imageUrl?: string;
   featured?: boolean;
   readTime?: string;
+  status?: 'published' | 'draft';
 }
 
 export const blogCategories = [
@@ -372,13 +372,15 @@ export const blogPosts: BlogPost[] = [
 ];
 
 export const getRecentBlogPosts = (count: number = 3): BlogPost[] => {
-  return [...blogPosts].sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  }).slice(0, count);
+  return [...blogPosts]
+    .filter(post => post.status !== 'draft')
+    .sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }).slice(0, count);
 };
 
 export const getFeaturedBlogPosts = (): BlogPost[] => {
-  return blogPosts.filter(post => post.featured);
+  return blogPosts.filter(post => post.featured && post.status !== 'draft');
 };
 
 export const getBlogPostById = (id: string): BlogPost | undefined => {

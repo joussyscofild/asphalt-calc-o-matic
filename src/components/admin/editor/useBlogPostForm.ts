@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { BlogPost } from '@/utils/blogPosts';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { FormData } from './types';
 
-export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPost) => {
+export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) => void, post?: BlogPost) => {
   const { toast } = useToast();
   const isNew = !post?.id;
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -22,6 +22,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
     category: 'Construction',
     tags: [],
     featured: false,
+    status: 'draft'
   };
 
   const [formData, setFormData] = useState<FormData>(initialFormState);
@@ -43,6 +44,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
         category: post.category || 'Construction',
         tags: post.tags || [],
         featured: post.featured || false,
+        status: post.status || 'published'
       });
     } else {
       // If no post is provided, reset to initial state
@@ -109,9 +111,20 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle saving as draft
+  const handleSaveDraft = (e: React.FormEvent) => {
     e.preventDefault();
-    
+    savePost(false);
+  };
+
+  // Handle publishing
+  const handlePublish = (e: React.FormEvent) => {
+    e.preventDefault();
+    savePost(true);
+  };
+
+  // Common save logic
+  const savePost = (isPublished: boolean) => {
     if (!formData.title || !formData.excerpt) {
       toast({
         title: "Validation Error",
@@ -137,12 +150,15 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
       category: formData.category || 'Construction',
       tags: formData.tags || [],
       featured: formData.featured || false,
+      status: isPublished ? 'published' : 'draft'
     };
     
-    onSave(completedPost);
+    onSave(completedPost, isPublished);
+    
+    const actionText = isPublished ? "Published" : "Saved as draft";
     toast({
-      title: isNew ? "Blog Post Created" : "Blog Post Updated",
-      description: `Blog post "${completedPost.title}" has been ${isNew ? 'created' : 'updated'} successfully.`,
+      title: isNew ? `Blog Post ${actionText}` : `Blog Post Updated`,
+      description: `Blog post "${completedPost.title}" has been ${isNew ? actionText.toLowerCase() : 'updated'} successfully.`,
     });
   };
 
@@ -158,7 +174,8 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
     handleTagsChange,
     handleSEOUpdate,
     calculateReadTime,
-    handleSubmit,
+    handleSaveDraft,
+    handlePublish,
     resetFormData
   };
 };

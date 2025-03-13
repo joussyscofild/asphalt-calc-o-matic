@@ -26,10 +26,12 @@ const EditorContent: React.FC<EditorContentProps> = ({
 }) => {
   // Ensure the editor content is up-to-date with the content prop
   useEffect(() => {
-    if (editorRef.current && content !== editorRef.current.innerHTML) {
-      editorRef.current.innerHTML = content || '';
+    if (editorRef.current) {
+      if (content !== editorRef.current.innerHTML) {
+        editorRef.current.innerHTML = content || '';
+      }
     }
-  }, [content]);
+  }, [content, editorRef]);
 
   return (
     <div className="relative">
@@ -44,6 +46,7 @@ const EditorContent: React.FC<EditorContentProps> = ({
         onKeyUp={saveSelection}
         onFocus={restoreSelection}
         onBlur={saveSelection}
+        dangerouslySetInnerHTML={{ __html: content || '' }}
       />
       {isContentEmpty && (
         <div className="absolute pointer-events-none text-gray-400 p-4" style={{top: 0, left: 0, right: 0}}>

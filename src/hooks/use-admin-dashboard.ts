@@ -10,9 +10,13 @@ export const useAdminDashboard = () => {
   // Handler for saving blog posts
   const handleSaveBlogPost = (post: BlogPost) => {
     // In a real application, you would save the post to your backend
+    const statusMessage = post.status === 'published' 
+      ? "Published" 
+      : "Saved as draft";
+      
     toast({
-      title: "Blog Post Saved",
-      description: `Successfully saved "${post.title}"`,
+      title: `Blog Post ${statusMessage}`,
+      description: `Successfully ${statusMessage.toLowerCase()} "${post.title}"`,
     });
   };
   
