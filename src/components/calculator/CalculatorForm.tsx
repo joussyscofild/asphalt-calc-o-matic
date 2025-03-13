@@ -1,174 +1,326 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useForm } from "react-hook-form";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, Check, Copy, Printer, Share2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { CalculatorField } from '@/utils/calculatorTypes';
-import { Info } from 'lucide-react';
-import { calculateResult, formatCalculatorResult } from '@/utils/calculatorFunctions';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { getCalculatorFunction } from '@/utils/calculatorFunctions';
+import { parseUnits } from '@/utils/unitConversion';
+
+export interface CalculatorResultItem {
+  label: string;
+  value: string;
+  description?: string;
+  highlight?: boolean;
+}
+
+export interface CalculatorRecommendation {
+  text: string;
+  type: 'info' | 'warning' | 'error' | 'tip';
+}
+
+export interface CalculatorResults {
+  results: CalculatorResultItem[];
+  recommendations?: CalculatorRecommendation[];
+}
 
 interface CalculatorFormProps {
   calculatorId: string;
   fields: CalculatorField[];
-  initialFormData: Record<string, any>;
+  initialFormData?: Record<string, any>;
 }
 
-const CalculatorForm: React.FC<CalculatorFormProps> = ({ 
-  calculatorId, 
-  fields, 
-  initialFormData 
+const CalculatorForm: React.FC<CalculatorFormProps> = ({
+  calculatorId,
+  fields,
+  initialFormData = {}
 }) => {
-  const [formData, setFormData] = useState<Record<string, any>>(initialFormData);
-  const [result, setResult] = useState<null | string | number>(null);
-  const [showingHelp, setShowingHelp] = useState<string | null>(null);
+  const [calculationResults, setCalculationResults] = useState<CalculatorResults | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
-  const { toast } = useToast();
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { id, value, type } = e.target;
-    let parsedValue: string | number = value;
-    
-    if (type === 'number' && value) {
-      parsedValue = parseFloat(value);
-    }
-    
-    setFormData({
-      ...formData,
-      [id]: parsedValue
+  
+  const form = useForm({
+    defaultValues: initialFormData
+  });
+  
+  const { handleSubmit, setValue, getValues, reset, watch } = form;
+  
+  // Setup form with initial values
+  useEffect(() => {
+    fields.forEach(field => {
+      if (field.defaultValue !== undefined && initialFormData[field.id] === undefined) {
+        setValue(field.id, field.defaultValue);
+      }
     });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  }, [fields, initialFormData, setValue]);
+  
+  // Watch form values for changes
+  const formValues = watch();
+  
+  const onSubmit = async (data: Record<string, any>) => {
     setIsCalculating(true);
     
     try {
-      // Calculate the result
-      const calculatedResult = calculateResult(calculatorId, formData);
-      setResult(calculatedResult);
+      console.log("Calculating with data:", data);
       
-      // Log this calculation to Supabase for analytics (if needed)
-      try {
-        const { error } = await supabase
-          .from('calculator_usage')
-          .insert({
-            calculator_id: calculatorId,
-            input_data: formData,
-            result: String(calculatedResult),
-            // Remove timestamp as it's already included as created_at by default
-          });
-          
-        if (error) {
-          console.error('Error logging calculator usage:', error);
-        }
-      } catch (error) {
-        // Just log the error but don't interrupt the user experience
-        console.error('Error logging calculator usage:', error);
-      }
+      // Get the appropriate calculation function for this calculator
+      const calculateFunction = getCalculatorFunction(calculatorId);
+      
+      // Calculate results
+      const results = calculateFunction(data);
+      setCalculationResults(results);
+      
+      console.log("Calculation results:", results);
     } catch (error) {
-      console.error('Error calculating result:', error);
-      toast({
-        title: 'Calculation Error',
-        description: 'There was an error performing the calculation. Please check your inputs.',
-        variant: 'destructive',
-      });
+      console.error("Calculation error:", error);
+      toast.error("Error calculating results. Please check your inputs and try again.");
     } finally {
       setIsCalculating(false);
     }
   };
-
-  // Convert result to string to ensure it's compatible with formatCalculatorResult
-  const formattedResult = result !== null ? formatCalculatorResult(String(result), calculatorId) : null;
-
-  return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {fields.map((field) => (
-          <div key={field.id} className="relative">
-            <div className="flex justify-between mb-1">
-              <label htmlFor={field.id} className="block text-sm font-medium text-asphalt">
-                {field.label} {field.required && <span className="text-red-500">*</span>}
-              </label>
-              {field.helperText && (
-                <button 
-                  type="button" 
-                  onClick={() => setShowingHelp(showingHelp === field.id ? null : field.id)}
-                  className="text-concrete hover:text-asphalt"
-                  aria-label="Show help text"
-                >
-                  <Info size={16} />
-                </button>
-              )}
-            </div>
-            
-            {showingHelp === field.id && (
-              <div className="text-sm text-concrete-dark mb-2 p-2 bg-gray-50 rounded">
-                {field.helperText}
-              </div>
+  
+  const handlePrint = () => {
+    window.print();
+    toast.success("Printing calculation results");
+  };
+  
+  const handleShare = () => {
+    // Create URL with current calculator and form values
+    const url = new URL(window.location.href);
+    
+    // Add form values as query parameters
+    Object.entries(getValues()).forEach(([key, value]) => {
+      url.searchParams.set(key, String(value));
+    });
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(url.toString())
+      .then(() => {
+        toast.success("Link copied to clipboard! Share it with others to show this calculation.");
+      })
+      .catch(error => {
+        console.error("Failed to copy link:", error);
+        toast.error("Failed to copy link to clipboard");
+      });
+  };
+  
+  const handleReset = () => {
+    // Reset to default values from fields
+    const defaultValues: Record<string, any> = {};
+    
+    fields.forEach(field => {
+      if (field.defaultValue !== undefined) {
+        defaultValues[field.id] = field.defaultValue;
+      }
+    });
+    
+    reset(defaultValues);
+    setCalculationResults(null);
+    toast.info("Calculator has been reset to default values");
+  };
+  
+  const renderFieldByType = (field: CalculatorField) => {
+    const { id, label, type, placeholder, required, options, unit, min, max, step, helperText } = field;
+    
+    switch (type) {
+      case 'number':
+        return (
+          <FormField
+            key={id}
+            name={id}
+            control={form.control}
+            render={({ field: formField }) => (
+              <FormItem>
+                <FormLabel>{label} {unit ? `(${unit})` : ''}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...formField}
+                    value={formField.value || ''}
+                    onChange={e => {
+                      const value = e.target.value === '' ? '' : parseFloat(e.target.value);
+                      formField.onChange(value);
+                    }}
+                    type="number"
+                    placeholder={placeholder}
+                    min={min}
+                    max={max}
+                    step={step}
+                    required={required}
+                  />
+                </FormControl>
+                {helperText && <FormDescription>{helperText}</FormDescription>}
+              </FormItem>
             )}
-
-            <div className="relative">
-              {field.type === 'select' ? (
-                <select
-                  id={field.id}
-                  value={formData[field.id] || ''}
-                  required={field.required}
-                  onChange={handleInputChange}
-                  className="input-field w-full"
+          />
+        );
+        
+      case 'select':
+        return (
+          <FormField
+            key={id}
+            name={id}
+            control={form.control}
+            render={({ field: formField }) => (
+              <FormItem>
+                <FormLabel>{label}</FormLabel>
+                <Select
+                  onValueChange={formField.onChange}
+                  defaultValue={String(formField.value)}
                 >
-                  <option value="">Select {field.label}</option>
-                  {Array.isArray(field.options) && field.options.map(option => (
-                    <option 
-                      key={option.value} 
-                      value={option.value}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type={field.type}
-                  id={field.id}
-                  placeholder={field.placeholder}
-                  value={formData[field.id] !== undefined ? formData[field.id] : ''}
-                  required={field.required}
-                  min={field.min}
-                  max={field.max}
-                  step={field.step}
-                  onChange={handleInputChange}
-                  className="input-field w-full pr-16"
-                />
-              )}
-              {field.unit && field.type !== 'select' && (
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-concrete pointer-events-none">
-                  {field.unit}
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={placeholder || `Select ${label}`} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {options && Array.isArray(options) && options.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {helperText && <FormDescription>{helperText}</FormDescription>}
+              </FormItem>
+            )}
+          />
+        );
+        
+      case 'radio':
+        return (
+          <FormField
+            key={id}
+            name={id}
+            control={form.control}
+            render={({ field: formField }) => (
+              <FormItem>
+                <FormLabel>{label}</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={formField.onChange}
+                    defaultValue={String(formField.value)}
+                    className="flex flex-col space-y-1"
+                  >
+                    {options && Array.isArray(options) && options.map(option => (
+                      <div key={option.value} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option.value} id={`${id}-${option.value}`} />
+                        <FormLabel htmlFor={`${id}-${option.value}`} className="font-normal">
+                          {option.label}
+                        </FormLabel>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                {helperText && <FormDescription>{helperText}</FormDescription>}
+              </FormItem>
+            )}
+          />
+        );
+        
+      case 'checkbox':
+        return (
+          <FormField
+            key={id}
+            name={id}
+            control={form.control}
+            render={({ field: formField }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border">
+                <FormControl>
+                  <Checkbox
+                    checked={formField.value || false}
+                    onCheckedChange={formField.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>{label}</FormLabel>
+                  {helperText && <FormDescription>{helperText}</FormDescription>}
+                </div>
+              </FormItem>
+            )}
+          />
+        );
+        
+      default:
+        return <div key={id}>Unsupported field type: {type}</div>;
+    }
+  };
+  
+  return (
+    <div>
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {fields.map(field => renderFieldByType(field))}
+          </div>
+          
+          <div className="flex justify-center pt-4">
+            <Button type="submit" className="px-8" disabled={isCalculating}>
+              {isCalculating ? 'Calculating...' : 'Calculate'}
+              {!isCalculating && <ArrowRight className="ml-2 h-4 w-4" />}
+            </Button>
+          </div>
+        </form>
+      </Form>
+      
+      {calculationResults && (
+        <div className="mt-8 space-y-6 animate-fade-in">
+          <Card className="bg-asphalt/5 border border-asphalt/10">
+            <CardContent className="pt-6">
+              <h3 className="text-xl font-bold mb-4">Calculation Results</h3>
+              
+              <div className="space-y-4">
+                {calculationResults.results.map((result, index) => (
+                  <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                    <div>
+                      <div className="text-asphalt-dark font-medium">{result.label}</div>
+                      {result.description && (
+                        <div className="text-sm text-concrete-dark">{result.description}</div>
+                      )}
+                    </div>
+                    <div className={`text-xl font-bold ${result.highlight ? 'text-safety-dark' : 'text-asphalt'}`}>
+                      {result.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {calculationResults.recommendations && calculationResults.recommendations.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <h4 className="font-medium mb-2">Recommendations</h4>
+                  <ul className="space-y-2">
+                    {calculationResults.recommendations.map((recommendation, index) => (
+                      <li key={index} className="flex items-start">
+                        <Check className="h-5 w-5 text-safety mr-2 flex-shrink-0 mt-0.5" />
+                        <span className="text-concrete-dark">{recommendation.text}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
-            </div>
+            </CardContent>
+          </Card>
+          
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button variant="outline" size="sm" onClick={handleReset}>
+              Reset Calculator
+            </Button>
+            <Button variant="outline" size="sm" onClick={handlePrint}>
+              <Printer className="mr-1 h-4 w-4" /> Print Results
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleShare}>
+              <Share2 className="mr-1 h-4 w-4" /> Share Calculation
+            </Button>
           </div>
-        ))}
-
-        <button 
-          type="submit" 
-          className="btn-primary w-full"
-          disabled={isCalculating}
-        >
-          {isCalculating ? 'Calculating...' : 'Calculate'}
-        </button>
-      </form>
-
-      {result !== null && (
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-100">
-          <h3 className="text-lg font-semibold text-asphalt mb-2">Result:</h3>
-          <div className="text-3xl font-bold text-safety-dark">
-            {formattedResult}
-          </div>
-          <p className="text-sm text-concrete-dark mt-2">
-            Based on your inputs. Results are estimates and may vary based on actual conditions.
-          </p>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

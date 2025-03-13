@@ -1,6 +1,6 @@
-
 import { Navigation, Ruler } from 'lucide-react';
-import { Calculator } from '../calculatorTypes';
+import { Calculator } from '@/utils/calculatorTypes';
+import { HardHat } from 'lucide-react';
 
 export const asphaltCalculators: Calculator[] = [
   {
@@ -132,5 +132,81 @@ export const asphaltCalculators: Calculator[] = [
         helperText: 'The climate conditions of the project location'
       }
     ]
+  },
+  {
+    id: 'asphalt-calculator',
+    title: 'Asphalt Tonnage Calculator',
+    description: 'Calculate the amount of asphalt needed for your paving project in tons, and estimate costs.',
+    longDescription: 'This calculator helps you determine the amount of asphalt needed for your paving project in tons, cubic feet, or cubic yards. It also estimates the cost based on the current price per ton of asphalt in your area. Perfect for contractors, project managers, and DIY enthusiasts planning paving projects.',
+    icon: HardHat,
+    category: 'Asphalt',
+    subCategory: 'Tonnage',
+    timeEstimate: '1 min',
+    featured: true,
+    formula: 'Volume (cu ft) = Length (ft) × Width (ft) × Thickness (in) ÷ 12\nWeight (tons) = Volume (cu ft) × Density (lb/cu ft) ÷ 2000\nCost = Weight (tons) × Cost per ton',
+    fields: [
+      {
+        id: 'length',
+        label: 'Length',
+        type: 'number',
+        placeholder: '10',
+        defaultValue: 10,
+        required: true,
+        unit: 'feet',
+        min: 1,
+        helperText: 'The length of the area to be paved'
+      },
+      {
+        id: 'width',
+        label: 'Width',
+        type: 'number',
+        placeholder: '10',
+        defaultValue: 10,
+        required: true,
+        unit: 'feet',
+        min: 1,
+        helperText: 'The width of the area to be paved'
+      },
+      {
+        id: 'thickness',
+        label: 'Thickness',
+        type: 'number',
+        placeholder: '2',
+        defaultValue: 2,
+        required: true,
+        unit: 'inches',
+        min: 0.5,
+        max: 8,
+        step: 0.25,
+        helperText: 'The thickness of the asphalt layer'
+      },
+      {
+        id: 'density',
+        label: 'Asphalt Density',
+        type: 'number',
+        placeholder: '145',
+        defaultValue: 145,
+        required: true,
+        unit: 'lbs/cubic foot',
+        min: 100,
+        max: 170,
+        helperText: 'The density of the asphalt mix (typically 140-150 lbs/cubic foot)'
+      },
+      {
+        id: 'costPerTon',
+        label: 'Cost per Ton',
+        type: 'number',
+        placeholder: '100',
+        defaultValue: 100,
+        required: true,
+        unit: '$',
+        min: 50,
+        max: 300,
+        step: 5,
+        helperText: 'The cost of asphalt per ton in your area'
+      }
+    ],
+    tags: ['asphalt', 'tonnage', 'paving', 'quantity', 'cost'],
+    relatedCalculators: ['asphalt-volume', 'asphalt-coverage']
   }
 ];
