@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import RichTextEditor from '../RichTextEditor';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ interface ContentTabProps {
 
 const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange }) => {
   const [editorKey, setEditorKey] = useState(Date.now());
-  const [lastContentLength, setLastContentLength] = useState(content ? content.length : 0);
+  const contentRef = useRef(content);
   
   // Force re-initialize editor when content from parent changes significantly
   useEffect(() => {
@@ -20,15 +20,13 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
       `${content.substring(0, 50)}... (${content.length} chars)` : 
       "empty");
     
-    // Only re-initialize if the content length changed significantly
-    // This prevents re-rendering during normal typing
-    const contentLengthDiff = Math.abs((content ? content.length : 0) - lastContentLength);
-    if (contentLengthDiff > 50) {
+    // Check if content has changed from our last known value
+    if (content !== contentRef.current) {
       console.log("Content changed significantly, reinitializing editor");
+      contentRef.current = content;
       setEditorKey(Date.now());
-      setLastContentLength(content ? content.length : 0);
     }
-  }, [content, lastContentLength]);
+  }, [content]);
   
   const handleOpenPreview = () => {
     const previewWindow = window.open('', '_blank');

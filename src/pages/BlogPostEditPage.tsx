@@ -6,24 +6,65 @@ import BlogPostEditor from '@/components/admin/BlogPostEditor';
 import { useAdminDashboard } from '@/hooks/use-admin-dashboard';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 const BlogPostEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | undefined>(undefined);
-  const { handleSaveBlogPost, handleCancelBlogPost } = useAdminDashboard();
+  const [isLoading, setIsLoading] = useState(true);
+  const { handleSaveBlogPost, handleCancelBlogPost, handleDeleteBlogPost } = useAdminDashboard();
+  const { toast } = useToast();
   
   useEffect(() => {
-    if (id) {
-      const foundPost = getBlogPostById(id);
-      if (foundPost) {
-        setPost(foundPost);
-      } else {
-        // Post not found, redirect to dashboard
-        navigate('/admin/dashboard#blog');
+    const loadPost = () => {
+      setIsLoading(true);
+      
+      if (id) {
+        console.log("Attempting to load post with ID:", id);
+        const foundPost = getBlogPostById(id);
+        
+        if (foundPost) {
+          console.log("Found post:", foundPost.title);
+          console.log("Post content length:", foundPost.content?.length || 0);
+          
+          // Ensure we're working with a complete post object
+          setPost({
+            ...foundPost,
+            content: foundPost.content || '',
+            status: foundPost.status || 'draft'
+          });
+          
+          toast({
+            title: "Post Loaded",
+            description: `Now editing: ${foundPost.title}`,
+          });
+        } else {
+          console.log("Post not found with ID:", id);
+          toast({
+            title: "Post Not Found",
+            description: "The requested post could not be found.",
+            variant: "destructive"
+          });
+          navigate('/admin/dashboard#blog');
+        }
       }
-    }
-  }, [id, navigate]);
+      
+      setIsLoading(false);
+    };
+    
+    loadPost();
+  }, [id, navigate, toast]);
+  
+  if (isLoading) {
+    return (
+      <div className="container-custom py-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading post content...</div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="container-custom py-8">
@@ -41,6 +82,7 @@ const BlogPostEditPage: React.FC = () => {
           post={post}
           onSave={handleSaveBlogPost}
           onCancel={handleCancelBlogPost}
+          onDelete={handleDeleteBlogPost}
         />
       </div>
     </div>

@@ -34,6 +34,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
       console.log("Loading post for editing:", post.id, "Content length:", post.content?.length || 0);
       console.log("Post status:", post.status);
       
+      // Create a deep copy to avoid reference issues
       setFormData({
         id: post.id || '',
         title: post.title || '',

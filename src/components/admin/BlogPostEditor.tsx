@@ -56,6 +56,9 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     console.log("BlogPostEditor initialized with post:", post?.id || "new post");
     if (post) {
       console.log("Initial post status:", post.status);
+      console.log("Initial post content length:", post.content?.length || 0);
+      setSelectedPost(post);
+      setIsCreating(true);
     }
   }, [post]);
   
@@ -83,6 +86,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     formData,
     activeTab,
     isNew,
+    hasInitialized,
     setActiveTab,
     handleInputChange,
     handleSelectChange,
@@ -96,18 +100,29 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     resetFormData
   } = useBlogPostForm(handleSaveComplete, selectedPost);
 
-  // When editing a post, update the editorKey to force a re-render
+  // Force a re-render of the form when post changes
   useEffect(() => {
     if (selectedPost) {
-      console.log("Blog post selected for editing, ID:", selectedPost.id, "Content length:", selectedPost.content.length);
+      console.log("Blog post selected for editing, ID:", selectedPost.id);
+      if (selectedPost.content) {
+        console.log("Content length:", selectedPost.content.length);
+      } else {
+        console.log("Content is empty or undefined");
+      }
       console.log("Post status:", selectedPost.status);
-      setEditorKey(prev => prev + 1);
+      setEditorKey(Date.now());
     }
   }, [selectedPost]);
 
   const handleEditPost = (blogPost: BlogPost) => {
-    console.log("Editing blog post:", blogPost.id, "Content length:", blogPost.content.length);
+    console.log("Editing blog post:", blogPost.id);
+    if (blogPost.content) {
+      console.log("Content length:", blogPost.content.length);
+    } else {
+      console.log("Content is empty or undefined");
+    }
     console.log("Post status:", blogPost.status);
+    
     toast({
       title: "Loading post for editing",
       description: `Loading "${blogPost.title}" for editing`,
@@ -233,6 +248,15 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
             </div>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  // Only show loading state when we haven't initialized the form yet
+  if (!hasInitialized) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-lg">Loading editor...</div>
       </div>
     );
   }

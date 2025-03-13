@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import EditorToolbar from './editor/EditorToolbar';
 import EditorContent from './editor/EditorContent';
@@ -31,13 +30,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     console.log("RichTextEditor initialValue changed, length:", initialValue?.length || 0);
     
     // Always update content state when initialValue changes
-    if (initialValue !== content) {
-      setContent(initialValue || '');
-      
-      // Ensure the editor content is updated
-      if (editorRef.current) {
-        editorRef.current.innerHTML = initialValue || '';
-      }
+    setContent(initialValue || '');
+    
+    // Ensure the editor content is updated
+    if (editorRef.current) {
+      editorRef.current.innerHTML = initialValue || '';
     }
   }, [initialValue]);
 
