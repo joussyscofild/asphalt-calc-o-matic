@@ -121,6 +121,11 @@ export const useFooterLinks = (
       // Format URL properly
       const formattedUrl = formatUrl(newLinkData.url, newLinkData.isExternal);
       
+      // Log the update operation
+      console.log('Updating link:', editingLink.id);
+      console.log('New URL:', formattedUrl);
+      console.log('Is External:', newLinkData.isExternal);
+      
       // Update in Supabase
       const { error } = await supabase
         .from('footer_links')

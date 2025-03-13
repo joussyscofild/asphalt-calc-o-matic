@@ -33,10 +33,20 @@ const LinkForm: React.FC<LinkFormProps> = ({
     
     // If it's a custom page URL, ensure it starts with /page/
     if (formattedUrl.includes('page/') && !formattedUrl.startsWith('/')) {
-      formattedUrl = `/${formattedUrl}`;
+      formattedUrl = `/page/${formattedUrl.replace('page/', '')}`;
       toast({
-        title: "URL Format Corrected",
-        description: "Custom page URLs should start with /page/",
+        title: "URL Format Updated",
+        description: "Custom page URLs should be in format: /page/slug",
+      });
+    } else if (formattedUrl.includes('page/') && !formattedUrl.startsWith('/page/')) {
+      if (formattedUrl.startsWith('/')) {
+        formattedUrl = `/page/${formattedUrl.substring(1).replace('page/', '')}`;
+      } else {
+        formattedUrl = `/page/${formattedUrl.replace('page/', '')}`;
+      }
+      toast({
+        title: "URL Format Updated",
+        description: "Custom page URLs should be in format: /page/slug",
       });
     }
     

@@ -54,7 +54,7 @@ const Footer = () => {
             groups[groupId].links.push({
               id: link.id,
               label: link.label,
-              url: link.url,
+              url: link.url, // We'll format this when rendering
               isExternal: link.is_external || false
             });
           });
@@ -81,6 +81,32 @@ const Footer = () => {
   
   const currentYear = new Date().getFullYear();
   
+  // Render a link based on its type (external or internal)
+  const renderLink = (link: FooterLink) => {
+    if (link.isExternal) {
+      return (
+        <a 
+          href={link.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-safety transition-colors"
+        >
+          {link.label}
+        </a>
+      );
+    } else {
+      // Use the route as is without additional formatting
+      return (
+        <Link 
+          to={link.url}
+          className="text-gray-400 hover:text-safety transition-colors"
+        >
+          {link.label}
+        </Link>
+      );
+    }
+  };
+  
   // Render a link group if available, otherwise render a placeholder
   const renderLinkGroup = (groupId: string, title: string, fallbackLinks: { label: string, url: string, icon?: React.ReactNode }[]) => {
     const group = linkGroups.find(g => g.id === groupId);
@@ -92,23 +118,7 @@ const Footer = () => {
           <ul className="space-y-2">
             {group.links.map(link => (
               <li key={link.id}>
-                {link.isExternal ? (
-                  <a 
-                    href={link.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-safety transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  <Link 
-                    to={link.url} 
-                    className="text-gray-400 hover:text-safety transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                )}
+                {renderLink(link)}
               </li>
             ))}
           </ul>
