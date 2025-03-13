@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { FooterLinkGroup } from './types';
+import { formatUrl } from '../admin/footer-manager/utils/urlFormatter';
 
 export const useFooterData = () => {
   const [linkGroups, setLinkGroups] = useState<FooterLinkGroup[]>([]);
@@ -35,16 +36,16 @@ export const useFooterData = () => {
               };
             }
             
-            // Ensure URL is properly formatted
-            let url = link.url;
+            // Format the URL properly
+            const formattedUrl = formatUrl(link.url, link.is_external);
             
-            // Log all URLs for debugging
-            console.log(`Processing footer link: ${link.label}, URL: ${url}`);
+            // Log each link for debugging
+            console.log(`Processing footer link: ${link.label}, URL: ${formattedUrl}, External: ${link.is_external}`);
             
             groups[groupId].links.push({
               id: link.id,
               label: link.label,
-              url: url,
+              url: formattedUrl,
               isExternal: link.is_external || false
             });
           });

@@ -10,9 +10,25 @@ interface FooterLinksProps {
 }
 
 const FooterLinks: React.FC<FooterLinksProps> = ({ linkGroups }) => {
+  // Find a specific group by ID, or use a close match
+  const findGroup = (targetId: string, fallbackTitle: string) => {
+    // Try exact match first
+    let group = linkGroups.find(g => g.id === targetId);
+    
+    // If no exact match, try case-insensitive match
+    if (!group) {
+      group = linkGroups.find(g => 
+        g.id.toLowerCase() === targetId.toLowerCase() || 
+        g.title.toLowerCase() === fallbackTitle.toLowerCase()
+      );
+    }
+    
+    return group;
+  };
+  
   // Render a link group if available, otherwise render a placeholder
   const renderLinkGroup = (groupId: string, title: string, fallbackLinks: { label: string, url: string, icon?: React.ReactNode }[]) => {
-    const group = linkGroups.find(g => g.id === groupId);
+    const group = findGroup(groupId, title);
     
     if (group && group.links.length > 0) {
       return (
