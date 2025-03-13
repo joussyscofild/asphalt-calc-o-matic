@@ -9,20 +9,42 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
   const isNew = !post?.id;
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const [formData, setFormData] = useState<FormData>({
-    id: post?.id || '',
-    title: post?.title || '',
-    excerpt: post?.excerpt || '',
-    content: post?.content || '',
-    imageUrl: post?.imageUrl || '',
-    author: post?.author || 'Admin User',
-    authorAvatar: post?.authorAvatar || '/placeholder.svg',
-    date: post?.date || today,
-    readTime: post?.readTime || '3 min read',
-    category: post?.category || 'Construction',
-    tags: post?.tags || [],
-    featured: post?.featured || false,
-  });
+  const initialFormState: FormData = {
+    id: '',
+    title: '',
+    excerpt: '',
+    content: '',
+    imageUrl: '',
+    author: 'Admin User',
+    authorAvatar: '/placeholder.svg',
+    date: today,
+    readTime: '3 min read',
+    category: 'Construction',
+    tags: [],
+    featured: false,
+  };
+
+  const [formData, setFormData] = useState<FormData>(
+    post ? {
+      id: post.id || '',
+      title: post.title || '',
+      excerpt: post.excerpt || '',
+      content: post.content || '',
+      imageUrl: post.imageUrl || '',
+      author: post.author || 'Admin User',
+      authorAvatar: post.authorAvatar || '/placeholder.svg',
+      date: post.date || today,
+      readTime: post.readTime || '3 min read',
+      category: post.category || 'Construction',
+      tags: post.tags || [],
+      featured: post.featured || false,
+    } : initialFormState
+  );
+
+  // Reset form data to initial state
+  const resetFormData = () => {
+    setFormData(initialFormState);
+  };
 
   // Update form data when post changes
   useEffect(() => {
@@ -147,6 +169,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
     handleTagsChange,
     handleSEOUpdate,
     calculateReadTime,
-    handleSubmit
+    handleSubmit,
+    resetFormData
   };
 };

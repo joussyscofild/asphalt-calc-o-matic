@@ -6,12 +6,12 @@ export const useEditorState = (initialValue: string, onChange: (value: string) =
   const [selection, setSelection] = useState<{start: number, end: number} | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Synchronize the editor content with the div when it changes
+  // Initialize the editor content when component mounts
   useEffect(() => {
-    if (editorRef.current && content !== editorRef.current.innerHTML) {
-      editorRef.current.innerHTML = content;
+    if (editorRef.current && initialValue) {
+      editorRef.current.innerHTML = initialValue;
     }
-  }, [content]);
+  }, []);
 
   // Handle content changes
   const handleChange = (e: React.FormEvent<HTMLDivElement>) => {
@@ -45,24 +45,25 @@ export const useEditorState = (initialValue: string, onChange: (value: string) =
   const restoreSelection = () => {
     if (!selection || !editorRef.current) return;
     
-    const charIndex = (node: Node, index: number): {node: Node, offset: number} => {
+    const charIndex = (node: Node, index: number): {node: Node, offset: number} | null => {
       if (node.nodeType === 3) {
-        if (index <= node.textContent!.length) {
+        if (index <= (node.textContent?.length || 0)) {
           return { node, offset: index };
         }
-        index -= node.textContent!.length;
+        index -= (node.textContent?.length || 0);
       } else {
         for (let i = 0; i < node.childNodes.length; i++) {
-          const result = charIndex(node.childNodes[i], index);
+          const childNode = node.childNodes[i];
+          const result = charIndex(childNode, index);
           if (result) {
             index = result.offset;
             if (index === 0) {
-              return { node: result.node, offset: result.offset };
+              return result;
             }
           }
         }
       }
-      return { node, offset: 0 };
+      return null;
     };
 
     try {
@@ -74,7 +75,10 @@ export const useEditorState = (initialValue: string, onChange: (value: string) =
         const range = document.createRange();
         
         const startInfo = charIndex(editorRef.current, selection.start);
+        if (!startInfo) return;
+        
         const endInfo = charIndex(editorRef.current, selection.end);
+        if (!endInfo) return;
         
         range.setStart(startInfo.node, startInfo.offset);
         range.setEnd(endInfo.node, endInfo.offset);
@@ -85,7 +89,9 @@ export const useEditorState = (initialValue: string, onChange: (value: string) =
     } catch (e) {
       console.error("Error restoring selection:", e);
       // Fallback for selection restoration
-      editorRef.current.focus();
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
     }
   };
 
@@ -107,12 +113,16 @@ export const useEditorCommands = (
 ) => {
   // Apply formatting
   const formatText = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    if (editorRef.current) {
-      const newContent = editorRef.current.innerHTML;
-      setContent(newContent);
-      onChange(newContent);
-      editorRef.current.focus();
+    try {
+      document.execCommand(command, false, value);
+      if (editorRef.current) {
+        const newContent = editorRef.current.innerHTML;
+        setContent(newContent);
+        onChange(newContent);
+        editorRef.current.focus();
+      }
+    } catch (error) {
+      console.error(`Error applying format ${command}:`, error);
     }
   };
 
@@ -134,10 +144,14 @@ export const useEditorCommands = (
   // Insert HTML template
   const insertTemplate = (template: string) => {
     if (editorRef.current) {
-      editorRef.current.innerHTML = template;
-      const newContent = editorRef.current.innerHTML;
-      setContent(newContent);
-      onChange(newContent);
+      try {
+        editorRef.current.innerHTML = template;
+        const newContent = editorRef.current.innerHTML;
+        setContent(newContent);
+        onChange(newContent);
+      } catch (error) {
+        console.error("Error inserting template:", error);
+      }
     }
   };
 

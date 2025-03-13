@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Edit, FileText, Image, Wand2, Plus } from 'lucide-react';
@@ -18,6 +19,9 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const [selectedPost, setSelectedPost] = useState<BlogPost | undefined>(post);
   const [isCreating, setIsCreating] = useState<boolean>(!post);
   
+  // Force a re-render when selectedPost changes
+  const [editorKey, setEditorKey] = useState<number>(0);
+  
   const {
     formData,
     activeTab,
@@ -30,17 +34,29 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     handleTagsChange,
     handleSEOUpdate,
     calculateReadTime,
-    handleSubmit
+    handleSubmit,
+    resetFormData
   } = useBlogPostForm(onSave, selectedPost);
 
+  // When editing a post, update the editorKey to force a re-render
+  useEffect(() => {
+    if (selectedPost) {
+      console.log("Blog post selected for editing:", selectedPost);
+      setEditorKey(prev => prev + 1);
+    }
+  }, [selectedPost]);
+
   const handleEditPost = (blogPost: BlogPost) => {
+    console.log("Editing blog post:", blogPost);
     setSelectedPost(blogPost);
     setIsCreating(true);
   };
 
   const handleCreateNew = () => {
+    resetFormData();
     setSelectedPost(undefined);
     setIsCreating(true);
+    setEditorKey(prev => prev + 1);
   };
 
   const handleCancelEdit = () => {
@@ -103,7 +119,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} key={editorKey}>
         <TabsList className="grid grid-cols-4 mb-6">
           <TabsTrigger value="general" className="flex items-center gap-1">
             <Edit size={14} />

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import EditorToolbar from './editor/EditorToolbar';
 import EditorContent from './editor/EditorContent';
 import { useEditorState, useEditorCommands, useKeyboardShortcuts } from './editor/editorHooks';
