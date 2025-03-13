@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import EditorToolbar from './editor/EditorToolbar';
 import EditorContent from './editor/EditorContent';
 import { useEditorState, useEditorCommands, useKeyboardShortcuts } from './editor/editorHooks';
@@ -26,6 +26,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     saveSelection,
     restoreSelection
   } = useEditorState(initialValue, onChange);
+
+  // Update content when initialValue changes (e.g., when switching between posts)
+  useEffect(() => {
+    console.log("RichTextEditor initialValue changed:", initialValue);
+    setContent(initialValue);
+  }, [initialValue, setContent]);
 
   // Editor commands
   const {

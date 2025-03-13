@@ -1,10 +1,16 @@
-
 import { useState, useRef, useEffect } from 'react';
 
 export const useEditorState = (initialValue: string, onChange: (value: string) => void) => {
-  const [content, setContent] = useState(initialValue);
+  const [content, setContent] = useState(initialValue || '');
   const [selection, setSelection] = useState<{start: number, end: number} | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+
+  // Synchronize the editor content with the div when it changes
+  useEffect(() => {
+    if (editorRef.current && content !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = content;
+    }
+  }, [content]);
 
   // Handle content changes
   const handleChange = (e: React.FormEvent<HTMLDivElement>) => {

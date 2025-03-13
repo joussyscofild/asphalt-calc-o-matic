@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { BlogPost } from '@/utils/blogPosts';
 import { useToast } from "@/components/ui/use-toast";
@@ -40,6 +41,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
 
   const handleContentChange = (content: string) => {
     setFormData(prev => ({ ...prev, content }));
+    console.log("Content updated:", content); // Log for debugging
   };
 
   const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {

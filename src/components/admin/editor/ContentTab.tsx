@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import RichTextEditor from '../RichTextEditor';
 
@@ -9,6 +9,11 @@ interface ContentTabProps {
 }
 
 const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange }) => {
+  // Log the content prop when it changes to verify it's being passed correctly
+  useEffect(() => {
+    console.log("Content Tab received content:", content);
+  }, [content]);
+
   return (
     <Card>
       <CardHeader>
@@ -19,7 +24,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
       </CardHeader>
       <CardContent>
         <RichTextEditor 
-          initialValue={content || ''} 
+          initialValue={content} 
           onChange={handleContentChange}
           minHeight="500px"
           placeholder="Start writing your blog post content here..."
