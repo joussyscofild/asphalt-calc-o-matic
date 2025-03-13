@@ -17,6 +17,7 @@ export interface UsePageManagerReturn {
   handleDuplicatePage: (page: Page) => void;
   handleStatusToggle: (id: string) => void;
   handlePreviewPage: (page: Page) => void;
+  handleReorderPages: (result: { source: number; destination: number }) => void;
   handleSavePage: () => Promise<void>;
   handleTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSlugChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

@@ -21,6 +21,7 @@ const PagesManager: React.FC<PageManagerProps> = () => {
     handleDuplicatePage,
     handleStatusToggle,
     handlePreviewPage,
+    handleReorderPages,
     handleSavePage,
     handleTitleChange,
     handleSlugChange,
@@ -48,6 +49,7 @@ const PagesManager: React.FC<PageManagerProps> = () => {
           onDuplicate={handleDuplicatePage}
           onStatusToggle={handleStatusToggle}
           onPreview={handlePreviewPage}
+          onReorder={handleReorderPages}
         />
       )}
       

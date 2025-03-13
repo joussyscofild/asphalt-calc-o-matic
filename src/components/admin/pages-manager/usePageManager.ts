@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Page } from '@/components/admin/pages/types';
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +11,6 @@ export const usePageManager = (): UsePageManagerReturn => {
   const [pageContent, setPageContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   
-  // Fetch pages from Supabase
   useEffect(() => {
     const fetchPages = async () => {
       setIsLoading(true);
@@ -20,6 +18,7 @@ export const usePageManager = (): UsePageManagerReturn => {
         const { data, error } = await supabase
           .from('custom_pages')
           .select('*')
+          .order('sort_order', { ascending: true })
           .order('created_at', { ascending: false });
         
         if (error) {
@@ -27,7 +26,6 @@ export const usePageManager = (): UsePageManagerReturn => {
         }
         
         if (data) {
-          // Transform database data to match our Page interface
           const formattedPages: Page[] = data.map(page => ({
             id: page.id,
             title: page.title,
@@ -85,7 +83,6 @@ export const usePageManager = (): UsePageManagerReturn => {
     
     try {
       if (currentPage.id) {
-        // Update existing page
         const { error } = await supabase
           .from('custom_pages')
           .update({
@@ -110,7 +107,6 @@ export const usePageManager = (): UsePageManagerReturn => {
           description: `"${currentPage.title}" has been updated successfully.`,
         });
       } else {
-        // Add new page
         const { data, error } = await supabase
           .from('custom_pages')
           .insert({
@@ -190,7 +186,7 @@ export const usePageManager = (): UsePageManagerReturn => {
           title: duplicateTitle,
           slug: duplicateSlug,
           content: page.content,
-          status: 'draft', // Always start as draft
+          status: 'draft',
         })
         .select();
       
@@ -226,13 +222,11 @@ export const usePageManager = (): UsePageManagerReturn => {
   
   const handleStatusToggle = async (id: string) => {
     try {
-      // Find the page and toggle its status
       const page = pages.find(p => p.id === id);
       if (!page) return;
       
       const newStatus = page.status === 'published' ? 'draft' : 'published';
       
-      // Update in Supabase
       const { error } = await supabase
         .from('custom_pages')
         .update({
@@ -243,7 +237,6 @@ export const usePageManager = (): UsePageManagerReturn => {
       
       if (error) throw error;
       
-      // Update local state
       setPages(pages.map(page => {
         if (page.id === id) {
           return {
@@ -270,7 +263,6 @@ export const usePageManager = (): UsePageManagerReturn => {
   };
 
   const handlePreviewPage = (page: Page) => {
-    // Open the page in a new tab
     window.open(`/page/${page.slug}`, '_blank');
   };
   
@@ -278,7 +270,6 @@ export const usePageManager = (): UsePageManagerReturn => {
     if (!currentPage) return;
     
     const title = e.target.value;
-    // Auto-generate slug from title
     let slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
     
     setCurrentPage({
@@ -291,13 +282,47 @@ export const usePageManager = (): UsePageManagerReturn => {
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!currentPage) return;
     
-    // Clean up slug, allowing only alphanumeric characters, hyphens, and underscores
     const slug = e.target.value.toLowerCase().replace(/[^\w-]+/g, '');
     
     setCurrentPage({
       ...currentPage,
       slug
     });
+  };
+
+  const handleReorderPages = async (result: { source: number; destination: number }) => {
+    try {
+      const reorderedPages = [...pages];
+      const [movedPage] = reorderedPages.splice(result.source, 1);
+      reorderedPages.splice(result.destination, 0, movedPage);
+      
+      setPages(reorderedPages);
+      
+      const pageIds = reorderedPages.map(page => page.id);
+      
+      for (let i = 0; i < pageIds.length; i++) {
+        const { error } = await supabase
+          .from('custom_pages')
+          .update({ sort_order: i })
+          .eq('id', pageIds[i]);
+        
+        if (error) throw error;
+      }
+      
+      toast({
+        title: "Pages reordered",
+        description: "The page order has been updated successfully."
+      });
+    } catch (error) {
+      console.error('Error reordering pages:', error);
+      fetchPages();
+      
+      toast({
+        title: "Error reordering pages",
+        description: "There was a problem updating the page order. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return {
@@ -312,6 +337,7 @@ export const usePageManager = (): UsePageManagerReturn => {
     handleDuplicatePage,
     handleStatusToggle,
     handlePreviewPage,
+    handleReorderPages,
     handleSavePage,
     handleTitleChange,
     handleSlugChange,
