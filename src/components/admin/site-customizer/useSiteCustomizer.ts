@@ -113,10 +113,10 @@ export const useSiteCustomizer = () => {
         if (error) {
           throw error;
         }
+        
+        // Force update the favicon with cache busting
+        updateDocumentFavicon(settings.favicon);
       }
-      
-      // Update the actual favicon in the document
-      updateDocumentFavicon(settings.favicon || '/favicon.ico');
       
       toast({
         title: "Settings saved",
@@ -132,26 +132,25 @@ export const useSiteCustomizer = () => {
     }
   };
   
-  // Helper function to update the actual favicon in the document
+  // Helper function to update the favicon in the document with improved cache busting
   const updateDocumentFavicon = (faviconUrl: string) => {
-    console.log("Updating favicon to:", faviconUrl);
+    console.log("Updating favicon with aggressive cache busting:", faviconUrl);
     
-    // Remove any existing favicon
+    // Remove any existing favicon links
     const existingLinks = document.querySelectorAll("link[rel*='icon']");
-    existingLinks.forEach(link => link.remove());
+    existingLinks.forEach(link => link.parentNode?.removeChild(link));
     
-    // Create and append the new favicon link
+    // Create and append the new favicon link with improved cache busting
+    const timestamp = new Date().getTime();
+    const randomStr = Math.random().toString(36).substring(2, 8);
     const link = document.createElement('link');
     link.id = 'favicon';
     link.rel = 'icon';
-    link.href = faviconUrl;
+    link.href = `${faviconUrl}?v=${timestamp}-${randomStr}`;
     document.head.appendChild(link);
     
-    // Force browser to refresh favicon by setting a random query parameter
-    setTimeout(() => {
-      const randomParam = `?v=${new Date().getTime()}`;
-      link.href = faviconUrl + randomParam;
-    }, 100);
+    // Also update the index.html favicon link for persistence
+    document.getElementById('favicon')?.setAttribute('href', faviconUrl);
   };
 
   return {

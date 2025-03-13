@@ -26,13 +26,14 @@ export const useSiteSettings = () => {
           .single();
           
         if (!faviconError && faviconData) {
+          const faviconUrl = faviconData.value;
           setSettings(prev => ({
             ...prev,
-            favicon: faviconData.value
+            favicon: faviconUrl
           }));
           
-          // Update favicon in the document
-          updateDocumentFavicon(faviconData.value);
+          // Force update the favicon in the document
+          updateDocumentFavicon(faviconUrl);
         }
       } catch (error) {
         console.error('Error loading site settings:', error);
@@ -44,26 +45,24 @@ export const useSiteSettings = () => {
     loadSettings();
   }, []);
   
-  // Helper function to update the favicon in the document
+  // Helper function to update the favicon in the document with improved cache-busting
   const updateDocumentFavicon = (faviconUrl: string) => {
     console.log("Updating favicon to:", faviconUrl);
     
-    // Remove any existing favicon
+    // Remove any existing favicon links
     const existingLinks = document.querySelectorAll("link[rel*='icon']");
-    existingLinks.forEach(link => link.remove());
+    existingLinks.forEach(link => link.parentNode?.removeChild(link));
     
-    // Create and append the new favicon link
+    // Create and append the new favicon link with cache busting
+    const timestamp = new Date().getTime();
     const link = document.createElement('link');
     link.id = 'favicon';
     link.rel = 'icon';
-    link.href = faviconUrl;
+    link.href = `${faviconUrl}?v=${timestamp}`;
     document.head.appendChild(link);
     
-    // Force browser to refresh favicon by setting a random query parameter
-    setTimeout(() => {
-      const randomParam = `?v=${new Date().getTime()}`;
-      link.href = faviconUrl + randomParam;
-    }, 100);
+    // Store the current favicon URL in localStorage for persistence
+    localStorage.setItem('currentFavicon', faviconUrl);
   };
 
   return { settings, loading };

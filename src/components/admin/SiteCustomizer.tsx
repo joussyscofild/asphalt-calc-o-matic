@@ -11,6 +11,7 @@ import TypographyTab from './site-customizer/TypographyTab';
 import LayoutTab from './site-customizer/LayoutTab';
 import FaviconTab from './site-customizer/FaviconTab';
 import { Loader2 } from 'lucide-react';
+import { toast } from "@/hooks/use-toast";
 
 const SiteCustomizer: React.FC = () => {
   const {
@@ -25,12 +26,20 @@ const SiteCustomizer: React.FC = () => {
     handleSave
   } = useSiteCustomizer();
 
-  // Update favicon when component mounts
+  // Update favicon when component mounts or when the favicon setting changes
   useEffect(() => {
     if (settings.favicon) {
+      // Force refresh favicon when it changes
       const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
       if (link) {
-        link.href = settings.favicon;
+        const timestamp = new Date().getTime();
+        link.href = `${settings.favicon}?v=${timestamp}`;
+        
+        // Show toast when favicon is updated
+        toast({
+          title: "Favicon updated",
+          description: "The favicon has been updated. If it doesn't appear immediately, try refreshing the page.",
+        });
       }
     }
   }, [settings.favicon]);
