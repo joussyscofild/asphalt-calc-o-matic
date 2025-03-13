@@ -1,21 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Plus } from 'lucide-react';
-import { toast } from "@/hooks/use-toast";
-import PagesTable from './pages/PagesTable';
-import PageEditorDialog from './pages/PageEditorDialog';
-import { Page } from './pages/types';
+import { useState, useEffect } from 'react';
+import { Page } from '@/components/admin/pages/types';
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from 'react-router-dom';
+import { toast } from "@/hooks/use-toast";
+import { UsePageManagerReturn } from './types';
 
-const PagesManager: React.FC = () => {
+export const usePageManager = (): UsePageManagerReturn => {
   const [pages, setPages] = useState<Page[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page | null>(null);
   const [pageContent, setPageContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
   
   // Fetch pages from Supabase
   useEffect(() => {
@@ -229,32 +224,6 @@ const PagesManager: React.FC = () => {
     }
   };
   
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!currentPage) return;
-    
-    const title = e.target.value;
-    // Auto-generate slug from title
-    let slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-    
-    setCurrentPage({
-      ...currentPage,
-      title,
-      slug
-    });
-  };
-  
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!currentPage) return;
-    
-    // Clean up slug, allowing only alphanumeric characters, hyphens, and underscores
-    const slug = e.target.value.toLowerCase().replace(/[^\w-]+/g, '');
-    
-    setCurrentPage({
-      ...currentPage,
-      slug
-    });
-  };
-  
   const handleStatusToggle = async (id: string) => {
     try {
       // Find the page and toggle its status
@@ -304,44 +273,49 @@ const PagesManager: React.FC = () => {
     // Open the page in a new tab
     window.open(`/page/${page.slug}`, '_blank');
   };
+  
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!currentPage) return;
+    
+    const title = e.target.value;
+    // Auto-generate slug from title
+    let slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+    
+    setCurrentPage({
+      ...currentPage,
+      title,
+      slug
+    });
+  };
+  
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!currentPage) return;
+    
+    // Clean up slug, allowing only alphanumeric characters, hyphens, and underscores
+    const slug = e.target.value.toLowerCase().replace(/[^\w-]+/g, '');
+    
+    setCurrentPage({
+      ...currentPage,
+      slug
+    });
+  };
 
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Pages</h2>
-        <Button onClick={handleCreatePage}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Page
-        </Button>
-      </div>
-      
-      {isLoading ? (
-        <div className="flex justify-center py-6">
-          <p>Loading pages...</p>
-        </div>
-      ) : (
-        <PagesTable 
-          pages={pages}
-          onEdit={handleEditPage}
-          onDelete={handleDeletePage}
-          onDuplicate={handleDuplicatePage}
-          onStatusToggle={handleStatusToggle}
-          onPreview={handlePreviewPage}
-        />
-      )}
-      
-      <PageEditorDialog
-        isOpen={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        currentPage={currentPage}
-        pageContent={pageContent}
-        setPageContent={setPageContent}
-        onSave={handleSavePage}
-        onTitleChange={handleTitleChange}
-        onSlugChange={handleSlugChange}
-      />
-    </div>
-  );
+  return {
+    pages,
+    isLoading,
+    isEditDialogOpen,
+    currentPage,
+    pageContent,
+    handleCreatePage,
+    handleEditPage,
+    handleDeletePage,
+    handleDuplicatePage,
+    handleStatusToggle,
+    handlePreviewPage,
+    handleSavePage,
+    handleTitleChange,
+    handleSlugChange,
+    setPageContent,
+    setIsEditDialogOpen
+  };
 };
-
-export default PagesManager;
