@@ -24,31 +24,12 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
     featured: false,
   };
 
-  const [formData, setFormData] = useState<FormData>(
-    post ? {
-      id: post.id || '',
-      title: post.title || '',
-      excerpt: post.excerpt || '',
-      content: post.content || '',
-      imageUrl: post.imageUrl || '',
-      author: post.author || 'Admin User',
-      authorAvatar: post.authorAvatar || '/placeholder.svg',
-      date: post.date || today,
-      readTime: post.readTime || '3 min read',
-      category: post.category || 'Construction',
-      tags: post.tags || [],
-      featured: post.featured || false,
-    } : initialFormState
-  );
-
-  // Reset form data to initial state
-  const resetFormData = () => {
-    setFormData(initialFormState);
-  };
+  const [formData, setFormData] = useState<FormData>(initialFormState);
 
   // Update form data when post changes
   useEffect(() => {
     if (post) {
+      console.log("Post content loaded:", post.content);
       setFormData({
         id: post.id || '',
         title: post.title || '',
@@ -63,9 +44,16 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
         tags: post.tags || [],
         featured: post.featured || false,
       });
-      console.log("Post content loaded:", post.content);
+    } else {
+      // If no post is provided, reset to initial state
+      setFormData(initialFormState);
     }
   }, [post, today]);
+
+  // Reset form data to initial state
+  const resetFormData = () => {
+    setFormData(initialFormState);
+  };
 
   const [activeTab, setActiveTab] = useState('general');
 
@@ -84,7 +72,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
 
   const handleContentChange = (content: string) => {
     setFormData(prev => ({ ...prev, content }));
-    console.log("Content updated:", content); // Log for debugging
+    console.log("Content updated:", content);
   };
 
   const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,7 +96,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
     const plainText = formData.content?.replace(/<[^>]*>?/gm, '') || '';
     
     const words = plainText.trim().split(/\s+/).length;
-    const minutes = Math.ceil(words / 200);
+    const minutes = Math.max(1, Math.ceil(words / 200));
     
     setFormData(prev => ({ 
       ...prev, 
@@ -124,15 +112,16 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.id || !formData.title || !formData.excerpt || !formData.content) {
+    if (!formData.title || !formData.excerpt) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields (ID, Title, Excerpt, Content).",
+        description: "Please fill in all required fields (Title, Excerpt).",
         variant: "destructive",
       });
       return;
     }
 
+    // Generate ID from title if not provided
     const postId = formData.id || formData.title.toLowerCase().replace(/\s+/g, '-');
     
     const completedPost: BlogPost = {

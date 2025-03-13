@@ -24,24 +24,6 @@ const BlogPost = () => {
     );
   }
 
-  // This would normally come from the API/database
-  const content = post.content || `
-    <p>This is a placeholder for the full content of "${post.title}". In a real application, this would be the complete article retrieved from a database.</p>
-    <p>The excerpt you've already seen is: <em>${post.excerpt}</em></p>
-    <h2>Why This Matters</h2>
-    <p>Understanding the concepts discussed in this article can make a significant difference in your construction projects. Here are a few key points to consider:</p>
-    <ul>
-      <li>Proper planning can reduce waste and save costs</li>
-      <li>Following industry best practices ensures higher quality outcomes</li>
-      <li>Safety considerations should always be a top priority</li>
-      <li>Material selection impacts both short-term and long-term project success</li>
-    </ul>
-    <h2>Practical Applications</h2>
-    <p>You can apply the knowledge from this article in the following scenarios:</p>
-    <p>For specific calculations related to this topic, check out our <a href="/calculators">calculators section</a> which provides practical tools.</p>
-    <p>If you have more questions about this topic, feel free to <a href="/contact">contact us</a> for personalized advice.</p>
-  `;
-
   return (
     <div className="container-custom py-12">
       <Breadcrumb className="mb-8">
@@ -105,7 +87,7 @@ const BlogPost = () => {
 
               <div 
                 className="prose prose-slate max-w-none"
-                dangerouslySetInnerHTML={{ __html: content }}
+                dangerouslySetInnerHTML={{ __html: post.content }}
               />
 
               <div className="mt-8 pt-6 border-t border-gray-100">

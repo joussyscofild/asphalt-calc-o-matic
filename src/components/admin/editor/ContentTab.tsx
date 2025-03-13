@@ -28,7 +28,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
           onChange={handleContentChange}
           minHeight="500px"
           placeholder="Start writing your blog post content here..."
-          key={content} // Add key to force re-render when content changes
+          key={`editor-${content?.length || 0}-${Date.now()}`} // Force re-render on content changes
         />
       </CardContent>
     </Card>

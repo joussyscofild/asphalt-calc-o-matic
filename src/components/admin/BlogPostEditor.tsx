@@ -10,16 +10,16 @@ import GeneralTab from './editor/GeneralTab';
 import ContentTab from './editor/ContentTab';
 import MediaTab from './editor/MediaTab';
 import { BlogPost, blogPosts } from '@/utils/blogPosts';
+import { useToast } from "@/components/ui/use-toast";
 
 const BlogPostEditor: React.FC<BlogPostEditorProps> = ({ 
   post,
   onSave,
   onCancel
 }) => {
+  const { toast } = useToast();
   const [selectedPost, setSelectedPost] = useState<BlogPost | undefined>(post);
   const [isCreating, setIsCreating] = useState<boolean>(!post);
-  
-  // Force a re-render when selectedPost changes
   const [editorKey, setEditorKey] = useState<number>(0);
   
   const {
@@ -48,11 +48,21 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
 
   const handleEditPost = (blogPost: BlogPost) => {
     console.log("Editing blog post:", blogPost);
+    toast({
+      title: "Loading post for editing",
+      description: `Loading "${blogPost.title}" for editing`,
+    });
     setSelectedPost(blogPost);
     setIsCreating(true);
+    // Force re-render of the editor
+    setEditorKey(prev => prev + 1);
   };
 
   const handleCreateNew = () => {
+    toast({
+      title: "Create New Post",
+      description: "Starting with a blank post",
+    });
     resetFormData();
     setSelectedPost(undefined);
     setIsCreating(true);
@@ -119,7 +129,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} key={editorKey}>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-4 mb-6">
           <TabsTrigger value="general" className="flex items-center gap-1">
             <Edit size={14} />
@@ -155,6 +165,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
           <ContentTab 
             content={formData.content || ''}
             handleContentChange={handleContentChange}
+            key={`content-tab-${editorKey}`}
           />
         </TabsContent>
 

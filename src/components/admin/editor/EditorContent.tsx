@@ -35,17 +35,15 @@ const EditorContent: React.FC<EditorContentProps> = ({
     <div className="relative">
       <div
         ref={editorRef}
-        className="p-4 outline-none"
+        className="p-4 outline-none min-h-[200px]"
         style={{ minHeight }}
-        contentEditable
+        contentEditable={true}
         onInput={handleChange}
         onKeyDown={handleKeyDown}
-        onClick={saveSelection}
+        onMouseUp={saveSelection}
         onKeyUp={saveSelection}
         onFocus={restoreSelection}
         onBlur={saveSelection}
-        dangerouslySetInnerHTML={{ __html: content }}
-        data-placeholder={placeholder}
       />
       {isContentEmpty && (
         <div className="absolute pointer-events-none text-gray-400 p-4" style={{top: 0, left: 0, right: 0}}>

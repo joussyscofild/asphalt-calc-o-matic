@@ -1,8 +1,8 @@
 
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import EditorToolbar from './editor/EditorToolbar';
 import EditorContent from './editor/EditorContent';
-import { useEditorState, useEditorCommands, useKeyboardShortcuts } from './editor/editorHooks';
+import { useEditorCommands, useKeyboardShortcuts } from './editor/editorHooks';
 
 interface RichTextEditorProps {
   initialValue: string;
@@ -17,30 +17,109 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   minHeight = '300px',
   placeholder = 'Start writing...'
 }) => {
-  // Editor state and basic handlers
-  const {
-    content,
-    setContent,
-    editorRef,
-    handleChange,
-    saveSelection,
-    restoreSelection
-  } = useEditorState(initialValue, onChange);
+  // Local state for content
+  const [content, setContent] = useState<string>(initialValue || '');
+  const [selection, setSelection] = useState<{start: number, end: number} | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  
+  console.log("RichTextEditor rendered with initialValue:", initialValue);
 
-  // Update content when initialValue changes (e.g., when switching between posts)
-  useLayoutEffect(() => {
-    console.log("RichTextEditor initialValue changed:", initialValue);
-    
-    // Reset content state
+  // Initialize editor with initial content
+  useEffect(() => {
+    console.log("initialValue changed:", initialValue);
     setContent(initialValue || '');
     
-    // Use setTimeout to ensure the DOM is ready before manipulating it
-    setTimeout(() => {
-      if (editorRef.current) {
-        editorRef.current.innerHTML = initialValue || '';
+    // Ensure the editor content is updated
+    if (editorRef.current) {
+      editorRef.current.innerHTML = initialValue || '';
+    }
+  }, [initialValue]);
+
+  // Handle content changes
+  const handleChange = (e: React.FormEvent<HTMLDivElement>) => {
+    const newContent = e.currentTarget.innerHTML;
+    setContent(newContent);
+    onChange(newContent);
+  };
+
+  // Save current selection
+  const saveSelection = () => {
+    if (window.getSelection) {
+      const sel = window.getSelection();
+      if (sel && sel.getRangeAt && sel.rangeCount) {
+        const range = sel.getRangeAt(0);
+        const preSelectionRange = range.cloneRange();
+        if (editorRef.current) {
+          preSelectionRange.selectNodeContents(editorRef.current);
+          preSelectionRange.setEnd(range.startContainer, range.startOffset);
+          const start = preSelectionRange.toString().length;
+          
+          setSelection({
+            start,
+            end: start + range.toString().length
+          });
+        }
       }
-    }, 0);
-  }, [initialValue, setContent]);
+    }
+  };
+
+  // Restore selection
+  const restoreSelection = () => {
+    if (!selection || !editorRef.current) return;
+    
+    try {
+      if (window.getSelection && document.createRange) {
+        const sel = window.getSelection();
+        if (!sel) return;
+        
+        sel.removeAllRanges();
+        const range = document.createRange();
+        let charIndex = 0;
+        let foundStart = false;
+        let foundEnd = false;
+        
+        function traverseNodes(node: Node) {
+          if (foundStart && foundEnd) return;
+          
+          if (node.nodeType === Node.TEXT_NODE) {
+            const nextCharIndex = charIndex + (node.textContent?.length || 0);
+            if (!foundStart && selection.start >= charIndex && selection.start <= nextCharIndex) {
+              range.setStart(node, selection.start - charIndex);
+              foundStart = true;
+            }
+            if (!foundEnd && selection.end >= charIndex && selection.end <= nextCharIndex) {
+              range.setEnd(node, selection.end - charIndex);
+              foundEnd = true;
+            }
+            charIndex = nextCharIndex;
+          } else {
+            for (let i = 0; i < node.childNodes.length; i++) {
+              traverseNodes(node.childNodes[i]);
+            }
+          }
+        }
+        
+        traverseNodes(editorRef.current);
+        
+        if (foundStart && foundEnd) {
+          sel.addRange(range);
+        } else {
+          // Fallback: place cursor at the end
+          range.selectNodeContents(editorRef.current);
+          range.collapse(false);
+          sel.addRange(range);
+        }
+        
+        editorRef.current.focus();
+      }
+    } catch (e) {
+      console.error("Error restoring selection:", e);
+      // Fallback for selection restoration
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+    }
+  };
 
   // Editor commands
   const {
