@@ -7,6 +7,7 @@ import NotFound from './pages/NotFound';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import Admin from './pages/Admin';
+import AdminDashboard from './pages/AdminDashboard';
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
   {
     path: '/admin',
     element: <Admin />,
+  },
+  {
+    path: '/admin/dashboard',
+    element: <AdminDashboard />,
   },
   {
     path: '*',
