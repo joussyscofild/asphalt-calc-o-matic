@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getBlogPostById } from '../utils/blogPosts';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
@@ -9,7 +9,12 @@ import { ArrowLeft, BookOpen, Calendar, Clock, Tag, User } from 'lucide-react';
 const BlogPost = () => {
   const { id = '' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const post = getBlogPostById(id);
+  const [post, setPost] = useState(getBlogPostById(id));
+  
+  // Refresh post data when component mounts or id changes
+  useEffect(() => {
+    setPost(getBlogPostById(id));
+  }, [id]);
 
   if (!post) {
     return (

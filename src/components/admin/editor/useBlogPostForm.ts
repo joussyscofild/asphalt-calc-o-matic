@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { BlogPost, blogPosts } from '@/utils/blogPosts';
 import { useToast } from "@/hooks/use-toast";
@@ -26,11 +25,12 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
   };
 
   const [formData, setFormData] = useState<FormData>(initialFormState);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Update form data when post changes
   useEffect(() => {
     if (post) {
-      console.log("Post content loaded:", post.content);
+      console.log("Post content loaded:", post.content?.substring(0, 50) + "...");
       setFormData({
         id: post.id || '',
         title: post.title || '',
@@ -46,15 +46,18 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
         featured: post.featured || false,
         status: post.status || 'published'
       });
+      setHasInitialized(true);
     } else {
       // If no post is provided, reset to initial state
       setFormData(initialFormState);
+      setHasInitialized(true);
     }
   }, [post, today]);
 
   // Reset form data to initial state
   const resetFormData = () => {
     setFormData(initialFormState);
+    setHasInitialized(false);
   };
 
   const [activeTab, setActiveTab] = useState('general');
@@ -73,8 +76,8 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
   };
 
   const handleContentChange = (content: string) => {
+    console.log("Content updated in form:", content.substring(0, 50) + "...");
     setFormData(prev => ({ ...prev, content }));
-    console.log("Content updated:", content);
   };
 
   const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,11 +156,15 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
       status: isPublished ? 'published' : 'draft'
     };
     
+    console.log("Saving post with content:", completedPost.content.substring(0, 50) + "...");
+    
     // Update the blogPosts array directly (for local state)
     const existingIndex = blogPosts.findIndex(p => p.id === completedPost.id);
     if (existingIndex !== -1) {
+      console.log("Updating existing post at index:", existingIndex);
       blogPosts[existingIndex] = { ...completedPost };
     } else {
+      console.log("Adding new post to blogPosts array");
       blogPosts.push({ ...completedPost });
     }
     
@@ -174,6 +181,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
     formData,
     activeTab,
     isNew,
+    hasInitialized,
     setActiveTab,
     handleInputChange,
     handleSelectChange,

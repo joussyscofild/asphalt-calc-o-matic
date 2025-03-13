@@ -21,25 +21,36 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [content, setContent] = useState<string>(initialValue || '');
   const [selection, setSelection] = useState<{start: number, end: number} | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const isInitializedRef = useRef(false);
   
   console.log("RichTextEditor rendered with initialValue:", initialValue);
 
   // Initialize editor with initial content
   useEffect(() => {
     console.log("initialValue changed:", initialValue);
-    setContent(initialValue || '');
     
-    // Ensure the editor content is updated
-    if (editorRef.current) {
-      editorRef.current.innerHTML = initialValue || '';
+    // Only set content if initialValue exists and is different from current content
+    if (initialValue && initialValue !== content) {
+      setContent(initialValue);
+      
+      // Ensure the editor content is updated
+      if (editorRef.current) {
+        editorRef.current.innerHTML = initialValue;
+        isInitializedRef.current = true;
+      }
     }
   }, [initialValue]);
 
   // Handle content changes
   const handleChange = (e: React.FormEvent<HTMLDivElement>) => {
     const newContent = e.currentTarget.innerHTML;
-    setContent(newContent);
-    onChange(newContent);
+    
+    // Only update if content has actually changed
+    if (newContent !== content) {
+      console.log("Content changed in editor:", newContent.substring(0, 50) + "...");
+      setContent(newContent);
+      onChange(newContent);
+    }
   };
 
   // Save current selection

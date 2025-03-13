@@ -11,15 +11,18 @@ export const useAdminDashboard = () => {
   const handleSaveBlogPost = (post: BlogPost) => {
     // In a real application, you would save the post to your backend
     // For now, we'll update our local data
+    console.log("Admin dashboard saving post:", post.id);
     
     // First, check if the post already exists
     const existingPostIndex = blogPosts.findIndex(p => p.id === post.id);
     
     if (existingPostIndex !== -1) {
       // Update existing post
+      console.log("Updating existing post in admin dashboard");
       blogPosts[existingPostIndex] = { ...post };
     } else {
       // Add new post
+      console.log("Adding new post in admin dashboard");
       blogPosts.push({ ...post });
     }
     
@@ -31,6 +34,11 @@ export const useAdminDashboard = () => {
       title: `Blog Post ${statusMessage}`,
       description: `Successfully ${statusMessage.toLowerCase()} "${post.title}"`,
     });
+    
+    // Force a refresh of the dashboard to show updated posts
+    setTimeout(() => {
+      navigate('/admin/dashboard');
+    }, 100);
   };
   
   // Handler for canceling blog post edits
