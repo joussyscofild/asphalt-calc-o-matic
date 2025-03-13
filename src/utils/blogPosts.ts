@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface BlogPost {
@@ -410,7 +411,7 @@ export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
         imageUrl: post.image_url,
         featured: post.featured,
         readTime: post.read_time,
-        status: post.status
+        status: post.status as 'published' | 'draft' // Add explicit type cast
       }));
       
       // Update the blogPosts array
@@ -479,9 +480,9 @@ export const deleteBlogPostFromSupabase = async (postId: string): Promise<void> 
 
 // Helper functions to work with blog posts
 export const getRecentBlogPosts = async (count: number = 3): Promise<BlogPost[]> => {
-  await fetchBlogPosts(); // Ensure we have the latest posts
+  const posts = await fetchBlogPosts(); // Ensure we have the latest posts
   
-  return [...blogPosts]
+  return [...posts]
     .filter(post => post.status === 'published')
     .sort((a, b) => {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -489,9 +490,9 @@ export const getRecentBlogPosts = async (count: number = 3): Promise<BlogPost[]>
 };
 
 export const getFeaturedBlogPosts = async (): Promise<BlogPost[]> => {
-  await fetchBlogPosts(); // Ensure we have the latest posts
+  const posts = await fetchBlogPosts(); // Ensure we have the latest posts
   
-  return blogPosts.filter(post => post.featured && post.status === 'published');
+  return posts.filter(post => post.featured && post.status === 'published');
 };
 
 export const getBlogPostById = async (id: string): Promise<BlogPost | undefined> => {
@@ -522,7 +523,7 @@ export const getBlogPostById = async (id: string): Promise<BlogPost | undefined>
         imageUrl: data.image_url,
         featured: data.featured,
         readTime: data.read_time,
-        status: data.status
+        status: data.status as 'published' | 'draft' // Add explicit type cast
       };
     }
     
@@ -552,13 +553,13 @@ export const getBlogPostsByTag = async (tag: string): Promise<BlogPost[]> => {
 };
 
 export const getAllPublishedPosts = async (): Promise<BlogPost[]> => {
-  await fetchBlogPosts(); // Ensure we have the latest posts
+  const posts = await fetchBlogPosts(); // Ensure we have the latest posts
   
-  return blogPosts.filter(post => post.status === 'published');
+  return posts.filter(post => post.status === 'published');
 };
 
 export const getAllDraftPosts = async (): Promise<BlogPost[]> => {
-  await fetchBlogPosts(); // Ensure we have the latest posts
+  const posts = await fetchBlogPosts(); // Ensure we have the latest posts
   
-  return blogPosts.filter(post => post.status === 'draft');
+  return posts.filter(post => post.status === 'draft');
 };

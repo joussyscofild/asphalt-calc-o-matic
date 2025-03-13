@@ -1,18 +1,33 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Hero from '@/components/Hero';
 import FeaturedCalculators from '@/components/FeaturedCalculators';
 import BlogPostList from '@/components/BlogPostList';
-import { getFeaturedBlogPosts } from '@/utils/blogPosts';
+import { BlogPost, getFeaturedBlogPosts } from '@/utils/blogPosts';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ArrowRight, Check, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
-  const featuredPosts = getFeaturedBlogPosts();
+  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   
   useEffect(() => {
+    // Load featured posts
+    const loadFeaturedPosts = async () => {
+      try {
+        const posts = await getFeaturedBlogPosts();
+        setFeaturedPosts(posts);
+      } catch (error) {
+        console.error("Error loading featured posts:", error);
+      } finally {
+        setIsLoadingPosts(false);
+      }
+    };
+    
+    loadFeaturedPosts();
+    
     // For SEO, set page title and meta description
     document.title = 'asphaltcalculator.co - Construction Calculators & Guides';
     

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Tag as TagIcon, Folder } from 'lucide-react';
+import { ArrowLeft, Tag as TagIcon, Folder, Loader2 } from 'lucide-react';
 import { BlogPost, getBlogPostsByTag, getBlogPostsByCategory } from '@/utils/blogPosts';
 import BlogPostCard from '@/components/blog/BlogPostCard';
 
@@ -20,21 +20,28 @@ const BlogTagResults = () => {
   useEffect(() => {
     setIsLoading(true);
     
-    // Simulate a database fetch with small delay
-    setTimeout(() => {
+    const fetchResults = async () => {
       let results: BlogPost[] = [];
       
-      if (isTagPage && tag) {
-        results = getBlogPostsByTag(tag);
-        console.log(`Found ${results.length} posts with tag: ${tag}`);
-      } else if (category) {
-        results = getBlogPostsByCategory(category);
-        console.log(`Found ${results.length} posts in category: ${category}`);
+      try {
+        if (isTagPage && tag) {
+          results = await getBlogPostsByTag(tag);
+          console.log(`Found ${results.length} posts with tag: ${tag}`);
+        } else if (category) {
+          results = await getBlogPostsByCategory(category);
+          console.log(`Found ${results.length} posts in category: ${category}`);
+        }
+        
+        setPosts(results);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        setPosts([]);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setPosts(results);
-      setIsLoading(false);
-    }, 300);
+    };
+    
+    fetchResults();
   }, [tag, category, isTagPage]);
   
   return (
@@ -93,23 +100,13 @@ const BlogTagResults = () => {
         </div>
         
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-xl h-96 shadow-sm animate-pulse">
-                <div className="h-48 bg-gray-200 rounded-t-xl"></div>
-                <div className="p-6">
-                  <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded-full w-1/4"></div>
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+            <div className="text-lg">Loading posts...</div>
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-lg shadow-sm">
-            {isTagPage ? <TagIcon size={48} /> : <Folder size={48} />}
+            {isTagPage ? <TagIcon size={48} className="mx-auto text-gray-400" /> : <Folder size={48} className="mx-auto text-gray-400" />}
             <h2 className="text-2xl font-bold text-asphalt mt-4 mb-2">No posts found</h2>
             <p className="text-concrete-dark mb-8">
               {isTagPage 

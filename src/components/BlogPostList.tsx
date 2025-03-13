@@ -1,16 +1,18 @@
 
-import BlogPost, { BlogPostProps } from './BlogPost';
+import BlogPost from './BlogPost';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
+import { BlogPost as BlogPostType } from '@/utils/blogPosts';
 
 interface BlogPostListProps {
-  posts: BlogPostProps[];
+  posts: BlogPostType[];
   title: string;
   description?: string;
   showViewAll?: boolean;
+  isLoading?: boolean;
 }
 
-const BlogPostList = ({ posts, title, description, showViewAll = true }: BlogPostListProps) => {
+const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading = false }: BlogPostListProps) => {
   return (
     <section className="py-16">
       <div className="container-custom">
@@ -30,11 +32,22 @@ const BlogPostList = ({ posts, title, description, showViewAll = true }: BlogPos
           )}
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
-            <BlogPost key={post.id} {...post} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+            <span>Loading posts...</span>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-concrete-dark">No posts available.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+              <BlogPost key={post.id} {...post} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
