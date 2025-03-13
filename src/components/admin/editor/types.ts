@@ -20,6 +20,8 @@ export interface BlogPostEditorProps {
   onSave: (post: any, status?: string) => void;
   onCancel: () => void;
   onDelete?: (postId: string) => void;
+  posts?: any[]; // Add this line to support the posts array
+  isLoading?: boolean; // Add this line to support the isLoading flag
 }
 
 export interface GeneralTabProps {
