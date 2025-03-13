@@ -1,28 +1,57 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getCalculatorById } from '../utils/calculators';
 import { ArrowLeft, Calculator as CalcIcon, Info } from 'lucide-react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { fetchCalculators } from '@/utils/calculatorService';
+import { Calculator as CalculatorType } from '@/utils/calculatorTypes';
+import { useToast } from '@/hooks/use-toast';
 
 const Calculator = () => {
   const { id = '' } = useParams<{ id: string }>();
-  const calculator = getCalculatorById(id);
+  const [calculator, setCalculator] = useState<CalculatorType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [result, setResult] = useState<null | string | number>(null);
   const [showingHelp, setShowingHelp] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  if (!calculator) {
-    return (
-      <div className="container-custom py-20 text-center">
-        <CalcIcon size={48} className="mx-auto text-concrete mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Calculator Not Found</h1>
-        <p className="mb-6">The calculator you're looking for doesn't exist or may have been moved.</p>
-        <Link to="/calculators" className="btn-primary">
-          Browse All Calculators
-        </Link>
-      </div>
-    );
-  }
+  // Load calculator details from Supabase
+  useEffect(() => {
+    const loadCalculator = async () => {
+      setIsLoading(true);
+      try {
+        const calculators = await fetchCalculators();
+        const found = calculators.find(calc => calc.id === id);
+        
+        if (found) {
+          setCalculator(found);
+          
+          // Initialize form data with default values
+          if (found.fields) {
+            const initialFormData: Record<string, any> = {};
+            found.fields.forEach(field => {
+              if (field.defaultValue !== undefined) {
+                initialFormData[field.id] = field.defaultValue;
+              }
+            });
+            setFormData(initialFormData);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading calculator:', error);
+        toast({
+          title: 'Error Loading Calculator',
+          description: 'Could not load the calculator. Please try again.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCalculator();
+  }, [id, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value, type } = e.target;
@@ -41,7 +70,7 @@ const Calculator = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (id === 'asphalt-tonnage' && calculator.fields) {
+    if (id === 'asphalt-tonnage') {
       const { length, width, thickness, density } = formData;
       if (length && width && thickness && density) {
         const thicknessInFeet = thickness / 12;
@@ -51,7 +80,7 @@ const Calculator = () => {
         setResult(tons.toFixed(2));
       }
     } 
-    else if (id === 'paving-cost' && calculator.fields) {
+    else if (id === 'paving-cost') {
       const { area, materialCost, laborCost, additionalCosts } = formData;
       if (area && materialCost) {
         const materialTotal = area * materialCost;
@@ -61,7 +90,7 @@ const Calculator = () => {
         setResult(totalCost.toFixed(2));
       }
     }
-    else if (id === 'concrete-volume' && calculator.fields) {
+    else if (id === 'concrete-volume') {
       const { length, width, thickness } = formData;
       if (length && width && thickness) {
         const thicknessInFeet = thickness / 12;
@@ -75,54 +104,79 @@ const Calculator = () => {
     }
   };
 
-  const calculatorFields = calculator.fields || (id === 'paving-cost' ? [
-    {
-      id: 'area',
-      label: 'Area to Pave',
-      type: 'number',
-      placeholder: '1000',
-      defaultValue: 1000,
-      required: true,
-      unit: 'sq. ft.',
-      min: 0,
-      helperText: 'Total area that needs to be paved'
-    },
-    {
-      id: 'materialCost',
-      label: 'Material Cost',
-      type: 'number',
-      placeholder: '2.50',
-      defaultValue: 2.5,
-      required: true,
-      unit: '$ per sq. ft.',
-      min: 0,
-      step: 0.1,
-      helperText: 'Cost of asphalt material per square foot'
-    },
-    {
-      id: 'laborCost',
-      label: 'Labor Cost',
-      type: 'number',
-      placeholder: '1.75',
-      defaultValue: 1.75,
-      required: false,
-      unit: '$ per sq. ft.',
-      min: 0,
-      step: 0.1,
-      helperText: 'Cost of labor per square foot (optional)'
-    },
-    {
-      id: 'additionalCosts',
-      label: 'Additional Costs',
-      type: 'number',
-      placeholder: '500',
-      defaultValue: 500,
-      required: false,
-      unit: '$',
-      min: 0,
-      helperText: 'Any additional costs like equipment rental, permits, etc. (optional)'
-    }
-  ] : []);
+  if (isLoading) {
+    return (
+      <div className="container-custom py-12 text-center">
+        <CalcIcon size={48} className="mx-auto animate-spin text-muted-foreground mb-4" />
+        <p>Loading calculator...</p>
+      </div>
+    );
+  }
+
+  if (!calculator) {
+    return (
+      <div className="container-custom py-20 text-center">
+        <CalcIcon size={48} className="mx-auto text-concrete mb-4" />
+        <h1 className="text-2xl font-bold mb-4">Calculator Not Found</h1>
+        <p className="mb-6">The calculator you're looking for doesn't exist or may have been moved.</p>
+        <Link to="/calculators" className="btn-primary">
+          Browse All Calculators
+        </Link>
+      </div>
+    );
+  }
+
+  // Default fields for calculators that don't have them defined yet
+  const calculatorFields = calculator.fields?.length ? calculator.fields : (
+    id === 'paving-cost' ? [
+      {
+        id: 'area',
+        label: 'Area to Pave',
+        type: 'number',
+        placeholder: '1000',
+        defaultValue: 1000,
+        required: true,
+        unit: 'sq. ft.',
+        min: 0,
+        helperText: 'Total area that needs to be paved'
+      },
+      {
+        id: 'materialCost',
+        label: 'Material Cost',
+        type: 'number',
+        placeholder: '2.50',
+        defaultValue: 2.5,
+        required: true,
+        unit: '$ per sq. ft.',
+        min: 0,
+        step: 0.1,
+        helperText: 'Cost of asphalt material per square foot'
+      },
+      {
+        id: 'laborCost',
+        label: 'Labor Cost',
+        type: 'number',
+        placeholder: '1.75',
+        defaultValue: 1.75,
+        required: false,
+        unit: '$ per sq. ft.',
+        min: 0,
+        step: 0.1,
+        helperText: 'Cost of labor per square foot (optional)'
+      },
+      {
+        id: 'additionalCosts',
+        label: 'Additional Costs',
+        type: 'number',
+        placeholder: '500',
+        defaultValue: 500,
+        required: false,
+        unit: '$',
+        min: 0,
+        helperText: 'Any additional costs like equipment rental, permits, etc. (optional)'
+      }
+    ] : []
+  );
 
   return (
     <div className="container-custom py-12">
@@ -249,18 +303,17 @@ const Calculator = () => {
                 <h3 className="text-sm font-medium text-asphalt mb-1">Related Calculators:</h3>
                 <ul className="space-y-1">
                   {calculator.relatedCalculators.map(calcId => {
-                    const relatedCalc = getCalculatorById(calcId);
-                    return relatedCalc ? (
+                    return (
                       <li key={calcId}>
                         <Link 
                           to={`/calculator/${calcId}`} 
                           className="text-asphalt hover:text-safety-dark text-sm flex items-center"
                         >
                           <ArrowLeft size={12} className="mr-1" />
-                          {relatedCalc.title}
+                          {calcId}
                         </Link>
                       </li>
-                    ) : null;
+                    );
                   })}
                 </ul>
               </div>

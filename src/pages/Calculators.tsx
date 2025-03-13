@@ -1,22 +1,44 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Calculator } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CalculatorCard from '@/components/CalculatorCard';
-import { calculators, categories } from '@/utils/calculators';
+import { categories } from '@/utils/calculatorCategories';
+import { fetchCalculators } from '@/utils/calculatorService';
+import { Calculator as CalculatorType } from '@/utils/calculatorTypes';
 
 const Calculators = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [filteredCalculators, setFilteredCalculators] = useState(calculators);
+  const [calculators, setCalculators] = useState<CalculatorType[]>([]);
+  const [filteredCalculators, setFilteredCalculators] = useState<CalculatorType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
+  // Load calculators from Supabase
   useEffect(() => {
-    // For SEO, set page title
-    document.title = 'Construction Calculators | asphaltcalculator.co';
+    const loadCalculators = async () => {
+      setIsLoading(true);
+      try {
+        // For SEO, set page title
+        document.title = 'Construction Calculators | asphaltcalculator.co';
+        
+        const loadedCalculators = await fetchCalculators();
+        setCalculators(loadedCalculators);
+        setFilteredCalculators(loadedCalculators);
+      } catch (error) {
+        console.error("Error loading calculators:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    // Filter calculators based on search query and category
+    loadCalculators();
+  }, []);
+  
+  // Filter calculators based on search query and category
+  useEffect(() => {
     const filtered = calculators.filter(calc => {
       const matchesSearch = 
         calc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -30,7 +52,7 @@ const Calculators = () => {
     });
     
     setFilteredCalculators(filtered);
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, calculators]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,7 +121,13 @@ const Calculators = () => {
           </div>
           
           {/* Calculators Grid */}
-          {filteredCalculators.length > 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="h-64 rounded-lg bg-white border border-gray-200 animate-pulse"></div>
+              ))}
+            </div>
+          ) : filteredCalculators.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCalculators.map(calc => (
                 <CalculatorCard

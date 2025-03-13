@@ -1,61 +1,35 @@
 
-import { Navigation, Ruler, Building, TrendingUp, Landmark, LayoutGrid, Warehouse, Gauge, Truck, ChevronRight } from 'lucide-react';
-import CalculatorCard from './CalculatorCard';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronRight, Calculator } from 'lucide-react';
+import CalculatorCard from './CalculatorCard';
+import { fetchCalculators } from '@/utils/calculatorService';
+import { Calculator as CalculatorType } from '@/utils/calculatorTypes';
 
 const FeaturedCalculators = () => {
-  const featuredCalculators = [
-    {
-      id: 'asphalt-tonnage',
-      title: 'Asphalt Tonnage Calculator',
-      description: 'Calculate the exact tonnage needed for your asphalt paving project with adjustments for density and temperature.',
-      icon: <Navigation size={20} />,
-      category: 'Asphalt',
-      timeEstimate: '1 min',
-      featured: true
-    },
-    {
-      id: 'asphalt-thickness',
-      title: 'Asphalt Thickness Estimator',
-      description: 'Determine the optimal asphalt thickness based on traffic load, subgrade conditions, and climate factors.',
-      icon: <Ruler size={20} />,
-      category: 'Asphalt',
-      timeEstimate: '2 min'
-    },
-    {
-      id: 'concrete-volume',
-      title: 'Concrete Volume Calculator',
-      description: 'Calculate the precise amount of concrete needed for your foundation, slab, column, or custom-shaped projects.',
-      icon: <Building size={20} />,
-      category: 'Concrete',
-      timeEstimate: '1 min'
-    },
-    {
-      id: 'paving-cost',
-      title: 'Paving Cost Calculator',
-      description: 'Estimate the total cost of your paving project including materials, labor, equipment, and other expenses.',
-      icon: <TrendingUp size={20} />,
-      category: 'Cost Estimation',
-      timeEstimate: '3 min',
-      featured: true
-    },
-    {
-      id: 'parking-lot',
-      title: 'Parking Lot Calculator',
-      description: 'Plan your parking lot with precise measurements for asphalt quantity, striping, and drainage requirements.',
-      icon: <LayoutGrid size={20} />,
-      category: 'Specialty',
-      timeEstimate: '3 min'
-    },
-    {
-      id: 'earthwork-excavation',
-      title: 'Earthwork Excavation Calculator',
-      description: 'Calculate cut and fill volumes for site preparation with adjustments for soil type and compaction.',
-      icon: <Truck size={20} />,
-      category: 'Earthwork',
-      timeEstimate: '2 min'
-    }
-  ];
+  const [calculators, setCalculators] = useState<CalculatorType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCalculators = async () => {
+      try {
+        const allCalculators = await fetchCalculators();
+        // Filter to get featured calculators or just show the first 6
+        const featuredCalcs = allCalculators.filter(calc => calc.featured);
+        const calcsToShow = featuredCalcs.length >= 3 ? 
+          featuredCalcs.slice(0, 6) : 
+          allCalculators.slice(0, 6);
+        
+        setCalculators(calcsToShow);
+      } catch (error) {
+        console.error("Error loading calculators:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadCalculators();
+  }, []);
 
   return (
     <section className="py-16 bg-gray-50">
@@ -74,11 +48,36 @@ const FeaturedCalculators = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredCalculators.map((calc) => (
-            <CalculatorCard key={calc.id} {...calc} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="h-64 rounded-lg bg-white border border-gray-200 animate-pulse"></div>
+            ))}
+          </div>
+        ) : calculators.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {calculators.map((calc) => (
+              <CalculatorCard 
+                key={calc.id}
+                id={calc.id}
+                title={calc.title}
+                description={calc.description}
+                icon={<calc.icon size={20} />}
+                category={calc.category}
+                timeEstimate={calc.timeEstimate}
+                featured={calc.featured}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <Calculator className="h-12 w-12 mx-auto text-concrete mb-4" />
+            <h3 className="text-xl font-semibold">No Calculators Available</h3>
+            <p className="text-concrete-dark mt-2">
+              Please check back later for our professional construction calculators.
+            </p>
+          </div>
+        )}
         
         <div className="mt-10 text-center">
           <p className="text-concrete-dark mb-4">

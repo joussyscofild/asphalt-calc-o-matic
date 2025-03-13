@@ -63,6 +63,148 @@ export type Database = {
         }
         Relationships: []
       }
+      calculator_fields: {
+        Row: {
+          calculator_id: string
+          created_at: string | null
+          default_value: Json | null
+          field_id: string
+          helper_text: string | null
+          id: string
+          label: string
+          max: number | null
+          min: number | null
+          options: Json | null
+          placeholder: string | null
+          required: boolean | null
+          sort_order: number
+          step: number | null
+          type: string
+          unit: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          calculator_id: string
+          created_at?: string | null
+          default_value?: Json | null
+          field_id: string
+          helper_text?: string | null
+          id?: string
+          label: string
+          max?: number | null
+          min?: number | null
+          options?: Json | null
+          placeholder?: string | null
+          required?: boolean | null
+          sort_order?: number
+          step?: number | null
+          type: string
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          calculator_id?: string
+          created_at?: string | null
+          default_value?: Json | null
+          field_id?: string
+          helper_text?: string | null
+          id?: string
+          label?: string
+          max?: number | null
+          min?: number | null
+          options?: Json | null
+          placeholder?: string | null
+          required?: boolean | null
+          sort_order?: number
+          step?: number | null
+          type?: string
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calculator_fields_calculator_id_fkey"
+            columns: ["calculator_id"]
+            isOneToOne: false
+            referencedRelation: "calculators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calculator_related_items: {
+        Row: {
+          calculator_id: string
+          created_at: string | null
+          id: string
+          related_id: string
+          related_type: string
+        }
+        Insert: {
+          calculator_id: string
+          created_at?: string | null
+          id?: string
+          related_id: string
+          related_type: string
+        }
+        Update: {
+          calculator_id?: string
+          created_at?: string | null
+          id?: string
+          related_id?: string
+          related_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calculator_related_items_calculator_id_fkey"
+            columns: ["calculator_id"]
+            isOneToOne: false
+            referencedRelation: "calculators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calculators: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string
+          featured: boolean | null
+          formula: string | null
+          icon: string
+          id: string
+          long_description: string | null
+          time_estimate: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description: string
+          featured?: boolean | null
+          formula?: string | null
+          icon: string
+          id: string
+          long_description?: string | null
+          time_estimate: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string
+          featured?: boolean | null
+          formula?: string | null
+          icon?: string
+          id?: string
+          long_description?: string | null
+          time_estimate?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
