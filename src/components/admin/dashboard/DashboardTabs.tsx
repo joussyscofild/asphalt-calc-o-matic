@@ -35,6 +35,8 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
     const hash = location.hash.replace('#', '');
     if (hash && ['dashboard', 'blog', 'calculators', 'pages', 'footer', 'appearance'].includes(hash)) {
       setActiveTab(hash);
+      // Force refresh when tab changes from URL
+      setTabKey(Date.now());
     }
   }, [location]);
   
@@ -46,6 +48,8 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
   
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+    // Force refresh when tab changes
+    setTabKey(Date.now());
     // Update URL hash for bookmarking/sharing
     navigate(`/admin/dashboard#${value}`, { replace: true });
   };
@@ -79,7 +83,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="dashboard">
+      <TabsContent value="dashboard" key={`dashboard-content-${tabKey}`}>
         <Card>
           <CardHeader>
             <CardTitle>Admin Dashboard</CardTitle>
@@ -93,7 +97,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="blog">
+      <TabsContent value="blog" key={`blog-content-${tabKey}`}>
         <Card>
           <CardHeader>
             <CardTitle>Blog Management</CardTitle>
@@ -112,7 +116,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="calculators">
+      <TabsContent value="calculators" key={`calculators-content-${tabKey}`}>
         <Card>
           <CardHeader>
             <CardTitle>Calculator Management</CardTitle>
@@ -126,7 +130,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="pages">
+      <TabsContent value="pages" key={`pages-content-${tabKey}`}>
         <Card>
           <CardHeader>
             <CardTitle>Pages Management</CardTitle>
@@ -140,7 +144,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="footer">
+      <TabsContent value="footer" key={`footer-content-${tabKey}`}>
         <Card>
           <CardHeader>
             <CardTitle>Footer Links Management</CardTitle>
@@ -154,7 +158,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="appearance">
+      <TabsContent value="appearance" key={`appearance-content-${tabKey}`}>
         <Card>
           <CardHeader>
             <CardTitle>Site Customization</CardTitle>
