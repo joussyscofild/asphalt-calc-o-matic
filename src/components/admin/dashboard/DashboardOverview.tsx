@@ -1,9 +1,48 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { BookOpen, Calculator as CalculatorIcon, FileText } from "lucide-react";
+import { BookOpen, Calculator as CalculatorIcon, FileText, Loader2 } from "lucide-react";
+import { useDashboardOverview } from '@/hooks/use-dashboard-overview';
 
 const DashboardOverview: React.FC = () => {
+  const { calculators, blogPosts, pages, recentActivity, isLoading } = useDashboardOverview();
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="mt-4 text-sm text-muted-foreground">Loading dashboard data...</p>
+      </div>
+    );
+  }
+
+  const getChangeText = (change: number) => {
+    if (change === 0) return "No change from last month";
+    return `${change > 0 ? '+' : ''}${change} from last month`;
+  };
+
+  const getActivityTimeText = (daysAgo: number) => {
+    if (daysAgo === 0) return "Today";
+    if (daysAgo === 1) return "Yesterday";
+    if (daysAgo < 7) return `${daysAgo} days ago`;
+    if (daysAgo < 14) return "1 week ago";
+    if (daysAgo < 30) return `${Math.floor(daysAgo / 7)} weeks ago`;
+    return `${Math.floor(daysAgo / 30)} month${Math.floor(daysAgo / 30) > 1 ? 's' : ''} ago`;
+  };
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'blog':
+        return <BookOpen className="h-4 w-4" />;
+      case 'calculator':
+        return <CalculatorIcon className="h-4 w-4" />;
+      case 'page':
+        return <FileText className="h-4 w-4" />;
+      default:
+        return <FileText className="h-4 w-4" />;
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -14,9 +53,9 @@ const DashboardOverview: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{calculators.total}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              +2 from last month
+              {getChangeText(calculators.change)}
             </p>
           </CardContent>
         </Card>
@@ -27,9 +66,9 @@ const DashboardOverview: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">6</div>
+            <div className="text-2xl font-bold">{blogPosts.total}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              +1 from last month
+              {getChangeText(blogPosts.change)}
             </p>
           </CardContent>
         </Card>
@@ -40,9 +79,9 @@ const DashboardOverview: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
+            <div className="text-2xl font-bold">{pages.total}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              No change from last month
+              {getChangeText(pages.change)}
             </p>
           </CardContent>
         </Card>
@@ -50,29 +89,28 @@ const DashboardOverview: React.FC = () => {
       
       <div className="mt-8">
         <h3 className="text-lg font-medium mb-4">Recent Activity</h3>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              <span>Blog post "Understanding Asphalt Density" edited</span>
-            </div>
-            <span className="text-sm text-muted-foreground">2 days ago</span>
+        {recentActivity.length > 0 ? (
+          <div className="space-y-2">
+            {recentActivity.map((item, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
+                <div className="flex items-center gap-2">
+                  {getActivityIcon(item.type)}
+                  <span>
+                    {item.type === 'blog' && 'Blog post '}
+                    {item.type === 'calculator' && 'Calculator '}
+                    {item.type === 'page' && 'Page '}
+                    "{item.title}" {item.action}
+                  </span>
+                </div>
+                <span className="text-sm text-muted-foreground">{getActivityTimeText(item.daysAgo)}</span>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
-            <div className="flex items-center gap-2">
-              <CalculatorIcon className="h-4 w-4" />
-              <span>New calculator "Retaining Wall" added</span>
-            </div>
-            <span className="text-sm text-muted-foreground">5 days ago</span>
+        ) : (
+          <div className="p-4 bg-secondary/50 rounded-md text-center">
+            <p className="text-muted-foreground">No recent activity found</p>
           </div>
-          <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span>Page "About Us" updated</span>
-            </div>
-            <span className="text-sm text-muted-foreground">1 week ago</span>
-          </div>
-        </div>
+        )}
       </div>
     </>
   );
