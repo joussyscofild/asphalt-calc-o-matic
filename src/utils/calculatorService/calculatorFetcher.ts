@@ -82,6 +82,10 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
         const iconName = calc.icon as keyof typeof LucideIcons;
         const icon = LucideIcons[iconName] || LucideIcons.Calculator;
 
+        // Handle the tags property - it may not exist in the database schema
+        // This fixes the TypeScript error by explicitly checking for the tags property
+        const tags = Array.isArray(calc['tags']) ? calc['tags'] : [];
+
         return {
           id: calc.id,
           title: calc.title,
@@ -95,7 +99,7 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           fields: fields,
           relatedCalculators: relatedCalculators,
           relatedArticles: relatedArticles,
-          tags: calc.tags
+          tags: tags
         };
       })
     );
