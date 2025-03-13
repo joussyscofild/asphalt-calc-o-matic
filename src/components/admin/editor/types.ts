@@ -23,5 +23,5 @@ export interface FormData {
   category: string;
   tags: string[];
   featured: boolean;
-  status?: string;
+  status: 'published' | 'draft';
 }

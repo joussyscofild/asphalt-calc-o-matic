@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,7 +34,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const { toast } = useToast();
   const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState<BlogPost | undefined>(post);
-  const [isCreating, setIsCreating] = useState<boolean>(false); // Changed to false by default
+  const [isCreating, setIsCreating] = useState<boolean>(false);
   const [editorKey, setEditorKey] = useState<number>(0);
   const [postsList, setPostsList] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -81,7 +80,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   }, [post]);
   
   const handleSaveComplete = (post: BlogPost, isPublished: boolean) => {
-    const updatedPost = {
+    const updatedPost: BlogPost = {
       ...post,
       status: isPublished ? 'published' : 'draft'
     };
@@ -165,7 +164,6 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const handleDeletePost = (postId: string) => {
     if (onDelete) {
       onDelete(postId);
-      // Update local list after delete
       setPostsList(prevPosts => prevPosts.filter(post => post.id !== postId));
     }
   };
