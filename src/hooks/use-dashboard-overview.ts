@@ -96,60 +96,75 @@ export const useDashboardOverview = (): DashboardStats => {
         const activity: ActivityItem[] = [];
 
         // Add blog post activity
-        postsData?.slice(0, 3).forEach(post => {
-          const date = post.updated_at || post.created_at;
-          if (date) {
-            const timestamp = parseISO(date);
-            const daysAgo = Math.floor((new Date().getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24));
+        if (postsData) {
+          for (const post of postsData.slice(0, 3)) {
+            const date = post.updated_at || post.created_at;
+            if (date) {
+              const timestamp = parseISO(date);
+              const daysAgo = Math.floor((new Date().getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24));
 
-            activity.push({
-              type: 'blog',
-              title: post.title,
-              action: 'edited',
-              timestamp: date,
-              daysAgo
-            });
+              activity.push({
+                type: 'blog',
+                title: post.title,
+                action: 'edited',
+                timestamp: date,
+                daysAgo
+              });
+            }
           }
-        });
+        }
 
         // Add calculator activity
-        calculatorsData?.slice(0, 3).forEach(calc => {
-          const { data: calcInfo } = await supabase
-            .from('calculators')
-            .select('title')
-            .eq('id', calc.id)
-            .single();
+        if (calculatorsData) {
+          for (const calc of calculatorsData.slice(0, 3)) {
+            try {
+              const { data: calcInfo, error } = await supabase
+                .from('calculators')
+                .select('title')
+                .eq('id', calc.id)
+                .single();
 
-          if (calc.created_at && calcInfo?.title) {
-            const timestamp = parseISO(calc.created_at);
-            const daysAgo = Math.floor((new Date().getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24));
+              if (error) {
+                console.error(`Error fetching calculator info for id ${calc.id}:`, error);
+                continue;
+              }
 
-            activity.push({
-              type: 'calculator',
-              title: calcInfo.title,
-              action: 'added',
-              timestamp: calc.created_at,
-              daysAgo
-            });
+              if (calc.created_at && calcInfo?.title) {
+                const timestamp = parseISO(calc.created_at);
+                const daysAgo = Math.floor((new Date().getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24));
+
+                activity.push({
+                  type: 'calculator',
+                  title: calcInfo.title,
+                  action: 'added',
+                  timestamp: calc.created_at,
+                  daysAgo
+                });
+              }
+            } catch (error) {
+              console.error(`Error processing calculator activity for id ${calc.id}:`, error);
+            }
           }
-        });
+        }
 
         // Add page activity
-        pagesData?.slice(0, 3).forEach(page => {
-          const date = page.last_modified || page.created_at;
-          if (date) {
-            const timestamp = parseISO(date);
-            const daysAgo = Math.floor((new Date().getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24));
+        if (pagesData) {
+          for (const page of pagesData.slice(0, 3)) {
+            const date = page.last_modified || page.created_at;
+            if (date) {
+              const timestamp = parseISO(date);
+              const daysAgo = Math.floor((new Date().getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24));
 
-            activity.push({
-              type: 'page',
-              title: page.title,
-              action: 'updated',
-              timestamp: date,
-              daysAgo
-            });
+              activity.push({
+                type: 'page',
+                title: page.title,
+                action: 'updated',
+                timestamp: date,
+                daysAgo
+              });
+            }
           }
-        });
+        }
 
         // Sort activity by timestamp (most recent first)
         activity.sort((a, b) => 
