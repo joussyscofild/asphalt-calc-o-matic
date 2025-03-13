@@ -62,15 +62,15 @@ const FeaturedCalculators = () => {
       <div className="container-custom">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
-            <h2 className="section-heading">Construction Calculators</h2>
+            <h2 className="section-heading mb-3">Professional Construction Calculators</h2>
             <p className="text-concrete-dark max-w-2xl">
-              Professional-grade calculators designed for precision and ease of use.
-              Save time and reduce material waste with our industry-standard tools.
+              Our professional-grade calculators are designed for precision and ease of use.
+              Save time, reduce material waste, and improve cost estimates with our industry-standard tools.
             </p>
           </div>
-          <Link to="/calculators" className="mt-4 md:mt-0 inline-flex items-center font-medium text-asphalt hover:text-safety-dark">
+          <Link to="/calculators" className="mt-4 md:mt-0 inline-flex items-center font-medium text-asphalt hover:text-safety-dark transition-colors group">
             View All Calculators
-            <ChevronRight size={18} className="ml-1" />
+            <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
         
@@ -78,6 +78,15 @@ const FeaturedCalculators = () => {
           {featuredCalculators.map((calc) => (
             <CalculatorCard key={calc.id} {...calc} />
           ))}
+        </div>
+        
+        <div className="mt-10 text-center">
+          <p className="text-concrete-dark mb-4">
+            Can't find what you're looking for? We're constantly adding new calculators.
+          </p>
+          <Link to="/calculators" className="btn-outline">
+            Explore All Calculators
+          </Link>
         </div>
       </div>
     </section>
