@@ -1,8 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Calculator } from '@/utils/calculatorTypes';
-import { fetchCalculators, saveCalculator, deleteCalculator, initializeCalculators } from '@/utils/calculatorService';
+import { 
+  fetchCalculators, 
+  saveCalculator, 
+  deleteCalculator, 
+  initializeCalculators 
+} from '@/utils/calculatorService';
 
 export const useCalculatorAdmin = () => {
   const { toast } = useToast();
