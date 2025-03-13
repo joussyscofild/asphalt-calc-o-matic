@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calculator, Globe, Mail } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import { formatUrl } from './admin/footer-manager/utils/urlFormatter';
 
 type FooterLink = {
   id: string;

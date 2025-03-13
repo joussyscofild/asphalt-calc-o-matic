@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { FooterLink, NewLinkData } from './types';
 import { useToast } from '@/hooks/use-toast';
+import { formatUrl } from './utils/urlFormatter';
 
 interface LinkFormProps {
   editingLink: FooterLink | null;
