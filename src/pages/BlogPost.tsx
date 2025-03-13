@@ -13,7 +13,10 @@ const BlogPost = () => {
   
   // Refresh post data when component mounts or id changes
   useEffect(() => {
-    setPost(getBlogPostById(id));
+    // Ensure we're getting the latest version of the post
+    const currentPost = getBlogPostById(id);
+    console.log("BlogPost page loading post:", id, "Content length:", currentPost?.content?.length || 0);
+    setPost(currentPost);
   }, [id]);
 
   if (!post) {
@@ -88,6 +91,11 @@ const BlogPost = () => {
                   <Tag size={16} className="mr-1" />
                   <span className="text-sm">{post.category}</span>
                 </div>
+                {post.status === 'draft' && (
+                  <div className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
+                    Draft
+                  </div>
+                )}
               </div>
 
               <div 

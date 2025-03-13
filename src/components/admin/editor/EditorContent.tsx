@@ -27,8 +27,10 @@ const EditorContent: React.FC<EditorContentProps> = ({
   // Ensure the editor content is up-to-date with the content prop
   useEffect(() => {
     if (editorRef.current) {
+      console.log("EditorContent syncing content, length:", content.length);
+      // Only update innerHTML if it's different to avoid cursor jumping
       if (content !== editorRef.current.innerHTML) {
-        editorRef.current.innerHTML = content || '';
+        editorRef.current.innerHTML = content;
       }
     }
   }, [content, editorRef]);
@@ -46,7 +48,7 @@ const EditorContent: React.FC<EditorContentProps> = ({
         onKeyUp={saveSelection}
         onFocus={restoreSelection}
         onBlur={saveSelection}
-        dangerouslySetInnerHTML={{ __html: content || '' }}
+        suppressContentEditableWarning={true}
       />
       {isContentEmpty && (
         <div className="absolute pointer-events-none text-gray-400 p-4" style={{top: 0, left: 0, right: 0}}>

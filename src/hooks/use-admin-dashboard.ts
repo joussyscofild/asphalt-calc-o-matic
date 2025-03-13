@@ -2,16 +2,18 @@
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { BlogPost, blogPosts } from '@/utils/blogPosts';
+import { useState } from "react";
 
 export const useAdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Handler for saving blog posts
   const handleSaveBlogPost = (post: BlogPost) => {
     // In a real application, you would save the post to your backend
     // For now, we'll update our local data
-    console.log("Admin dashboard saving post:", post.id);
+    console.log("Admin dashboard saving post:", post.id, "Content length:", post.content.length);
     
     // First, check if the post already exists
     const existingPostIndex = blogPosts.findIndex(p => p.id === post.id);
@@ -35,7 +37,10 @@ export const useAdminDashboard = () => {
       description: `Successfully ${statusMessage.toLowerCase()} "${post.title}"`,
     });
     
-    // Force a refresh of the dashboard to show updated posts
+    // Force a refresh to show updated posts
+    setRefreshTrigger(prev => prev + 1);
+    
+    // Navigate back to dashboard after a brief delay to allow state updates
     setTimeout(() => {
       navigate('/admin/dashboard');
     }, 100);
@@ -47,6 +52,7 @@ export const useAdminDashboard = () => {
       title: "Editing Canceled",
       description: "Changes to the blog post have been discarded.",
     });
+    navigate('/admin/dashboard');
   };
 
   // Handle admin logout
@@ -62,6 +68,7 @@ export const useAdminDashboard = () => {
   return {
     handleSaveBlogPost,
     handleCancelBlogPost,
-    handleLogout
+    handleLogout,
+    refreshTrigger
   };
 };

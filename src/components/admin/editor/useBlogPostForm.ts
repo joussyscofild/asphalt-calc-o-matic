@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { BlogPost, blogPosts } from '@/utils/blogPosts';
 import { useToast } from "@/hooks/use-toast";
@@ -30,7 +31,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
   // Update form data when post changes
   useEffect(() => {
     if (post) {
-      console.log("Post content loaded:", post.content?.substring(0, 50) + "...");
+      console.log("Loading post for editing:", post.id, "Content length:", post.content?.length || 0);
       setFormData({
         id: post.id || '',
         title: post.title || '',
@@ -44,7 +45,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
         category: post.category || 'Construction',
         tags: post.tags || [],
         featured: post.featured || false,
-        status: post.status || 'published'
+        status: post.status || 'draft'
       });
       setHasInitialized(true);
     } else {
@@ -76,7 +77,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
   };
 
   const handleContentChange = (content: string) => {
-    console.log("Content updated in form:", content.substring(0, 50) + "...");
+    console.log("Content changed in form, new length:", content.length);
     setFormData(prev => ({ ...prev, content }));
   };
 
@@ -156,17 +157,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
       status: isPublished ? 'published' : 'draft'
     };
     
-    console.log("Saving post with content:", completedPost.content.substring(0, 50) + "...");
-    
-    // Update the blogPosts array directly (for local state)
-    const existingIndex = blogPosts.findIndex(p => p.id === completedPost.id);
-    if (existingIndex !== -1) {
-      console.log("Updating existing post at index:", existingIndex);
-      blogPosts[existingIndex] = { ...completedPost };
-    } else {
-      console.log("Adding new post to blogPosts array");
-      blogPosts.push({ ...completedPost });
-    }
+    console.log("Saving post with ID:", completedPost.id, "Content length:", completedPost.content.length);
     
     onSave(completedPost, isPublished);
     

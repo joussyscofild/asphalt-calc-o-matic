@@ -22,12 +22,18 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const [isCreating, setIsCreating] = useState<boolean>(!post);
   const [editorKey, setEditorKey] = useState<number>(0);
   
+  useEffect(() => {
+    console.log("BlogPostEditor initialized with post:", post?.id || "new post");
+  }, [post]);
+  
   const handleSaveComplete = (post: BlogPost, isPublished: boolean) => {
     // Add the status to the post object
     const updatedPost = {
       ...post,
       status: isPublished ? 'published' : 'draft'
     };
+    
+    console.log("Saving post from editor, ID:", updatedPost.id, "Content length:", updatedPost.content.length);
     
     // Call the parent component's onSave function
     onSave(updatedPost);
@@ -59,13 +65,13 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   // When editing a post, update the editorKey to force a re-render
   useEffect(() => {
     if (selectedPost) {
-      console.log("Blog post selected for editing:", selectedPost);
+      console.log("Blog post selected for editing, ID:", selectedPost.id, "Content length:", selectedPost.content.length);
       setEditorKey(prev => prev + 1);
     }
   }, [selectedPost]);
 
   const handleEditPost = (blogPost: BlogPost) => {
-    console.log("Editing blog post:", blogPost);
+    console.log("Editing blog post:", blogPost.id, "Content length:", blogPost.content.length);
     toast({
       title: "Loading post for editing",
       description: `Loading "${blogPost.title}" for editing`,
@@ -171,7 +177,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   }
 
   return (
-    <form className="space-y-6">
+    <form className="space-y-6" key={`blog-post-form-${editorKey}`}>
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">
           {isNew ? "Create New Blog Post" : `Edit: ${selectedPost?.title}`}

@@ -18,26 +18,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = 'Start writing...'
 }) => {
   // Local state for content
-  const [content, setContent] = useState<string>(initialValue || '');
+  const [content, setContent] = useState<string>(initialValue);
   const [selection, setSelection] = useState<{start: number, end: number} | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-  const isInitializedRef = useRef(false);
   
-  console.log("RichTextEditor rendered with initialValue:", initialValue);
+  console.log("RichTextEditor rendered with initialValue length:", initialValue.length);
 
   // Initialize editor with initial content
   useEffect(() => {
-    console.log("initialValue changed:", initialValue);
+    console.log("RichTextEditor initialValue changed, length:", initialValue.length);
     
-    // Only set content if initialValue exists and is different from current content
-    if (initialValue && initialValue !== content) {
-      setContent(initialValue);
-      
-      // Ensure the editor content is updated
-      if (editorRef.current) {
-        editorRef.current.innerHTML = initialValue;
-        isInitializedRef.current = true;
-      }
+    // Always update content state when initialValue changes
+    setContent(initialValue);
+    
+    // Ensure the editor content is updated
+    if (editorRef.current) {
+      editorRef.current.innerHTML = initialValue;
     }
   }, [initialValue]);
 
@@ -47,7 +43,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     
     // Only update if content has actually changed
     if (newContent !== content) {
-      console.log("Content changed in editor:", newContent.substring(0, 50) + "...");
+      console.log("Content changed in editor, new length:", newContent.length);
       setContent(newContent);
       onChange(newContent);
     }

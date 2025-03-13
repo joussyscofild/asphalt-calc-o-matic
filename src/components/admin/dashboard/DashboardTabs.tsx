@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import BlogPostEditor from "@/components/admin/BlogPostEditor";
@@ -10,18 +10,43 @@ import FooterManager from "@/components/admin/FooterManager";
 import { FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen, Link as LinkIcon } from "lucide-react";
 import { BlogPost } from '@/utils/blogPosts';
 import DashboardOverview from './DashboardOverview';
+import { useLocation } from 'react-router-dom';
 
 interface DashboardTabsProps {
   handleSaveBlogPost: (post: BlogPost) => void;
   handleCancelBlogPost: () => void;
+  refreshTrigger?: number;
 }
 
 const DashboardTabs: React.FC<DashboardTabsProps> = ({
   handleSaveBlogPost,
-  handleCancelBlogPost
+  handleCancelBlogPost,
+  refreshTrigger
 }) => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Parse tab from URL hash if present
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash && ['dashboard', 'blog', 'calculators', 'pages', 'footer', 'appearance'].includes(hash)) {
+      setActiveTab(hash);
+    }
+  }, [location]);
+  
+  // Force refresh when refreshTrigger changes
+  useEffect(() => {
+    console.log("Dashboard refreshing due to refresh trigger");
+  }, [refreshTrigger]);
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Update URL hash for bookmarking/sharing
+    window.location.hash = value;
+  };
+
   return (
-    <Tabs defaultValue="dashboard" className="w-full">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="grid w-full grid-cols-6 mb-8">
         <TabsTrigger value="dashboard" className="flex items-center gap-1">
           <LayoutDashboard size={14} />
@@ -75,6 +100,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             <BlogPostEditor 
               onSave={handleSaveBlogPost}
               onCancel={handleCancelBlogPost}
+              key={`blog-editor-${refreshTrigger}`}
             />
           </CardContent>
         </Card>
@@ -89,7 +115,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CalculatorManager />
+            <CalculatorManager key={`calculator-manager-${refreshTrigger}`} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -103,7 +129,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <PagesManager />
+            <PagesManager key={`pages-manager-${refreshTrigger}`} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -117,7 +143,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <FooterManager />
+            <FooterManager key={`footer-manager-${refreshTrigger}`} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -131,7 +157,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SiteCustomizer />
+            <SiteCustomizer key={`site-customizer-${refreshTrigger}`} />
           </CardContent>
         </Card>
       </TabsContent>

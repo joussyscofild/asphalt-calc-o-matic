@@ -5,19 +5,24 @@ import { blogPosts, blogCategories, getBlogPostsByCategory } from '@/utils/blogP
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PenSquare } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [posts, setPosts] = useState(blogPosts);
+  const [posts, setPosts] = useState(blogPosts.filter(post => post.status !== 'draft'));
+  const navigate = useNavigate();
   
-  // Refresh the posts array when the component mounts or when blogPosts changes
+  // Refresh the posts array when the component mounts or when navigating to this page
   useEffect(() => {
-    setPosts([...blogPosts]);
-  }, [blogPosts]);
+    console.log("Blog page refreshing posts, count:", blogPosts.length);
+    
+    const visiblePosts = blogPosts.filter(post => post.status !== 'draft');
+    setPosts(visiblePosts);
+  }, [navigate]);
   
+  // Filter posts by category
   const filteredPosts = selectedCategory === 'all' 
-    ? posts.filter(post => post.status !== 'draft') 
+    ? posts 
     : getBlogPostsByCategory(selectedCategory).filter(post => post.status !== 'draft');
 
   return (
