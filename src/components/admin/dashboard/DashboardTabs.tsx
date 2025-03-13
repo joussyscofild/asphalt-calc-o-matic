@@ -6,7 +6,7 @@ import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import SiteCustomizer from "@/components/admin/SiteCustomizer";
 import PagesManager from "@/components/admin/PagesManager";
 import CalculatorManager from "@/components/admin/CalculatorManager";
-import FooterManager from "@/components/admin/FooterManager";
+import FooterManager from "@/components/admin/footer-manager";
 import { FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen, Link as LinkIcon } from "lucide-react";
 import { BlogPost } from '@/utils/blogPosts';
 import DashboardOverview from './DashboardOverview';
