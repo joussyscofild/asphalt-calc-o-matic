@@ -47,12 +47,12 @@ const LinkForm: React.FC<LinkFormProps> = ({
                 id="link-url"
                 value={newLinkData.url}
                 onChange={(e) => onLinkDataChange({...newLinkData, url: e.target.value})}
-                placeholder="/about or /page/about-us"
+                placeholder={newLinkData.isExternal ? "https://example.com" : "/about-us"}
                 className="mt-1"
               />
               {!newLinkData.isExternal && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  For custom pages, use format: /page/slug (e.g., /page/contact-us)
+                  Enter URLs exactly as they should appear (e.g., /page/contact-us or page/contact-us)
                 </p>
               )}
             </div>
