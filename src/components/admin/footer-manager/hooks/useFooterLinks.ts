@@ -1,4 +1,5 @@
 
+import { FooterLinkGroup } from '../../footer-manager/types';
 import { useLinkActions } from './useLinkActions';
 import { useLinkState } from './useLinkState';
 
