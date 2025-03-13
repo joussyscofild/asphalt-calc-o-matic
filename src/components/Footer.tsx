@@ -1,10 +1,74 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calculator, Globe, Mail } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+
+type FooterLink = {
+  id: string;
+  label: string;
+  url: string;
+  isExternal: boolean;
+};
+
+type FooterLinkGroup = {
+  id: string;
+  title: string;
+  links: FooterLink[];
+};
 
 const Footer = () => {
   const [email, setEmail] = useState('');
+  const [linkGroups, setLinkGroups] = useState<FooterLinkGroup[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchFooterLinks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('footer_links')
+          .select('*')
+          .order('sort_order');
+        
+        if (error) {
+          console.error('Error fetching footer links:', error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          // Group links by group_id
+          const groups: Record<string, FooterLinkGroup> = {};
+          
+          data.forEach(link => {
+            const groupId = link.group_id;
+            
+            if (!groups[groupId]) {
+              groups[groupId] = {
+                id: groupId,
+                title: link.group_title,
+                links: []
+              };
+            }
+            
+            groups[groupId].links.push({
+              id: link.id,
+              label: link.label,
+              url: link.url,
+              isExternal: link.is_external || false
+            });
+          });
+          
+          setLinkGroups(Object.values(groups));
+        }
+      } catch (error) {
+        console.error('Error fetching footer links:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchFooterLinks();
+  }, []);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +79,62 @@ const Footer = () => {
   };
   
   const currentYear = new Date().getFullYear();
+  
+  // Render a link group if available, otherwise render a placeholder
+  const renderLinkGroup = (groupId: string, title: string, fallbackLinks: { label: string, url: string, icon?: React.ReactNode }[]) => {
+    const group = linkGroups.find(g => g.id === groupId);
+    
+    if (group && group.links.length > 0) {
+      return (
+        <div className="col-span-1">
+          <h3 className="text-lg font-semibold mb-4">{group.title}</h3>
+          <ul className="space-y-2">
+            {group.links.map(link => (
+              <li key={link.id}>
+                {link.isExternal ? (
+                  <a 
+                    href={link.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-safety transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link 
+                    to={link.url} 
+                    className="text-gray-400 hover:text-safety transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    
+    // Fallback if no links found for this group
+    return (
+      <div className="col-span-1">
+        <h3 className="text-lg font-semibold mb-4">{title}</h3>
+        <ul className="space-y-2">
+          {fallbackLinks.map((link, index) => (
+            <li key={index}>
+              <Link 
+                to={link.url}
+                className="text-gray-400 hover:text-safety transition-colors flex items-center"
+              >
+                {link.icon && link.icon}
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
   
   return (
     <footer className="bg-asphalt text-white pt-12 pb-6">
@@ -48,60 +168,21 @@ const Footer = () => {
             </div>
           </div>
           
-          {/* Quick Links */}
-          <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/calculators" className="text-gray-400 hover:text-safety transition-colors flex items-center">
-                  <Calculator size={16} className="mr-2" />
-                  Calculators
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-gray-400 hover:text-safety transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-400 hover:text-safety transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-gray-400 hover:text-safety transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Quick Links - Either from database or fallback */}
+          {renderLinkGroup('quick-links', 'Quick Links', [
+            { label: 'Calculators', url: '/calculators', icon: <Calculator size={16} className="mr-2" /> },
+            { label: 'Blog', url: '/blog' },
+            { label: 'About Us', url: '/about' },
+            { label: 'Contact', url: '/contact' }
+          ])}
           
-          {/* Calculator Categories */}
-          <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4">Calculator Categories</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/calculators/asphalt" className="text-gray-400 hover:text-safety transition-colors">
-                  Asphalt Calculators
-                </Link>
-              </li>
-              <li>
-                <Link to="/calculators/concrete" className="text-gray-400 hover:text-safety transition-colors">
-                  Concrete Calculators
-                </Link>
-              </li>
-              <li>
-                <Link to="/calculators/cost" className="text-gray-400 hover:text-safety transition-colors">
-                  Cost Estimators
-                </Link>
-              </li>
-              <li>
-                <Link to="/calculators/measurement" className="text-gray-400 hover:text-safety transition-colors">
-                  Measurement Tools
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Calculator Categories - Either from database or fallback */}
+          {renderLinkGroup('calc-categories', 'Calculator Categories', [
+            { label: 'Asphalt Calculators', url: '/calculators/asphalt' },
+            { label: 'Concrete Calculators', url: '/calculators/concrete' },
+            { label: 'Cost Estimators', url: '/calculators/cost' },
+            { label: 'Measurement Tools', url: '/calculators/measurement' }
+          ])}
           
           {/* Newsletter */}
           <div className="col-span-1">

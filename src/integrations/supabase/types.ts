@@ -240,6 +240,72 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_pages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          last_modified: string
+          slug: string
+          status: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          last_modified?: string
+          slug: string
+          status?: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          last_modified?: string
+          slug?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      footer_links: {
+        Row: {
+          created_at: string
+          group_id: string
+          group_title: string
+          id: string
+          is_external: boolean | null
+          label: string
+          last_modified: string
+          sort_order: number | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          group_title: string
+          id?: string
+          is_external?: boolean | null
+          label: string
+          last_modified?: string
+          sort_order?: number | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          group_title?: string
+          id?: string
+          is_external?: boolean | null
+          label?: string
+          last_modified?: string
+          sort_order?: number | null
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

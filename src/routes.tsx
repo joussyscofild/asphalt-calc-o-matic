@@ -11,6 +11,7 @@ import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import BlogPostEditPage from './pages/BlogPostEditPage';
+import Page from './pages/Page'; // Import the new Page component
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
   {
     path: '/admin/blog/edit/:id?',
     element: <ProtectedRoute><BlogPostEditPage /></ProtectedRoute>,
+  },
+  {
+    path: '/page/:slug', // Add custom page route
+    element: <Page />,
   },
   {
     path: '*',

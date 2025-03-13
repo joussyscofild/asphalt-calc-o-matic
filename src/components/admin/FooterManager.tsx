@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit, Trash2, Link, ExternalLink } from 'lucide-react';
+import { Plus, Edit, Trash2, Link, ExternalLink, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define footer link types
 type FooterLinkGroup = {
@@ -22,43 +23,10 @@ type FooterLink = {
   isExternal: boolean;
 };
 
-// Mock data for initial footer links
-const initialLinkGroups: FooterLinkGroup[] = [
-  {
-    id: 'quick-links',
-    title: 'Quick Links',
-    links: [
-      { id: 'calculators', label: 'Calculators', url: '/calculators', isExternal: false },
-      { id: 'blog', label: 'Blog', url: '/blog', isExternal: false },
-      { id: 'about', label: 'About Us', url: '/about', isExternal: false },
-      { id: 'contact', label: 'Contact', url: '/contact', isExternal: false },
-    ]
-  },
-  {
-    id: 'calc-categories',
-    title: 'Calculator Categories',
-    links: [
-      { id: 'asphalt', label: 'Asphalt Calculators', url: '/calculators/asphalt', isExternal: false },
-      { id: 'concrete', label: 'Concrete Calculators', url: '/calculators/concrete', isExternal: false },
-      { id: 'cost', label: 'Cost Estimators', url: '/calculators/cost', isExternal: false },
-      { id: 'measurement', label: 'Measurement Tools', url: '/calculators/measurement', isExternal: false },
-    ]
-  },
-  {
-    id: 'social',
-    title: 'Social Links',
-    links: [
-      { id: 'twitter', label: 'Twitter', url: 'https://twitter.com', isExternal: true },
-      { id: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com', isExternal: true },
-      { id: 'facebook', label: 'Facebook', url: 'https://facebook.com', isExternal: true },
-    ]
-  }
-];
-
 const FooterManager: React.FC = () => {
   const { toast } = useToast();
-  const [linkGroups, setLinkGroups] = useState<FooterLinkGroup[]>(initialLinkGroups);
-  const [activeTab, setActiveTab] = useState('quick-links');
+  const [linkGroups, setLinkGroups] = useState<FooterLinkGroup[]>([]);
+  const [activeTab, setActiveTab] = useState('');
   const [editingLink, setEditingLink] = useState<FooterLink | null>(null);
   const [newLinkData, setNewLinkData] = useState<Omit<FooterLink, 'id'>>({
     label: '',
@@ -69,8 +37,69 @@ const FooterManager: React.FC = () => {
   // For adding new group
   const [newGroupTitle, setNewGroupTitle] = useState('');
   const [isAddingGroup, setIsAddingGroup] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleAddGroup = () => {
+  // Fetch footer links from Supabase
+  useEffect(() => {
+    const fetchFooterLinks = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('footer_links')
+          .select('*')
+          .order('sort_order');
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (data) {
+          // Group links by group_id
+          const groups: Record<string, FooterLinkGroup> = {};
+          
+          data.forEach(link => {
+            const groupId = link.group_id;
+            
+            if (!groups[groupId]) {
+              groups[groupId] = {
+                id: groupId,
+                title: link.group_title,
+                links: []
+              };
+            }
+            
+            groups[groupId].links.push({
+              id: link.id,
+              label: link.label,
+              url: link.url,
+              isExternal: link.is_external || false
+            });
+          });
+          
+          const groupsArray = Object.values(groups);
+          setLinkGroups(groupsArray);
+          
+          // Set active tab to first group if available
+          if (groupsArray.length > 0) {
+            setActiveTab(groupsArray[0].id);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching footer links:', error);
+        toast({
+          title: "Error fetching footer links",
+          description: "There was a problem loading footer links. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchFooterLinks();
+  }, [toast]);
+  
+  const handleAddGroup = async () => {
     if (!newGroupTitle.trim()) {
       toast({
         title: "Validation Error",
@@ -92,41 +121,90 @@ const FooterManager: React.FC = () => {
       return;
     }
 
-    const newGroup: FooterLinkGroup = {
-      id: newId,
-      title: newGroupTitle,
-      links: []
-    };
+    try {
+      // Create a placeholder link for this group (needed to establish the group)
+      const { error } = await supabase
+        .from('footer_links')
+        .insert({
+          group_id: newId,
+          group_title: newGroupTitle,
+          label: "Example Link",
+          url: "#",
+          is_external: false,
+          sort_order: 0
+        });
+      
+      if (error) throw error;
+      
+      const newGroup: FooterLinkGroup = {
+        id: newId,
+        title: newGroupTitle,
+        links: [{
+          id: Date.now().toString(), // Temporary ID until we refresh
+          label: "Example Link",
+          url: "#",
+          isExternal: false
+        }]
+      };
 
-    setLinkGroups([...linkGroups, newGroup]);
-    setActiveTab(newId);
-    setNewGroupTitle('');
-    setIsAddingGroup(false);
-    
-    toast({
-      title: "Group Added",
-      description: `"${newGroupTitle}" group has been added`
-    });
-  };
-
-  const handleDeleteGroup = (groupId: string) => {
-    const updatedGroups = linkGroups.filter(group => group.id !== groupId);
-    setLinkGroups(updatedGroups);
-    
-    // Set active tab to first group or empty if no groups
-    if (updatedGroups.length > 0) {
-      setActiveTab(updatedGroups[0].id);
-    } else {
-      setActiveTab('');
+      setLinkGroups([...linkGroups, newGroup]);
+      setActiveTab(newId);
+      setNewGroupTitle('');
+      setIsAddingGroup(false);
+      
+      toast({
+        title: "Group Added",
+        description: `"${newGroupTitle}" group has been added`
+      });
+      
+      // Refresh to get proper IDs
+      setTimeout(() => window.location.reload(), 500);
+      
+    } catch (error) {
+      console.error('Error adding group:', error);
+      toast({
+        title: "Error adding group",
+        description: "There was a problem adding the group. Please try again.",
+        variant: "destructive"
+      });
     }
-    
-    toast({
-      title: "Group Deleted",
-      description: "The link group has been deleted"
-    });
   };
 
-  const handleAddLink = () => {
+  const handleDeleteGroup = async (groupId: string) => {
+    try {
+      // Delete all links in the group
+      const { error } = await supabase
+        .from('footer_links')
+        .delete()
+        .eq('group_id', groupId);
+      
+      if (error) throw error;
+      
+      const updatedGroups = linkGroups.filter(group => group.id !== groupId);
+      setLinkGroups(updatedGroups);
+      
+      // Set active tab to first group or empty if no groups
+      if (updatedGroups.length > 0) {
+        setActiveTab(updatedGroups[0].id);
+      } else {
+        setActiveTab('');
+      }
+      
+      toast({
+        title: "Group Deleted",
+        description: "The link group has been deleted"
+      });
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      toast({
+        title: "Error deleting group",
+        description: "There was a problem deleting the group. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAddLink = async () => {
     if (!newLinkData.label.trim() || !newLinkData.url.trim()) {
       toast({
         title: "Validation Error",
@@ -139,32 +217,63 @@ const FooterManager: React.FC = () => {
     const currentGroup = linkGroups.find(group => group.id === activeTab);
     if (!currentGroup) return;
     
-    const newLink: FooterLink = {
-      id: `${activeTab}-${Date.now()}`,
-      ...newLinkData
-    };
-
-    const updatedGroups = linkGroups.map(group => {
-      if (group.id === activeTab) {
-        return {
-          ...group,
-          links: [...group.links, newLink]
+    try {
+      // Determine next sort order
+      const nextSortOrder = currentGroup.links.length;
+      
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from('footer_links')
+        .insert({
+          group_id: activeTab,
+          group_title: currentGroup.title,
+          label: newLinkData.label,
+          url: newLinkData.url,
+          is_external: newLinkData.isExternal,
+          sort_order: nextSortOrder
+        })
+        .select();
+      
+      if (error) throw error;
+      
+      if (data && data[0]) {
+        const newLink: FooterLink = {
+          id: data[0].id,
+          label: data[0].label,
+          url: data[0].url,
+          isExternal: data[0].is_external
         };
-      }
-      return group;
-    });
 
-    setLinkGroups(updatedGroups);
-    setNewLinkData({
-      label: '',
-      url: '',
-      isExternal: false
-    });
-    
-    toast({
-      title: "Link Added",
-      description: `"${newLink.label}" has been added to ${currentGroup.title}`
-    });
+        const updatedGroups = linkGroups.map(group => {
+          if (group.id === activeTab) {
+            return {
+              ...group,
+              links: [...group.links, newLink]
+            };
+          }
+          return group;
+        });
+
+        setLinkGroups(updatedGroups);
+        setNewLinkData({
+          label: '',
+          url: '',
+          isExternal: false
+        });
+        
+        toast({
+          title: "Link Added",
+          description: `"${newLink.label}" has been added to ${currentGroup.title}`
+        });
+      }
+    } catch (error) {
+      console.error('Error adding link:', error);
+      toast({
+        title: "Error adding link",
+        description: "There was a problem adding the link. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleEditLink = (link: FooterLink) => {
@@ -176,7 +285,7 @@ const FooterManager: React.FC = () => {
     });
   };
 
-  const handleUpdateLink = () => {
+  const handleUpdateLink = async () => {
     if (!editingLink) return;
     
     if (!newLinkData.label.trim() || !newLinkData.url.trim()) {
@@ -188,57 +297,99 @@ const FooterManager: React.FC = () => {
       return;
     }
 
-    const updatedGroups = linkGroups.map(group => {
-      if (group.id === activeTab) {
-        return {
-          ...group,
-          links: group.links.map(link => {
-            if (link.id === editingLink.id) {
-              return {
-                ...link,
-                label: newLinkData.label,
-                url: newLinkData.url,
-                isExternal: newLinkData.isExternal
-              };
-            }
-            return link;
-          })
-        };
-      }
-      return group;
-    });
+    try {
+      const currentGroup = linkGroups.find(group => group.id === activeTab);
+      if (!currentGroup) return;
+      
+      // Update in Supabase
+      const { error } = await supabase
+        .from('footer_links')
+        .update({
+          label: newLinkData.label,
+          url: newLinkData.url,
+          is_external: newLinkData.isExternal,
+          last_modified: new Date().toISOString()
+        })
+        .eq('id', editingLink.id);
+      
+      if (error) throw error;
 
-    setLinkGroups(updatedGroups);
-    setEditingLink(null);
-    setNewLinkData({
-      label: '',
-      url: '',
-      isExternal: false
-    });
-    
-    toast({
-      title: "Link Updated",
-      description: `"${newLinkData.label}" has been updated`
-    });
+      const updatedGroups = linkGroups.map(group => {
+        if (group.id === activeTab) {
+          return {
+            ...group,
+            links: group.links.map(link => {
+              if (link.id === editingLink.id) {
+                return {
+                  ...link,
+                  label: newLinkData.label,
+                  url: newLinkData.url,
+                  isExternal: newLinkData.isExternal
+                };
+              }
+              return link;
+            })
+          };
+        }
+        return group;
+      });
+
+      setLinkGroups(updatedGroups);
+      setEditingLink(null);
+      setNewLinkData({
+        label: '',
+        url: '',
+        isExternal: false
+      });
+      
+      toast({
+        title: "Link Updated",
+        description: `"${newLinkData.label}" has been updated`
+      });
+    } catch (error) {
+      console.error('Error updating link:', error);
+      toast({
+        title: "Error updating link",
+        description: "There was a problem updating the link. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleDeleteLink = (linkId: string) => {
-    const updatedGroups = linkGroups.map(group => {
-      if (group.id === activeTab) {
-        return {
-          ...group,
-          links: group.links.filter(link => link.id !== linkId)
-        };
-      }
-      return group;
-    });
+  const handleDeleteLink = async (linkId: string) => {
+    try {
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('footer_links')
+        .delete()
+        .eq('id', linkId);
+      
+      if (error) throw error;
+      
+      const updatedGroups = linkGroups.map(group => {
+        if (group.id === activeTab) {
+          return {
+            ...group,
+            links: group.links.filter(link => link.id !== linkId)
+          };
+        }
+        return group;
+      });
 
-    setLinkGroups(updatedGroups);
-    
-    toast({
-      title: "Link Deleted",
-      description: "The link has been deleted"
-    });
+      setLinkGroups(updatedGroups);
+      
+      toast({
+        title: "Link Deleted",
+        description: "The link has been deleted"
+      });
+    } catch (error) {
+      console.error('Error deleting link:', error);
+      toast({
+        title: "Error deleting link",
+        description: "There was a problem deleting the link. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCancelEdit = () => {
@@ -251,14 +402,20 @@ const FooterManager: React.FC = () => {
   };
 
   const handleSaveAllChanges = () => {
-    // In a real application, this would save to a database or API
-    localStorage.setItem('footerLinks', JSON.stringify(linkGroups));
-    
     toast({
       title: "Changes Saved",
-      description: "All footer link changes have been saved"
+      description: "All footer link changes have been saved to the database"
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin mb-4" />
+        <p>Loading footer links...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
