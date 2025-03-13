@@ -42,7 +42,7 @@ export const searchCalculators = (query: string): Calculator[] => {
     const searchableText = [
       calc.title,
       calc.description,
-      calc.longDescription,
+      calc.longDescription || '',
       calc.category,
       ...(calc.tags || [])
     ].join(' ').toLowerCase();

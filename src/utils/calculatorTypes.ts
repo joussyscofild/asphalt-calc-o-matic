@@ -16,6 +16,7 @@ export interface Calculator {
   fields?: CalculatorField[];
   relatedCalculators?: string[];
   relatedArticles?: string[];
+  tags?: string[];
 }
 
 export interface CalculatorField {
