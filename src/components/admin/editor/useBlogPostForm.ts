@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { BlogPost } from '@/utils/blogPosts';
+import { BlogPost, blogPosts } from '@/utils/blogPosts';
 import { useToast } from "@/hooks/use-toast";
 import { FormData } from './types';
 
@@ -139,19 +139,27 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
     
     const completedPost: BlogPost = {
       id: postId,
-      title: formData.title || '',
-      excerpt: formData.excerpt || '',
-      content: formData.content || '',
+      title: formData.title,
+      excerpt: formData.excerpt,
+      content: formData.content,
       imageUrl: formData.imageUrl || '',
-      author: formData.author || 'Admin User',
-      authorAvatar: formData.authorAvatar || '/placeholder.svg',
-      date: formData.date || today,
-      readTime: formData.readTime || '3 min read',
-      category: formData.category || 'Construction',
-      tags: formData.tags || [],
-      featured: formData.featured || false,
+      author: formData.author,
+      authorAvatar: formData.authorAvatar,
+      date: formData.date,
+      readTime: formData.readTime,
+      category: formData.category,
+      tags: formData.tags,
+      featured: formData.featured,
       status: isPublished ? 'published' : 'draft'
     };
+    
+    // Update the blogPosts array directly (for local state)
+    const existingIndex = blogPosts.findIndex(p => p.id === completedPost.id);
+    if (existingIndex !== -1) {
+      blogPosts[existingIndex] = { ...completedPost };
+    } else {
+      blogPosts.push({ ...completedPost });
+    }
     
     onSave(completedPost, isPublished);
     

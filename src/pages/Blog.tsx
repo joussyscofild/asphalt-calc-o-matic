@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BlogPostList from '@/components/BlogPostList';
 import { blogPosts, blogCategories, getBlogPostsByCategory } from '@/utils/blogPosts';
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,16 @@ import { Link } from 'react-router-dom';
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [posts, setPosts] = useState(blogPosts);
+  
+  // Refresh the posts array when the component mounts or when blogPosts changes
+  useEffect(() => {
+    setPosts([...blogPosts]);
+  }, [blogPosts]);
   
   const filteredPosts = selectedCategory === 'all' 
-    ? blogPosts 
-    : getBlogPostsByCategory(selectedCategory);
+    ? posts.filter(post => post.status !== 'draft') 
+    : getBlogPostsByCategory(selectedCategory).filter(post => post.status !== 'draft');
 
   return (
     <div className="py-8">
