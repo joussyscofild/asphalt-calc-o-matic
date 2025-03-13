@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import BlogPostEditor from "@/components/admin/BlogPostEditor";
@@ -8,9 +8,29 @@ import PagesManager from "@/components/admin/PagesManager";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { BlogPost } from '@/utils/blogPosts';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // Handler for saving blog posts
+  const handleSaveBlogPost = (post: BlogPost) => {
+    // In a real application, you would save the post to your backend
+    toast({
+      title: "Blog Post Saved",
+      description: `Successfully saved "${post.title}"`,
+    });
+  };
+  
+  // Handler for canceling blog post edits
+  const handleCancelBlogPost = () => {
+    toast({
+      title: "Editing Canceled",
+      description: "Changes to the blog post have been discarded.",
+    });
+  };
   
   return (
     <div className="container-custom py-8">
@@ -43,7 +63,10 @@ const AdminDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <BlogPostEditor />
+              <BlogPostEditor 
+                onSave={handleSaveBlogPost}
+                onCancel={handleCancelBlogPost}
+              />
             </CardContent>
           </Card>
         </TabsContent>
