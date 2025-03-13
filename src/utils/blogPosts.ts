@@ -411,7 +411,7 @@ export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
         imageUrl: post.image_url,
         featured: post.featured,
         readTime: post.read_time,
-        status: post.status as 'published' | 'draft' // Add explicit type cast
+        status: post.status as 'published' | 'draft'
       }));
       
       // Update the blogPosts array
@@ -420,6 +420,7 @@ export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
       return posts;
     } else {
       // If no posts in Supabase yet, use default posts and add them to Supabase
+      console.log("No posts found in Supabase, using default posts");
       for (const post of defaultBlogPosts) {
         await addBlogPostToSupabase(post);
       }
@@ -436,6 +437,7 @@ export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
 // Add a blog post to Supabase
 export const addBlogPostToSupabase = async (post: BlogPost): Promise<void> => {
   try {
+    console.log("Adding/updating blog post to Supabase:", post.id);
     const { error } = await supabase
       .from('blog_posts')
       .upsert({
@@ -451,14 +453,19 @@ export const addBlogPostToSupabase = async (post: BlogPost): Promise<void> => {
         image_url: post.imageUrl,
         featured: post.featured,
         read_time: post.readTime,
-        status: post.status
+        status: post.status,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'id'
       });
     
     if (error) {
       console.error('Error adding blog post to Supabase:', error);
+      throw error;
     }
   } catch (error) {
     console.error('Error in addBlogPostToSupabase:', error);
+    throw error;
   }
 };
 
@@ -472,9 +479,11 @@ export const deleteBlogPostFromSupabase = async (postId: string): Promise<void> 
     
     if (error) {
       console.error('Error deleting blog post from Supabase:', error);
+      throw error;
     }
   } catch (error) {
     console.error('Error in deleteBlogPostFromSupabase:', error);
+    throw error;
   }
 };
 
@@ -523,7 +532,7 @@ export const getBlogPostById = async (id: string): Promise<BlogPost | undefined>
         imageUrl: data.image_url,
         featured: data.featured,
         readTime: data.read_time,
-        status: data.status as 'published' | 'draft' // Add explicit type cast
+        status: data.status as 'published' | 'draft'
       };
     }
     

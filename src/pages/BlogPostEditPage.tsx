@@ -69,7 +69,21 @@ const BlogPostEditPage: React.FC = () => {
   const handleSave = async (updatedPost: BlogPost) => {
     try {
       console.log("Saving post with content length:", updatedPost.content.length);
+      
+      // Show toast for saving
+      toast({
+        title: "Saving...",
+        description: "Saving your blog post",
+      });
+      
       await handleSaveBlogPost(updatedPost);
+      
+      // Show success toast
+      toast({
+        title: "Post Saved",
+        description: "Your blog post has been saved successfully.",
+      });
+      
       navigate('/admin/dashboard#blog');
     } catch (error) {
       console.error("Error saving post:", error);

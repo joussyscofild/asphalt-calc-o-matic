@@ -45,7 +45,7 @@ export const useAdminDashboard = () => {
       const { data, error } = await supabase
         .from('blog_posts')
         .upsert({
-          id: post.id.includes('-') ? post.id : undefined, // Only use ID if it looks like a UUID
+          id: post.id,
           title: post.title,
           excerpt: post.excerpt,
           content: post.content,
@@ -65,6 +65,11 @@ export const useAdminDashboard = () => {
       
       if (error) {
         console.error("Error saving blog post to Supabase:", error);
+        toast({
+          title: "Error Saving Post",
+          description: "There was an error saving your blog post. Please try again.",
+          variant: "destructive"
+        });
         throw error;
       }
       
