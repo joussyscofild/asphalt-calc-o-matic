@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,7 +35,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const { toast } = useToast();
   const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState<BlogPost | undefined>(post);
-  const [isCreating, setIsCreating] = useState<boolean>(!post);
+  const [isCreating, setIsCreating] = useState<boolean>(false); // Changed to false by default
   const [editorKey, setEditorKey] = useState<number>(0);
   const [postsList, setPostsList] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -140,7 +141,8 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
       title: "Loading post for editing",
       description: `Loading "${blogPost.title}" for editing`,
     });
-    navigate(`/admin/blog/edit/${blogPost.id}`);
+    setSelectedPost(blogPost);
+    setIsCreating(true);
   };
 
   const handleCreateNew = () => {
@@ -148,7 +150,8 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
       title: "Create New Post",
       description: "Starting with a blank post",
     });
-    navigate('/admin/blog/edit');
+    setSelectedPost(undefined);
+    setIsCreating(true);
   };
 
   const handleCancelEdit = () => {
@@ -162,6 +165,8 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const handleDeletePost = (postId: string) => {
     if (onDelete) {
       onDelete(postId);
+      // Update local list after delete
+      setPostsList(prevPosts => prevPosts.filter(post => post.id !== postId));
     }
   };
 
