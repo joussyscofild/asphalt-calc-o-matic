@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,7 +27,9 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   post,
   onSave,
   onCancel,
-  onDelete
+  onDelete,
+  posts = [],
+  isLoading = false
 }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -38,23 +39,35 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   const [postsList, setPostsList] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   
-  // Load posts from Supabase
   useEffect(() => {
-    const loadPosts = async () => {
-      setLoading(true);
-      try {
-        const posts = await fetchBlogPosts();
-        setPostsList(posts);
-      } catch (error) {
-        console.error("Error loading posts:", error);
-        setPostsList(blogPosts);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadPosts();
-  }, []);
+    if (posts && posts.length > 0) {
+      console.log("Using posts from props:", posts.length);
+      setPostsList(posts);
+      setLoading(false);
+    } else {
+      const loadPosts = async () => {
+        setLoading(true);
+        try {
+          const loadedPosts = await fetchBlogPosts();
+          console.log("Fetched posts in editor:", loadedPosts.length);
+          setPostsList(loadedPosts);
+        } catch (error) {
+          console.error("Error loading posts:", error);
+          setPostsList(blogPosts);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      loadPosts();
+    }
+  }, [posts]);
+  
+  useEffect(() => {
+    if (isLoading !== undefined) {
+      setLoading(isLoading);
+    }
+  }, [isLoading]);
   
   useEffect(() => {
     console.log("BlogPostEditor initialized with post:", post?.id || "new post");
@@ -67,7 +80,6 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   }, [post]);
   
   const handleSaveComplete = (post: BlogPost, isPublished: boolean) => {
-    // Add the status to the post object
     const updatedPost = {
       ...post,
       status: isPublished ? 'published' : 'draft'
@@ -76,10 +88,8 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     console.log("Saving post from editor, ID:", updatedPost.id, "Content length:", updatedPost.content.length);
     console.log("Post status being set to:", updatedPost.status);
     
-    // Call the parent component's onSave function
     onSave(updatedPost);
     
-    // If we were creating a new post, reset the form for another new post
     if (!selectedPost) {
       resetFormData();
       setEditorKey(prev => prev + 1);
@@ -104,7 +114,6 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     resetFormData
   } = useBlogPostForm(handleSaveComplete, selectedPost);
 
-  // Force a re-render of the form when post changes
   useEffect(() => {
     if (selectedPost) {
       console.log("Blog post selected for editing, ID:", selectedPost.id);
@@ -157,7 +166,6 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   };
 
   const handlePreview = () => {
-    // Open a new window with the blog post preview
     const previewWindow = window.open('', '_blank');
     if (previewWindow) {
       previewWindow.document.write(`
@@ -207,62 +215,67 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {postsList.map((blogPost) => (
-              <div
-                key={blogPost.id}
-                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-center"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${blogPost.status === 'draft' ? 'bg-orange-100' : 'bg-primary/10'}`}>
-                    <FileText className={`h-5 w-5 ${blogPost.status === 'draft' ? 'text-orange-500' : 'text-primary'}`} />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">
-                      {blogPost.title}
-                      {blogPost.status === 'draft' && (
-                        <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded">Draft</span>
-                      )}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{blogPost.date} • {blogPost.category}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => handleEditPost(blogPost)}>
-                    Edit
-                  </Button>
-                  {onDelete && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="icon">
-                          <Trash size={16} />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Blog Post</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{blogPost.title}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeletePost(blogPost.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
-                </div>
+            {postsList.length === 0 ? (
+              <div className="text-center py-10 text-gray-500">
+                No blog posts found. Click "Create New Post" to get started.
               </div>
-            ))}
+            ) : (
+              postsList.map((blogPost) => (
+                <div
+                  key={blogPost.id}
+                  className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-center"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${blogPost.status === 'draft' ? 'bg-orange-100' : 'bg-primary/10'}`}>
+                      <FileText className={`h-5 w-5 ${blogPost.status === 'draft' ? 'text-orange-500' : 'text-primary'}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">
+                        {blogPost.title}
+                        {blogPost.status === 'draft' && (
+                          <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded">Draft</span>
+                        )}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">{blogPost.date} • {blogPost.category}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => handleEditPost(blogPost)}>
+                      Edit
+                    </Button>
+                    {onDelete && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="icon">
+                            <Trash size={16} />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Blog Post</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{blogPost.title}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeletePost(blogPost.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
     );
   }
 
-  // Only show loading state when we haven't initialized the form yet
   if (!hasInitialized) {
     return (
       <div className="flex justify-center items-center h-64">

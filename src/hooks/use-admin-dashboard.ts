@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { BlogPost, blogPosts, getAllPublishedPosts, addBlogPostToSupabase, deleteBlogPostFromSupabase, fetchBlogPosts } from '@/utils/blogPosts';
@@ -17,9 +16,36 @@ export const useAdminDashboard = () => {
     const loadPosts = async () => {
       setIsLoading(true);
       try {
-        const loadedPosts = await fetchBlogPosts();
+        // Fetch all posts, not just published ones
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (error) {
+          throw error;
+        }
+        
+        // Transform Supabase data to BlogPost format
+        const loadedPosts: BlogPost[] = data.map((post: any) => ({
+          id: post.id,
+          title: post.title,
+          excerpt: post.excerpt,
+          content: post.content,
+          imageUrl: post.image_url,
+          author: post.author,
+          authorAvatar: post.author_avatar,
+          date: post.date,
+          readTime: post.read_time,
+          category: post.category,
+          tags: post.tags || [],
+          featured: post.featured,
+          status: post.status || 'published',
+        }));
+        
         setPosts(loadedPosts);
-        console.log("Loaded", loadedPosts.length, "posts from Supabase");
+        console.log("Loaded", loadedPosts.length, "posts from Supabase in admin dashboard");
+        console.log("Posts statuses:", loadedPosts.map(p => p.status).join(', '));
       } catch (error) {
         console.error("Error loading posts:", error);
       } finally {
