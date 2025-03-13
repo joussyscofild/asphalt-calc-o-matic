@@ -1,5 +1,5 @@
 
-import { Calculator } from './calculatorTypes';
+import { type Calculator, type CalculatorField } from './calculatorTypes';
 import { categories } from './calculatorCategories';
 import { asphaltCalculators } from './calculators/asphaltCalculators';
 import { concreteCalculators } from './calculators/concreteCalculators';
@@ -18,7 +18,9 @@ export const calculators: Calculator[] = [
   ...specialtyCalculators
 ];
 
-export { Calculator, categories };
+// Re-export types and categories
+export { categories };
+export type { Calculator, CalculatorField };
 
 // Helper functions
 export const getCalculatorById = (id: string): Calculator | undefined => {
