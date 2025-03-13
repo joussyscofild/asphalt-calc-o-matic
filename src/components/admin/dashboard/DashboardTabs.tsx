@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import SiteCustomizer from "@/components/admin/SiteCustomizer";
-import PagesManager from "@/components/admin/PagesManager";
+import PagesManager from "@/components/admin/pages-manager";
 import CalculatorManager from "@/components/admin/CalculatorManager";
 import FooterManager from "@/components/admin/footer-manager";
 import { FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen, Link as LinkIcon } from "lucide-react";
