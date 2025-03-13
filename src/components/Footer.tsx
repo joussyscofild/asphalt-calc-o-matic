@@ -5,6 +5,7 @@ import FooterLinks from './footer/FooterLinks';
 import FooterNewsletter from './footer/FooterNewsletter';
 import FooterBottom from './footer/FooterBottom';
 import { useFooterData } from './footer/useFooterData';
+import { Loader2 } from 'lucide-react';
 
 const Footer = () => {
   const { linkGroups, isLoading } = useFooterData();
@@ -21,9 +22,16 @@ const Footer = () => {
           
           {/* Link Groups */}
           {isLoading ? (
-            <div className="col-span-2 text-gray-400">Loading footer links...</div>
-          ) : (
+            <div className="col-span-2 flex items-center text-gray-400">
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
+              Loading footer links...
+            </div>
+          ) : linkGroups.length > 0 ? (
             <FooterLinks linkGroups={linkGroups} />
+          ) : (
+            <div className="col-span-2 text-gray-400">
+              No footer links configured. Add links in the admin dashboard.
+            </div>
           )}
           
           {/* Newsletter */}

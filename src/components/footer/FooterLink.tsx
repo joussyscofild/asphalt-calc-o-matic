@@ -11,9 +11,15 @@ const FooterLink: React.FC<FooterLinkProps> = ({ link }) => {
   console.log(`Rendering FooterLink: "${link.label}", URL: "${link.url}", External: ${link.isExternal}`);
   
   if (link.isExternal) {
+    // Clean up URL if needed
+    let url = link.url;
+    if (url.includes('//page/')) {
+      url = url.replace('//page/', '/page/');
+    }
+    
     return (
       <a 
-        href={link.url} 
+        href={url} 
         target="_blank" 
         rel="noopener noreferrer"
         className="text-gray-400 hover:text-safety transition-colors"
