@@ -303,7 +303,10 @@ export const usePageManager = (): UsePageManagerReturn => {
       for (let i = 0; i < pageIds.length; i++) {
         const { error } = await supabase
           .from('custom_pages')
-          .update({ sort_order: i })
+          .update({ 
+            last_modified: new Date().toISOString(),
+            sort_order: i 
+          })
           .eq('id', pageIds[i]);
         
         if (error) throw error;
@@ -315,7 +318,7 @@ export const usePageManager = (): UsePageManagerReturn => {
       });
     } catch (error) {
       console.error('Error reordering pages:', error);
-      fetchPages();
+      await fetchPages();
       
       toast({
         title: "Error reordering pages",
