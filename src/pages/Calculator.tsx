@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { fetchCalculators } from '@/utils/calculatorService';
-import { Calculator as CalculatorType } from '@/utils/calculatorTypes';
+import { Calculator as CalculatorType, CalculatorField } from '@/utils/calculatorTypes';
 import { useToast } from '@/hooks/use-toast';
 import { getDefaultFields } from '@/utils/calculatorFunctions';
 import CalculatorForm from '@/components/calculator/CalculatorForm';
@@ -64,7 +64,9 @@ const Calculator = () => {
   }
 
   // Default fields for calculators that don't have them defined yet
-  const calculatorFields = calculator.fields?.length ? calculator.fields : getDefaultFields(id);
+  const calculatorFields: CalculatorField[] = calculator.fields?.length 
+    ? calculator.fields 
+    : getDefaultFields(id);
 
   return (
     <div className="container-custom py-12">

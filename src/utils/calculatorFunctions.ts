@@ -1,5 +1,6 @@
 
 // Calculator-specific calculation functions
+import { CalculatorField } from './calculatorTypes';
 
 /**
  * Calculate asphalt tonnage based on input dimensions and density
@@ -158,7 +159,7 @@ export const calculateMaterialWaste = (
 /**
  * Get default fields for a calculator based on type
  */
-export const getDefaultFields = (calculatorId: string) => {
+export const getDefaultFields = (calculatorId: string): CalculatorField[] => {
   switch (calculatorId) {
     case 'asphalt-tonnage':
       return [
@@ -456,7 +457,7 @@ export const getDefaultFields = (calculatorId: string) => {
 /**
  * Format the result based on calculator type
  */
-export const formatCalculatorResult = (result: string | null, calculatorId: string): string | null => {
+export const formatCalculatorResult = (result: string | number | null, calculatorId: string): string | null => {
   if (result === null) return null;
   
   switch (calculatorId) {
@@ -469,15 +470,15 @@ export const formatCalculatorResult = (result: string | null, calculatorId: stri
     case 'material-conversion':
       return `${result} tons`;
     case 'slope-grade':
-      return result;
+      return String(result);
     case 'retaining-wall':
       return `${result} blocks`;
     case 'parking-lot':
       return `${result} spaces`;
     case 'material-waste':
-      return result;
+      return String(result);
     default:
-      return result;
+      return String(result);
   }
 };
 
