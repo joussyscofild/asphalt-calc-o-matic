@@ -1,5 +1,6 @@
 
 import { LucideIcon } from 'lucide-react';
+import { Json } from '@/integrations/supabase/types';
 
 export interface Calculator {
   id: string;
@@ -22,7 +23,7 @@ export interface CalculatorField {
   label: string;
   type: 'number' | 'select' | 'radio' | 'checkbox';
   placeholder?: string;
-  defaultValue?: string | number;
+  defaultValue?: string | number | Json;
   required?: boolean;
   options?: { value: string; label: string }[];
   unit?: string;
