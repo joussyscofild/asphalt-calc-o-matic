@@ -1,53 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
+import { Plus } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { 
-  Plus, 
-  MoreVertical, 
-  Pencil, 
-  Trash2, 
-  Copy, 
-  Eye 
-} from 'lucide-react';
-import RichTextEditor from '@/components/admin/RichTextEditor';
-
-interface Page {
-  id: string;
-  title: string;
-  slug: string;
-  status: 'published' | 'draft';
-  content: string;
-  created: string;
-  lastModified: string;
-}
+import PagesTable from './pages/PagesTable';
+import PageEditorDialog from './pages/PageEditorDialog';
+import { Page } from './pages/types';
 
 const defaultPages: Page[] = [
   {
@@ -212,130 +170,24 @@ const PagesManager: React.FC = () => {
         </Button>
       </div>
       
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[300px]">Page Title</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Last Modified</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {pages.map((page) => (
-            <TableRow key={page.id}>
-              <TableCell className="font-medium">
-                {page.title}
-                <div className="text-sm text-muted-foreground">
-                  /{page.slug}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  page.status === 'published' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-amber-100 text-amber-800'
-                }`}>
-                  {page.status === 'published' ? 'Published' : 'Draft'}
-                </div>
-              </TableCell>
-              <TableCell>{page.lastModified}</TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical size={16} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleEditPage(page)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDuplicatePage(page)}>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Duplicate
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Preview
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={() => handleStatusToggle(page.id)}
-                      className="text-amber-600"
-                    >
-                      {page.status === 'published' ? 'Set as Draft' : 'Publish'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleDeletePage(page.id)}
-                      className="text-red-600"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <PagesTable 
+        pages={pages}
+        onEdit={handleEditPage}
+        onDelete={handleDeletePage}
+        onDuplicate={handleDuplicatePage}
+        onStatusToggle={handleStatusToggle}
+      />
       
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>{currentPage?.id ? 'Edit Page' : 'Create New Page'}</DialogTitle>
-            <DialogDescription>
-              Make changes to your page here. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          
-          {currentPage && (
-            <>
-              <div className="grid grid-cols-2 gap-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Page Title</Label>
-                  <Input 
-                    id="title" 
-                    value={currentPage.title} 
-                    onChange={handleTitleChange} 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="slug">Slug</Label>
-                  <Input 
-                    id="slug" 
-                    value={currentPage.slug} 
-                    onChange={handleSlugChange} 
-                  />
-                </div>
-              </div>
-              
-              <Separator className="my-2" />
-              
-              <div className="flex-1 overflow-auto">
-                <Label htmlFor="content" className="mb-2 block">Content</Label>
-                <div className="border rounded-md h-full">
-                  <RichTextEditor 
-                    initialValue={currentPage.content}
-                    onChange={setPageContent}
-                  />
-                </div>
-              </div>
-              
-              <DialogFooter className="mt-4">
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSavePage}>Save Changes</Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <PageEditorDialog
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        currentPage={currentPage}
+        pageContent={pageContent}
+        setPageContent={setPageContent}
+        onSave={handleSavePage}
+        onTitleChange={handleTitleChange}
+        onSlugChange={handleSlugChange}
+      />
     </div>
   );
 };
