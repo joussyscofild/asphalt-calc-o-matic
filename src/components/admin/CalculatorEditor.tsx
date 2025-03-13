@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calculator, type CalculatorField } from '../../utils/calculatorTypes';
 import { Input } from "@/components/ui/input";
@@ -71,14 +70,12 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
       description: data.description
     }));
     
-    // Convert keywords to tags or related content as needed
     const keywordArray = data.keywords.split(',').map(k => k.trim());
     if (keywordArray.length > 0) {
       setFormData(prev => ({ ...prev, subCategory: keywordArray[0] }));
     }
   };
 
-  // Field management
   const addField = () => {
     const newField: CalculatorField = {
       id: `field-${Date.now()}`,
@@ -130,12 +127,15 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
     }));
   };
 
-  // Option management for select/radio fields
   const addOption = (fieldIndex: number) => {
     const field = formData.fields?.[fieldIndex];
     if (!field) return;
     
-    const options = [...(field.options || [])];
+    const currentOptions = Array.isArray(field.options) 
+      ? field.options 
+      : (field.options ? [] : []);
+      
+    const options = [...currentOptions];
     options.push({ value: `option-${options.length + 1}`, label: `Option ${options.length + 1}` });
     
     updateField(fieldIndex, { options });
@@ -143,7 +143,7 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
 
   const updateOption = (fieldIndex: number, optionIndex: number, value: string, label: string) => {
     const field = formData.fields?.[fieldIndex];
-    if (!field || !field.options) return;
+    if (!field || !field.options || !Array.isArray(field.options)) return;
     
     const options = [...field.options];
     options[optionIndex] = { value, label };
@@ -153,7 +153,7 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
 
   const removeOption = (fieldIndex: number, optionIndex: number) => {
     const field = formData.fields?.[fieldIndex];
-    if (!field || !field.options) return;
+    if (!field || !field.options || !Array.isArray(field.options)) return;
     
     const options = [...field.options];
     options.splice(optionIndex, 1);
@@ -164,7 +164,6 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (!formData.id || !formData.title || !formData.description) {
       toast({
         title: "Validation Error",
@@ -174,10 +173,8 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
       return;
     }
 
-    // Generate ID from title if not provided
     const calculatorId = formData.id || formData.title.toLowerCase().replace(/\s+/g, '-');
     
-    // Generate a complete calculator object
     const completedCalculator: Calculator = {
       id: calculatorId,
       title: formData.title || '',
@@ -201,7 +198,6 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
   };
 
   const generateSampleFields = () => {
-    // Generate appropriate fields based on category
     let sampleFields: CalculatorField[] = [];
     
     if (formData.category?.toLowerCase().includes('asphalt')) {
@@ -317,7 +313,6 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
         }
       ];
     } else {
-      // Default fields
       sampleFields = [
         {
           id: 'input1',
@@ -658,7 +653,7 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
                           </div>
                         )}
 
-                        {(field.type === 'select' || field.type === 'radio') && (
+                        {(field.type === 'select' || field.type === 'radio') ? (
                           <div className="mt-4 space-y-2">
                             <div className="flex justify-between items-center">
                               <Label>Options</Label>
@@ -671,7 +666,7 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
                                 Add Option
                               </Button>
                             </div>
-                            {field.options && field.options.length > 0 ? (
+                            {field.options && Array.isArray(field.options) && field.options.length > 0 ? (
                               <div className="space-y-2 mt-2">
                                 {field.options.map((option, optIndex) => (
                                   <div key={optIndex} className="flex space-x-2 items-center">
@@ -712,7 +707,7 @@ const CalculatorEditor: React.FC<CalculatorEditorProps> = ({
                               <p className="text-sm text-muted-foreground">No options added yet</p>
                             )}
                           </div>
-                        )}
+                        ) : null}
 
                         <div className="mt-4 space-y-2">
                           <Label>Helper Text</Label>

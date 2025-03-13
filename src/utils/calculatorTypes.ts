@@ -25,7 +25,7 @@ export interface CalculatorField {
   placeholder?: string;
   defaultValue?: string | number | Json;
   required?: boolean;
-  options?: { value: string; label: string }[];
+  options?: { value: string; label: string }[] | Json;
   unit?: string;
   min?: number;
   max?: number;

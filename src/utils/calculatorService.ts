@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Calculator, CalculatorField } from './calculatorTypes';
 import { LucideIcon } from 'lucide-react';
