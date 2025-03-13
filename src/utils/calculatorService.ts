@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Calculator, CalculatorField } from './calculatorTypes';
 import { LucideIcon } from 'lucide-react';
@@ -102,6 +103,9 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
 // Save a calculator to Supabase
 export const saveCalculator = async (calculator: Calculator): Promise<void> => {
   try {
+    // Ensure we have a valid icon name from the icon object
+    const iconName = calculator.icon.name || 'Calculator';
+    
     // Save the calculator basic info
     const { error: calculatorError } = await supabase
       .from('calculators')
@@ -110,7 +114,7 @@ export const saveCalculator = async (calculator: Calculator): Promise<void> => {
         title: calculator.title,
         description: calculator.description,
         long_description: calculator.longDescription,
-        icon: calculator.icon.name,
+        icon: iconName,
         category: calculator.category,
         time_estimate: calculator.timeEstimate,
         featured: calculator.featured,
@@ -195,19 +199,27 @@ export const saveCalculator = async (calculator: Calculator): Promise<void> => {
 
     // Insert related articles if they exist
     if (calculator.relatedArticles && calculator.relatedArticles.length > 0) {
-      const relatedArticlesToInsert = calculator.relatedArticles.map(relatedId => ({
-        calculator_id: calculator.id,
-        related_type: 'article',
-        related_id: relatedId
-      }));
+      // Filter out non-UUID related articles to avoid database errors
+      const validArticles = calculator.relatedArticles.filter(id => {
+        // Basic UUID validation (not comprehensive but helps catch obvious errors)
+        return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      });
+      
+      if (validArticles.length > 0) {
+        const relatedArticlesToInsert = validArticles.map(relatedId => ({
+          calculator_id: calculator.id,
+          related_type: 'article',
+          related_id: relatedId
+        }));
 
-      const { error: relatedArticlesError } = await supabase
-        .from('calculator_related_items')
-        .insert(relatedArticlesToInsert);
+        const { error: relatedArticlesError } = await supabase
+          .from('calculator_related_items')
+          .insert(relatedArticlesToInsert);
 
-      if (relatedArticlesError) {
-        console.error("Error inserting related articles:", relatedArticlesError);
-        throw relatedArticlesError;
+        if (relatedArticlesError) {
+          console.error("Error inserting related articles:", relatedArticlesError);
+          throw relatedArticlesError;
+        }
       }
     }
   } catch (error) {
