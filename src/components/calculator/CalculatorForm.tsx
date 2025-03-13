@@ -39,7 +39,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
     setResult(calculatedResult);
   };
 
-  const formattedResult = formatCalculatorResult(result, calculatorId);
+  // Convert result to string to ensure it's compatible with formatCalculatorResult
+  const formattedResult = result !== null ? formatCalculatorResult(String(result), calculatorId) : null;
 
   return (
     <>

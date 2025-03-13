@@ -64,9 +64,10 @@ const Calculator = () => {
   }
 
   // Default fields for calculators that don't have them defined yet
+  // Explicitly cast the result of getDefaultFields to CalculatorField[] to satisfy TypeScript
   const calculatorFields: CalculatorField[] = calculator.fields?.length 
     ? calculator.fields 
-    : getDefaultFields(id);
+    : getDefaultFields(id) as CalculatorField[];
 
   return (
     <div className="container-custom py-12">

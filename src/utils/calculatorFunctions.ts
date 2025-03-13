@@ -1,4 +1,3 @@
-
 // Calculator-specific calculation functions
 import { CalculatorField } from './calculatorTypes';
 
@@ -457,8 +456,8 @@ export const getDefaultFields = (calculatorId: string): CalculatorField[] => {
 /**
  * Format the result based on calculator type
  */
-export const formatCalculatorResult = (result: string | number | null, calculatorId: string): string | null => {
-  if (result === null) return null;
+export const formatCalculatorResult = (result: string, calculatorId: string): string => {
+  if (!result) return '';
   
   switch (calculatorId) {
     case 'asphalt-tonnage':
@@ -485,56 +484,68 @@ export const formatCalculatorResult = (result: string | number | null, calculato
 /**
  * Calculate the result based on calculator type and form data
  */
-export const calculateResult = (calculatorId: string, formData: Record<string, any>): string | null => {
+export const calculateResult = (calculatorId: string, formData: Record<string, any>): string => {
+  let result: string | number | null = null;
+  
   switch (calculatorId) {
     case 'asphalt-tonnage':
-      return calculateAsphaltTonnage(
+      result = calculateAsphaltTonnage(
         formData.length, 
         formData.width, 
         formData.thickness, 
         formData.density
       );
+      break;
     case 'paving-cost':
-      return calculatePavingCost(
+      result = calculatePavingCost(
         formData.area, 
         formData.materialCost, 
         formData.laborCost, 
         formData.additionalCosts
       );
+      break;
     case 'concrete-volume':
-      return calculateConcreteVolume(
+      result = calculateConcreteVolume(
         formData.length, 
         formData.width, 
         formData.depth
       );
+      break;
     case 'material-conversion':
-      return calculateMaterialConversion(
+      result = calculateMaterialConversion(
         formData.cubicYards, 
         formData.materialType
       );
+      break;
     case 'slope-grade':
-      return calculateSlopeGrade(
+      result = calculateSlopeGrade(
         formData.rise, 
         formData.run
       );
+      break;
     case 'retaining-wall':
-      return calculateRetainingWall(
+      result = calculateRetainingWall(
         formData.wallLength, 
         formData.wallHeight, 
         formData.blockType
       );
+      break;
     case 'parking-lot':
-      return calculateParkingLot(
+      result = calculateParkingLot(
         formData.lotLength, 
         formData.lotWidth, 
         formData.spaceType
       );
+      break;
     case 'material-waste':
-      return calculateMaterialWaste(
+      result = calculateMaterialWaste(
         formData.quantity, 
         formData.wastePercent
       );
+      break;
     default:
-      return "Calculator implementation coming soon";
+      result = "Calculator implementation coming soon";
   }
+  
+  return result !== null ? String(result) : "";
 };
