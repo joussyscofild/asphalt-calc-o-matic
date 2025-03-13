@@ -1,3 +1,4 @@
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -11,7 +12,7 @@ export interface BlogPost {
   imageUrl?: string;
   featured?: boolean;
   readTime?: string;
-  status?: 'published' | 'draft';
+  status: 'published' | 'draft';
 }
 
 export const blogCategories = [
@@ -22,6 +23,7 @@ export const blogCategories = [
   { id: 'diy-tips', name: 'DIY Tips & Tricks' }
 ];
 
+// Add default status of 'published' to all posts
 export const blogPosts: BlogPost[] = [
   {
     id: 'understanding-asphalt-density',
@@ -66,7 +68,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['Asphalt Density', 'Material Properties', 'Paving Durability'],
     imageUrl: 'https://images.unsplash.com/photo-1518962634205-830d3ccb1b92?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
     featured: true,
-    readTime: '5 min read'
+    readTime: '5 min read',
+    status: 'published'
   },
   {
     id: 'choosing-right-concrete-mix',
@@ -120,7 +123,8 @@ export const blogPosts: BlogPost[] = [
     category: 'Construction Materials 101',
     tags: ['Concrete Mix', 'Material Selection', 'Construction Basics'],
     imageUrl: 'https://images.unsplash.com/photo-1578053373574-177685692edf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    readTime: '6 min read'
+    readTime: '6 min read',
+    status: 'published'
   },
   {
     id: 'asphalt-vs-concrete-driveways',
@@ -178,7 +182,8 @@ export const blogPosts: BlogPost[] = [
     category: 'Project Planning',
     tags: ['Driveways', 'Cost Comparison', 'Asphalt', 'Concrete'],
     imageUrl: 'https://images.unsplash.com/photo-1617108029561-d5e7825f2851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    readTime: '7 min read'
+    readTime: '7 min read',
+    status: 'published'
   },
   {
     id: 'minimizing-material-waste',
@@ -242,7 +247,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['Waste Reduction', 'Cost Saving', 'Sustainability'],
     imageUrl: 'https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
     featured: true,
-    readTime: '4 min read'
+    readTime: '4 min read',
+    status: 'published'
   },
   {
     id: 'parking-lot-design-tips',
@@ -306,7 +312,8 @@ export const blogPosts: BlogPost[] = [
     category: 'Project Planning',
     tags: ['Parking Lot', 'Design', 'Space Utilization'],
     imageUrl: 'https://images.unsplash.com/photo-1545364477-c76935cd61f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    readTime: '5 min read'
+    readTime: '5 min read',
+    status: 'published'
   },
   {
     id: 'sustainable-paving-practices',
@@ -367,20 +374,22 @@ export const blogPosts: BlogPost[] = [
     category: 'Industry Trends',
     tags: ['Sustainability', 'Environmental Compliance', 'Green Building'],
     imageUrl: 'https://images.unsplash.com/photo-1553708881-112abc53fe54?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    readTime: '6 min read'
+    readTime: '6 min read',
+    status: 'published'
   }
 ];
 
+// Helper functions to work with blog posts
 export const getRecentBlogPosts = (count: number = 3): BlogPost[] => {
   return [...blogPosts]
-    .filter(post => post.status !== 'draft')
+    .filter(post => post.status === 'published')
     .sort((a, b) => {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     }).slice(0, count);
 };
 
 export const getFeaturedBlogPosts = (): BlogPost[] => {
-  return blogPosts.filter(post => post.featured && post.status !== 'draft');
+  return blogPosts.filter(post => post.featured && post.status === 'published');
 };
 
 export const getBlogPostById = (id: string): BlogPost | undefined => {
@@ -390,12 +399,21 @@ export const getBlogPostById = (id: string): BlogPost | undefined => {
 export const getBlogPostsByCategory = (categoryId: string): BlogPost[] => {
   return blogPosts.filter(post => {
     const normCat = post.category.toLowerCase().replace(/\s+/g, '-');
-    return normCat === categoryId.toLowerCase();
+    return normCat === categoryId.toLowerCase() && post.status === 'published';
   });
 };
 
 export const getBlogPostsByTag = (tag: string): BlogPost[] => {
   return blogPosts.filter(post => {
-    return post.tags.some(t => t.toLowerCase().replace(/\s+/g, '-') === tag.toLowerCase());
+    return post.tags.some(t => t.toLowerCase().replace(/\s+/g, '-') === tag.toLowerCase()) 
+      && post.status === 'published';
   });
+};
+
+export const getAllPublishedPosts = (): BlogPost[] => {
+  return blogPosts.filter(post => post.status === 'published');
+};
+
+export const getAllDraftPosts = (): BlogPost[] => {
+  return blogPosts.filter(post => post.status === 'draft');
 };

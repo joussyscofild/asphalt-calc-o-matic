@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import EditorToolbar from './editor/EditorToolbar';
 import EditorContent from './editor/EditorContent';
 import { useEditorCommands, useKeyboardShortcuts } from './editor/editorHooks';
+import { Button } from '@/components/ui/button';
+import { Eye } from 'lucide-react';
 
 interface RichTextEditorProps {
   initialValue: string;
@@ -18,22 +20,24 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = 'Start writing...'
 }) => {
   // Local state for content
-  const [content, setContent] = useState<string>(initialValue);
+  const [content, setContent] = useState<string>(initialValue || '');
   const [selection, setSelection] = useState<{start: number, end: number} | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   
-  console.log("RichTextEditor rendered with initialValue length:", initialValue.length);
+  console.log("RichTextEditor rendered with initialValue length:", initialValue?.length || 0);
 
   // Initialize editor with initial content
   useEffect(() => {
-    console.log("RichTextEditor initialValue changed, length:", initialValue.length);
+    console.log("RichTextEditor initialValue changed, length:", initialValue?.length || 0);
     
     // Always update content state when initialValue changes
-    setContent(initialValue);
-    
-    // Ensure the editor content is updated
-    if (editorRef.current) {
-      editorRef.current.innerHTML = initialValue;
+    if (initialValue !== content) {
+      setContent(initialValue || '');
+      
+      // Ensure the editor content is updated
+      if (editorRef.current) {
+        editorRef.current.innerHTML = initialValue || '';
+      }
     }
   }, [initialValue]);
 
@@ -182,6 +186,34 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   // Check if content is empty to show placeholder
   const isContentEmpty = !content || content === '' || content === '<br>' || content === '<p></p>';
+  
+  // Handle preview
+  const handlePreview = () => {
+    const previewWindow = window.open('', '_blank');
+    if (previewWindow) {
+      previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Content Preview</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          <style>
+            body { padding: 2rem; background-color: #f9fafb; }
+            .content { max-width: 800px; margin: 0 auto; padding: 2rem; background-color: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .content img { max-width: 100%; height: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="content prose">
+            ${content || '<p>No content to preview</p>'}
+          </div>
+        </body>
+        </html>
+      `);
+      previewWindow.document.close();
+    }
+  };
 
   return (
     <div className="border rounded-md">

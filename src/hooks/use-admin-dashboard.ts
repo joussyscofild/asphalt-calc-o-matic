@@ -11,15 +11,13 @@ export const useAdminDashboard = () => {
   
   // Handler for saving blog posts
   const handleSaveBlogPost = (post: BlogPost) => {
-    // In a real application, you would save the post to your backend
-    // For now, we'll update our local data
-    console.log("Admin dashboard saving post:", post.id, "Content length:", post.content.length);
-    console.log("Post status:", post.status);
-    
     // Ensure post has a valid status
     if (!post.status) {
       post.status = 'published';
     }
+    
+    console.log("Admin dashboard saving post:", post.id, "Content length:", post.content.length);
+    console.log("Post status:", post.status);
     
     // First, check if the post already exists
     const existingPostIndex = blogPosts.findIndex(p => p.id === post.id);
@@ -48,8 +46,8 @@ export const useAdminDashboard = () => {
     
     // Navigate back to dashboard after a brief delay to allow state updates
     setTimeout(() => {
-      navigate('/admin/dashboard');
-    }, 300);
+      navigate('/admin/dashboard#blog');
+    }, 500);
   };
   
   // Handler for canceling blog post edits
@@ -58,7 +56,7 @@ export const useAdminDashboard = () => {
       title: "Editing Canceled",
       description: "Changes to the blog post have been discarded.",
     });
-    navigate('/admin/dashboard');
+    navigate('/admin/dashboard#blog');
   };
 
   // Handle admin logout

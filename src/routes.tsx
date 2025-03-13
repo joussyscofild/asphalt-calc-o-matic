@@ -6,6 +6,7 @@ import Calculator from './pages/Calculator';
 import NotFound from './pages/NotFound';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import BlogTagResults from './pages/BlogTagResults';
 import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
@@ -30,6 +31,14 @@ export const router = createBrowserRouter([
   {
     path: '/blog/:id',
     element: <BlogPost />,
+  },
+  {
+    path: '/blog/tag/:tag',
+    element: <BlogTagResults />,
+  },
+  {
+    path: '/blog/category/:category',
+    element: <BlogTagResults />,
   },
   {
     path: '/admin',
