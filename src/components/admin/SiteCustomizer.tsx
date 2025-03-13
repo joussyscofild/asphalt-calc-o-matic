@@ -53,6 +53,19 @@ const SiteCustomizer: React.FC = () => {
     }
   }, [settings.favicon]);
   
+  // Handle color change with preview notification
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange(e);
+    
+    // Only show toast for color changes
+    if (e.target.name.includes('Color')) {
+      toast({
+        title: "Color Preview Updated",
+        description: "Save your changes to apply these colors site-wide.",
+      });
+    }
+  };
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -100,7 +113,7 @@ const SiteCustomizer: React.FC = () => {
         <TabsContent value="colors">
           <ColorsTab 
             settings={settings}
-            handleChange={handleChange}
+            handleChange={handleColorChange}
           />
         </TabsContent>
         
