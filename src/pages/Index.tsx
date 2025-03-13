@@ -1,32 +1,35 @@
 
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import Hero from '@/components/Hero';
 import FeaturedCalculators from '@/components/FeaturedCalculators';
 import BlogPostList from '@/components/BlogPostList';
-import { BlogPost, getFeaturedBlogPosts } from '@/utils/blogPosts';
+import { BlogPost, getRecentBlogPosts } from '@/utils/blogPosts';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ArrowRight, Check, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
-  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   
   useEffect(() => {
-    // Load featured posts
-    const loadFeaturedPosts = async () => {
+    // Load recent posts
+    const loadRecentPosts = async () => {
+      setIsLoadingPosts(true);
       try {
-        const posts = await getFeaturedBlogPosts();
-        setFeaturedPosts(posts);
+        const posts = await getRecentBlogPosts(3);
+        setRecentPosts(posts);
       } catch (error) {
-        console.error("Error loading featured posts:", error);
+        console.error("Error loading recent posts:", error);
+        toast.error("Failed to load recent blog posts");
       } finally {
         setIsLoadingPosts(false);
       }
     };
     
-    loadFeaturedPosts();
+    loadRecentPosts();
     
     // For SEO, set page title and meta description
     document.title = 'asphaltcalculator.co - Construction Calculators & Guides';
@@ -94,7 +97,8 @@ const Index = () => {
         <BlogPostList 
           title="Latest Construction Insights" 
           description="Expert knowledge and practical advice to help you make informed decisions for your construction projects."
-          posts={featuredPosts}
+          posts={recentPosts}
+          isLoading={isLoadingPosts}
         />
         
         {/* CTA Section */}

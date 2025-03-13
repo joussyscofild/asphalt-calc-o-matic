@@ -1,16 +1,19 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Calculator, ChevronRight, Search } from 'lucide-react';
 import HomeCalculator from './HomeCalculator';
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
-    // Implement search functionality here
+    if (searchQuery.trim()) {
+      console.log('Searching for:', searchQuery);
+      navigate(`/calculators?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
   
   return (
@@ -57,6 +60,7 @@ const Hero = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for calculators..."
                 className="input-field flex-grow rounded-none rounded-l-lg border-0"
+                aria-label="Search for calculators"
               />
               <button 
                 type="submit"

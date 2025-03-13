@@ -34,3 +34,20 @@ export const getCalculatorsByCategory = (categoryId: string): Calculator[] => {
 export const getFeaturedCalculators = (): Calculator[] => {
   return calculators.filter(calc => calc.featured);
 };
+
+export const searchCalculators = (query: string): Calculator[] => {
+  const searchTerms = query.toLowerCase().trim().split(/\s+/);
+  
+  return calculators.filter(calc => {
+    const searchableText = [
+      calc.title,
+      calc.description,
+      calc.longDescription,
+      calc.category,
+      ...(calc.tags || [])
+    ].join(' ').toLowerCase();
+    
+    // Check if all search terms are present in the searchable text
+    return searchTerms.every(term => searchableText.includes(term));
+  });
+};
