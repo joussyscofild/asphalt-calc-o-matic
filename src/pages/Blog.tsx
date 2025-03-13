@@ -14,30 +14,25 @@ const Blog = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   
   // Load posts when the component mounts
   useEffect(() => {
-    // First try to get posts from localStorage
-    try {
-      const storedPosts = localStorage.getItem('blogPosts');
-      if (storedPosts) {
-        const parsedPosts = JSON.parse(storedPosts);
-        // Filter for only published posts
-        const publishedPosts = parsedPosts.filter((post: BlogPost) => post.status === 'published');
-        console.log("Blog page loaded, published posts from localStorage:", publishedPosts.length);
+    const loadPosts = async () => {
+      setLoading(true);
+      try {
+        const publishedPosts = await getAllPublishedPosts();
+        console.log("Blog page loaded, published posts:", publishedPosts.length);
         setPosts(publishedPosts);
         setFilteredPosts(publishedPosts);
-        return;
+      } catch (error) {
+        console.error("Error loading posts:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error loading posts from localStorage:", error);
-    }
+    };
     
-    // Fall back to the default posts if localStorage failed
-    const publishedPosts = getAllPublishedPosts();
-    console.log("Blog page loaded, published posts from defaults:", publishedPosts.length);
-    setPosts(publishedPosts);
-    setFilteredPosts(publishedPosts);
+    loadPosts();
   }, []);
   
   // Filter posts when search query or category changes
@@ -120,7 +115,11 @@ const Blog = () => {
           </TabsList>
         </Tabs>
         
-        {filteredPosts.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="spinner">Loading...</div>
+          </div>
+        ) : filteredPosts.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-lg shadow-sm">
             <BookOpen size={48} className="mx-auto text-gray-300 mb-4" />
             <h2 className="text-2xl font-bold text-asphalt mb-2">No Posts Found</h2>

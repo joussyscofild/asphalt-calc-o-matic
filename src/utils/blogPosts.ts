@@ -1,3 +1,4 @@
+import { supabase } from '@/integrations/supabase/client';
 
 export interface BlogPost {
   id: string;
@@ -23,8 +24,8 @@ export const blogCategories = [
   { id: 'diy-tips', name: 'DIY Tips & Tricks' }
 ];
 
-// Add default status of 'published' to all posts
-export const blogPosts: BlogPost[] = [
+// Default blog posts - only used when no posts exist in Supabase
+export const defaultBlogPosts: BlogPost[] = [
   {
     id: 'understanding-asphalt-density',
     title: 'Understanding Asphalt Density: The Key to Durable Pavements',
@@ -379,8 +380,107 @@ export const blogPosts: BlogPost[] = [
   }
 ];
 
+// Initialize the posts array - this will be populated from Supabase
+export const blogPosts: BlogPost[] = [];
+
+// Fetch posts from Supabase
+export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching blog posts:', error);
+      return [...defaultBlogPosts]; // Fall back to default posts on error
+    }
+    
+    if (data && data.length > 0) {
+      // Map Supabase data format to our BlogPost format
+      const posts = data.map(post => ({
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        author: post.author,
+        authorAvatar: post.author_avatar,
+        date: post.date,
+        category: post.category,
+        tags: post.tags || [],
+        imageUrl: post.image_url,
+        featured: post.featured,
+        readTime: post.read_time,
+        status: post.status
+      }));
+      
+      // Update the blogPosts array
+      blogPosts.length = 0;
+      blogPosts.push(...posts);
+      return posts;
+    } else {
+      // If no posts in Supabase yet, use default posts and add them to Supabase
+      for (const post of defaultBlogPosts) {
+        await addBlogPostToSupabase(post);
+      }
+      blogPosts.length = 0;
+      blogPosts.push(...defaultBlogPosts);
+      return [...defaultBlogPosts];
+    }
+  } catch (error) {
+    console.error('Error in fetchBlogPosts:', error);
+    return [...defaultBlogPosts];
+  }
+};
+
+// Add a blog post to Supabase
+export const addBlogPostToSupabase = async (post: BlogPost): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('blog_posts')
+      .upsert({
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        author: post.author,
+        author_avatar: post.authorAvatar,
+        date: post.date,
+        category: post.category,
+        tags: post.tags,
+        image_url: post.imageUrl,
+        featured: post.featured,
+        read_time: post.readTime,
+        status: post.status
+      });
+    
+    if (error) {
+      console.error('Error adding blog post to Supabase:', error);
+    }
+  } catch (error) {
+    console.error('Error in addBlogPostToSupabase:', error);
+  }
+};
+
+// Delete a blog post from Supabase
+export const deleteBlogPostFromSupabase = async (postId: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('blog_posts')
+      .delete()
+      .eq('id', postId);
+    
+    if (error) {
+      console.error('Error deleting blog post from Supabase:', error);
+    }
+  } catch (error) {
+    console.error('Error in deleteBlogPostFromSupabase:', error);
+  }
+};
+
 // Helper functions to work with blog posts
-export const getRecentBlogPosts = (count: number = 3): BlogPost[] => {
+export const getRecentBlogPosts = async (count: number = 3): Promise<BlogPost[]> => {
+  await fetchBlogPosts(); // Ensure we have the latest posts
+  
   return [...blogPosts]
     .filter(post => post.status === 'published')
     .sort((a, b) => {
@@ -388,32 +488,77 @@ export const getRecentBlogPosts = (count: number = 3): BlogPost[] => {
     }).slice(0, count);
 };
 
-export const getFeaturedBlogPosts = (): BlogPost[] => {
+export const getFeaturedBlogPosts = async (): Promise<BlogPost[]> => {
+  await fetchBlogPosts(); // Ensure we have the latest posts
+  
   return blogPosts.filter(post => post.featured && post.status === 'published');
 };
 
-export const getBlogPostById = (id: string): BlogPost | undefined => {
-  return blogPosts.find(post => post.id === id);
+export const getBlogPostById = async (id: string): Promise<BlogPost | undefined> => {
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching blog post by ID:', error);
+      // Fall back to local array search
+      return blogPosts.find(post => post.id === id);
+    }
+    
+    if (data) {
+      return {
+        id: data.id,
+        title: data.title,
+        excerpt: data.excerpt,
+        content: data.content,
+        author: data.author,
+        authorAvatar: data.author_avatar,
+        date: data.date,
+        category: data.category,
+        tags: data.tags || [],
+        imageUrl: data.image_url,
+        featured: data.featured,
+        readTime: data.read_time,
+        status: data.status
+      };
+    }
+    
+    return undefined;
+  } catch (error) {
+    console.error('Error in getBlogPostById:', error);
+    return blogPosts.find(post => post.id === id);
+  }
 };
 
-export const getBlogPostsByCategory = (categoryId: string): BlogPost[] => {
+export const getBlogPostsByCategory = async (categoryId: string): Promise<BlogPost[]> => {
+  await fetchBlogPosts(); // Ensure we have the latest posts
+  
   return blogPosts.filter(post => {
     const normCat = post.category.toLowerCase().replace(/\s+/g, '-');
     return normCat === categoryId.toLowerCase() && post.status === 'published';
   });
 };
 
-export const getBlogPostsByTag = (tag: string): BlogPost[] => {
+export const getBlogPostsByTag = async (tag: string): Promise<BlogPost[]> => {
+  await fetchBlogPosts(); // Ensure we have the latest posts
+  
   return blogPosts.filter(post => {
     return post.tags.some(t => t.toLowerCase().replace(/\s+/g, '-') === tag.toLowerCase()) 
       && post.status === 'published';
   });
 };
 
-export const getAllPublishedPosts = (): BlogPost[] => {
+export const getAllPublishedPosts = async (): Promise<BlogPost[]> => {
+  await fetchBlogPosts(); // Ensure we have the latest posts
+  
   return blogPosts.filter(post => post.status === 'published');
 };
 
-export const getAllDraftPosts = (): BlogPost[] => {
+export const getAllDraftPosts = async (): Promise<BlogPost[]> => {
+  await fetchBlogPosts(); // Ensure we have the latest posts
+  
   return blogPosts.filter(post => post.status === 'draft');
 };

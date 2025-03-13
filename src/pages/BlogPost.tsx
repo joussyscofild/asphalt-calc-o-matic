@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, User, ChevronLeft, Tag, Clock } from 'lucide-react';
@@ -20,47 +19,30 @@ const BlogPost = () => {
       return;
     }
     
-    // First try to load from localStorage
-    try {
-      const storedPosts = localStorage.getItem('blogPosts');
-      if (storedPosts) {
-        const posts = JSON.parse(storedPosts);
-        const foundPost = posts.find((p: IBlogPost) => p.id === id);
+    const loadPost = async () => {
+      setLoading(true);
+      try {
+        const foundPost = await getBlogPostById(id);
+        
         if (foundPost && foundPost.status === 'published') {
-          console.log("BlogPost page loaded post from localStorage:", foundPost.id, "Content length:", foundPost.content.length);
+          console.log("BlogPost page loaded post:", foundPost.id, "Content length:", foundPost.content.length);
           setPost(foundPost);
           
           // Get recent posts excluding current one
-          const recent = posts
-            .filter((p: IBlogPost) => p.id !== id && p.status === 'published')
-            .sort((a: IBlogPost, b: IBlogPost) => {
-              return new Date(b.date).getTime() - new Date(a.date).getTime();
-            })
-            .slice(0, 3);
-            
-          setRecentPosts(recent);
-          setLoading(false);
-          return;
+          const recent = await getRecentBlogPosts(4);
+          setRecentPosts(recent.filter(p => p.id !== id).slice(0, 3));
+        } else {
+          navigate('/blog');
         }
+      } catch (error) {
+        console.error("Error loading post:", error);
+        navigate('/blog');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error loading post from localStorage:", error);
-    }
+    };
     
-    // Fallback to default post data
-    const postData = getBlogPostById(id);
-    if (postData) {
-      console.log("BlogPost page loaded post from defaults:", postData.id, "Content length:", postData.content.length);
-      setPost(postData);
-      
-      // Get recent posts excluding current one
-      const recent = getRecentBlogPosts(4).filter(p => p.id !== id).slice(0, 3);
-      setRecentPosts(recent);
-    } else {
-      navigate('/blog');
-    }
-    
-    setLoading(false);
+    loadPost();
   }, [id, navigate]);
   
   if (loading) {
