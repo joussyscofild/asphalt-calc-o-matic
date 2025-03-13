@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calculator, ChevronRight, Search } from 'lucide-react';
+import HomeCalculator from './HomeCalculator';
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,37 +68,9 @@ const Hero = () => {
             </form>
           </div>
           
-          {/* Hero Image */}
+          {/* Hero Calculator */}
           <div className="md:w-5/12 relative animate-fade-in">
-            <div className="calculator-card bg-white shadow-xl">
-              <h3 className="text-xl font-bold mb-4">Asphalt Tonnage Calculator</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Length (feet)</label>
-                  <input type="number" placeholder="100" className="input-field w-full" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Width (feet)</label>
-                  <input type="number" placeholder="20" className="input-field w-full" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Thickness (inches)</label>
-                  <input type="number" placeholder="2" className="input-field w-full" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit weight (lb/ft³)</label>
-                  <input type="number" placeholder="145" className="input-field w-full" />
-                </div>
-                <button className="btn-primary w-full">Calculate Tonnage</button>
-              </div>
-              
-              {/* Sample Result Box */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
-                <h4 className="text-sm font-semibold text-asphalt mb-1">Estimated Result:</h4>
-                <p className="text-2xl font-bold text-safety-dark">24.3 tons</p>
-                <p className="text-xs text-gray-500 mt-1">Based on standard asphalt density</p>
-              </div>
-            </div>
+            <HomeCalculator />
             
             {/* Decorative Elements */}
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-safety/20 rounded-full -z-10"></div>

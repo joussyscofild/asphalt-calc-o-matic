@@ -59,6 +59,29 @@ export const asphaltCalculators: Calculator[] = [
         min: 100,
         max: 200,
         helperText: 'Standard hot-mix asphalt is typically 145-150 lb/ft³'
+      },
+      {
+        id: 'costPerTon',
+        label: 'Cost per Ton',
+        type: 'number',
+        placeholder: '100',
+        defaultValue: 100,
+        required: false,
+        unit: '$',
+        min: 0,
+        helperText: 'The cost of asphalt material per ton'
+      },
+      {
+        id: 'unitSystem',
+        label: 'Unit System',
+        type: 'select',
+        defaultValue: 'imperial',
+        required: false,
+        options: [
+          { value: 'imperial', label: 'Imperial (feet, inches)' },
+          { value: 'metric', label: 'Metric (meters, cm)' }
+        ],
+        helperText: 'Choose your preferred unit system'
       }
     ],
     relatedCalculators: ['asphalt-thickness', 'paving-cost'],
