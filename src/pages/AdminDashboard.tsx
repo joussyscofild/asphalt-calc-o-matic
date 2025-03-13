@@ -1,13 +1,14 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import SiteCustomizer from "@/components/admin/SiteCustomizer";
 import PagesManager from "@/components/admin/PagesManager";
+import CalculatorManager from "@/components/admin/CalculatorManager";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { ArrowLeft, LogOut, FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BlogPost } from '@/utils/blogPosts';
 
@@ -66,13 +67,110 @@ const AdminDashboard = () => {
         </Button>
       </div>
       
-      <Tabs defaultValue="blog" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8">
-          <TabsTrigger value="blog">Blog Posts</TabsTrigger>
-          <TabsTrigger value="pages">Pages</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsTrigger value="dashboard" className="flex items-center gap-1">
+            <LayoutDashboard size={14} />
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="blog" className="flex items-center gap-1">
+            <BookOpen size={14} />
+            Blog Posts
+          </TabsTrigger>
+          <TabsTrigger value="calculators" className="flex items-center gap-1">
+            <CalculatorIcon size={14} />
+            Calculators
+          </TabsTrigger>
+          <TabsTrigger value="pages" className="flex items-center gap-1">
+            <FileText size={14} />
+            Pages
+          </TabsTrigger>
+          <TabsTrigger value="appearance" className="flex items-center gap-1">
+            <LayoutDashboard size={14} />
+            Appearance
+          </TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="dashboard">
+          <Card>
+            <CardHeader>
+              <CardTitle>Admin Dashboard</CardTitle>
+              <CardDescription>
+                Overview of your website statistics and activities
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Total Calculators
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">12</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      +2 from last month
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Blog Posts
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">6</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      +1 from last month
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Total Pages
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">8</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      No change from last month
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="mt-8">
+                <h3 className="text-lg font-medium mb-4">Recent Activity</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      <span>Blog post "Understanding Asphalt Density" edited</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">2 days ago</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <CalculatorIcon className="h-4 w-4" />
+                      <span>New calculator "Retaining Wall" added</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">5 days ago</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      <span>Page "About Us" updated</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">1 week ago</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         
         <TabsContent value="blog">
           <Card>
@@ -87,6 +185,20 @@ const AdminDashboard = () => {
                 onSave={handleSaveBlogPost}
                 onCancel={handleCancelBlogPost}
               />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="calculators">
+          <Card>
+            <CardHeader>
+              <CardTitle>Calculator Management</CardTitle>
+              <CardDescription>
+                Create, edit and manage your construction calculators.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CalculatorManager />
             </CardContent>
           </Card>
         </TabsContent>
@@ -115,20 +227,6 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <SiteCustomizer />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Site Settings</CardTitle>
-              <CardDescription>
-                Configure general settings for your website.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Settings controls coming soon...</p>
             </CardContent>
           </Card>
         </TabsContent>
