@@ -163,6 +163,41 @@ export type Database = {
           },
         ]
       }
+      calculator_usage: {
+        Row: {
+          calculator_id: string
+          created_at: string
+          id: string
+          input_data: Json
+          result: string
+          timestamp: string
+        }
+        Insert: {
+          calculator_id: string
+          created_at?: string
+          id?: string
+          input_data: Json
+          result: string
+          timestamp?: string
+        }
+        Update: {
+          calculator_id?: string
+          created_at?: string
+          id?: string
+          input_data?: Json
+          result?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calculator_usage_calculator_id_fkey"
+            columns: ["calculator_id"]
+            isOneToOne: false
+            referencedRelation: "calculators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calculators: {
         Row: {
           category: string

@@ -48,15 +48,18 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
       
       // Log this calculation to Supabase for analytics (if needed)
       try {
-        await supabase
+        const { error } = await supabase
           .from('calculator_usage')
           .insert({
             calculator_id: calculatorId,
             input_data: formData,
-            result: calculatedResult,
-            timestamp: new Date().toISOString()
-          })
-          .select();
+            result: String(calculatedResult),
+            // Remove timestamp as it's already included as created_at by default
+          });
+          
+        if (error) {
+          console.error('Error logging calculator usage:', error);
+        }
       } catch (error) {
         // Just log the error but don't interrupt the user experience
         console.error('Error logging calculator usage:', error);
