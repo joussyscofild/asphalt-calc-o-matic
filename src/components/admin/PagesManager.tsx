@@ -7,6 +7,7 @@ import PagesTable from './pages/PagesTable';
 import PageEditorDialog from './pages/PageEditorDialog';
 import { Page } from './pages/types';
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from 'react-router-dom';
 
 const PagesManager: React.FC = () => {
   const [pages, setPages] = useState<Page[]>([]);
@@ -14,6 +15,7 @@ const PagesManager: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page | null>(null);
   const [pageContent, setPageContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
   
   // Fetch pages from Supabase
   useEffect(() => {
@@ -22,7 +24,8 @@ const PagesManager: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('custom_pages')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
         
         if (error) {
           throw error;
@@ -136,7 +139,7 @@ const PagesManager: React.FC = () => {
             lastModified: new Date(data[0].last_modified).toISOString().split('T')[0],
           };
           
-          setPages([...pages, newPage]);
+          setPages([newPage, ...pages]);
           
           toast({
             title: "Page created",
@@ -209,7 +212,7 @@ const PagesManager: React.FC = () => {
           lastModified: new Date(data[0].last_modified).toISOString().split('T')[0],
         };
         
-        setPages([...pages, newPage]);
+        setPages([newPage, ...pages]);
         
         toast({
           title: "Page duplicated",
@@ -297,6 +300,11 @@ const PagesManager: React.FC = () => {
     }
   };
 
+  const handlePreviewPage = (page: Page) => {
+    // Open the page in a new tab
+    window.open(`/page/${page.slug}`, '_blank');
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -318,6 +326,7 @@ const PagesManager: React.FC = () => {
           onDelete={handleDeletePage}
           onDuplicate={handleDuplicatePage}
           onStatusToggle={handleStatusToggle}
+          onPreview={handlePreviewPage}
         />
       )}
       

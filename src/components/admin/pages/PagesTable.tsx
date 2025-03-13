@@ -17,6 +17,7 @@ interface PagesTableProps {
   onDelete: (id: string) => void;
   onDuplicate: (page: Page) => void;
   onStatusToggle: (id: string) => void;
+  onPreview: (page: Page) => void;
 }
 
 const PagesTable: React.FC<PagesTableProps> = ({ 
@@ -24,7 +25,8 @@ const PagesTable: React.FC<PagesTableProps> = ({
   onEdit, 
   onDelete, 
   onDuplicate,
-  onStatusToggle
+  onStatusToggle,
+  onPreview
 }) => {
   return (
     <Table>
@@ -37,35 +39,44 @@ const PagesTable: React.FC<PagesTableProps> = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {pages.map((page) => (
-          <TableRow key={page.id}>
-            <TableCell className="font-medium">
-              {page.title}
-              <div className="text-sm text-muted-foreground">
-                /{page.slug}
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                page.status === 'published' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-amber-100 text-amber-800'
-              }`}>
-                {page.status === 'published' ? 'Published' : 'Draft'}
-              </div>
-            </TableCell>
-            <TableCell>{page.lastModified}</TableCell>
-            <TableCell className="text-right">
-              <PageActionMenu 
-                page={page} 
-                onEdit={onEdit} 
-                onDelete={onDelete} 
-                onDuplicate={onDuplicate}
-                onStatusToggle={onStatusToggle}
-              />
+        {pages.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+              No pages found. Create your first page by clicking "Add New Page" above.
             </TableCell>
           </TableRow>
-        ))}
+        ) : (
+          pages.map((page) => (
+            <TableRow key={page.id}>
+              <TableCell className="font-medium">
+                {page.title}
+                <div className="text-sm text-muted-foreground">
+                  /{page.slug}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  page.status === 'published' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-amber-100 text-amber-800'
+                }`}>
+                  {page.status === 'published' ? 'Published' : 'Draft'}
+                </div>
+              </TableCell>
+              <TableCell>{page.lastModified}</TableCell>
+              <TableCell className="text-right">
+                <PageActionMenu 
+                  page={page} 
+                  onEdit={onEdit} 
+                  onDelete={onDelete} 
+                  onDuplicate={onDuplicate}
+                  onStatusToggle={onStatusToggle}
+                  onPreview={onPreview}
+                />
+              </TableCell>
+            </TableRow>
+          ))
+        )}
       </TableBody>
     </Table>
   );

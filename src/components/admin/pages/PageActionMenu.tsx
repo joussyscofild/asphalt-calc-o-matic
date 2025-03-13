@@ -18,6 +18,7 @@ interface PageActionMenuProps {
   onDelete: (id: string) => void;
   onDuplicate: (page: Page) => void;
   onStatusToggle: (id: string) => void;
+  onPreview: (page: Page) => void;
 }
 
 const PageActionMenu: React.FC<PageActionMenuProps> = ({ 
@@ -25,7 +26,8 @@ const PageActionMenu: React.FC<PageActionMenuProps> = ({
   onEdit, 
   onDelete, 
   onDuplicate,
-  onStatusToggle
+  onStatusToggle,
+  onPreview
 }) => {
   return (
     <DropdownMenu>
@@ -45,7 +47,7 @@ const PageActionMenu: React.FC<PageActionMenuProps> = ({
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onPreview(page)}>
           <Eye className="mr-2 h-4 w-4" />
           Preview
         </DropdownMenuItem>
