@@ -247,6 +247,7 @@ export type Database = {
           id: string
           last_modified: string
           slug: string
+          sort_order: number | null
           status: string
           title: string
         }
@@ -256,6 +257,7 @@ export type Database = {
           id?: string
           last_modified?: string
           slug: string
+          sort_order?: number | null
           status?: string
           title: string
         }
@@ -265,6 +267,7 @@ export type Database = {
           id?: string
           last_modified?: string
           slug?: string
+          sort_order?: number | null
           status?: string
           title?: string
         }
