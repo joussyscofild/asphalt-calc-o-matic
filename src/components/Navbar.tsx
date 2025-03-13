@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Calculator, BookOpen, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Calculator, BookOpen } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,13 +64,7 @@ const Navbar = () => {
               <BookOpen size={18} />
               <span>Blog</span>
             </Link>
-            <Link 
-              to="/admin" 
-              className={`nav-link flex items-center space-x-1 ${isActive('/admin') ? 'text-foreground font-semibold' : ''}`}
-            >
-              <LayoutDashboard size={18} />
-              <span>Admin</span>
-            </Link>
+            {/* Admin link removed from public navigation */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -114,15 +108,7 @@ const Navbar = () => {
               <BookOpen size={18} />
               <span>Blog</span>
             </Link>
-            <Link 
-              to="/admin" 
-              className={`flex items-center space-x-2 p-2 rounded-md ${
-                isActive('/admin') ? 'bg-muted font-medium' : ''
-              }`}
-            >
-              <LayoutDashboard size={18} />
-              <span>Admin</span>
-            </Link>
+            {/* Admin link removed from mobile navigation */}
           </div>
         </div>
       </div>

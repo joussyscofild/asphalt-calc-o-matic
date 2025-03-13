@@ -8,6 +8,7 @@ import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
+import ProtectedRoute from './components/admin/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
@@ -36,7 +37,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin/dashboard',
-    element: <AdminDashboard />,
+    element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>,
   },
   {
     path: '*',

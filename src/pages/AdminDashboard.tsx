@@ -7,8 +7,8 @@ import SiteCustomizer from "@/components/admin/SiteCustomizer";
 import PagesManager from "@/components/admin/PagesManager";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { ArrowLeft, LogOut } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { BlogPost } from '@/utils/blogPosts';
 
 const AdminDashboard = () => {
@@ -31,19 +31,39 @@ const AdminDashboard = () => {
       description: "Changes to the blog post have been discarded.",
     });
   };
+
+  // Handle admin logout
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuthenticated');
+    toast({
+      title: "Logged out",
+      description: "You have been logged out of the admin dashboard.",
+    });
+    navigate('/admin');
+  };
   
   return (
     <div className="container-custom py-8">
-      <div className="mb-8 flex items-center">
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="mr-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Site
+          </Button>
+          <h1 className="text-3xl font-bold">Site Administration</h1>
+        </div>
         <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="mr-4"
+          variant="outline" 
+          onClick={handleLogout}
+          className="flex items-center"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Site
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
         </Button>
-        <h1 className="text-3xl font-bold">Site Administration</h1>
       </div>
       
       <Tabs defaultValue="blog" className="w-full">
