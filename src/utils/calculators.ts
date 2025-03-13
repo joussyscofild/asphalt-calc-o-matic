@@ -1,5 +1,4 @@
-
-import { Road, Ruler, Building, TrendingUp, LayoutGrid, Truck, Scale, Target, CornerUpRight, Percent, Clock, Home, Landmark, Warehouse, Gauge } from 'lucide-react';
+import { Navigation, Ruler, Building, TrendingUp, LayoutGrid, Truck, Scale, Target, CornerUpRight, Percent, Clock, Home, Landmark, Warehouse, Gauge } from 'lucide-react';
 
 export interface Calculator {
   id: string;
@@ -33,7 +32,7 @@ export interface CalculatorField {
 }
 
 export const categories = [
-  { id: 'asphalt', label: 'Asphalt', icon: Road },
+  { id: 'asphalt', label: 'Asphalt', icon: Navigation },
   { id: 'concrete', label: 'Concrete', icon: Building },
   { id: 'earthwork', label: 'Earthwork', icon: Truck },
   { id: 'cost', label: 'Cost Estimation', icon: TrendingUp },
@@ -47,7 +46,7 @@ export const calculators: Calculator[] = [
     title: 'Asphalt Tonnage Calculator',
     description: 'Calculate the exact tonnage needed for your asphalt paving project with adjustments for density and temperature.',
     longDescription: 'Our asphalt tonnage calculator helps you determine precisely how much asphalt material is required for your paving project. It takes into account dimensions, thickness, and density to provide accurate estimates that can save you time and money by reducing waste and ensuring you order the right amount of material.',
-    icon: Road,
+    icon: Navigation,
     category: 'Asphalt',
     timeEstimate: '1 min',
     featured: true,

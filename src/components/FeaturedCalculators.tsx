@@ -1,5 +1,5 @@
 
-import { Road, Ruler, Building, TrendingUp, Landmark, LayoutGrid, Warehouse, Gauge, Truck } from 'lucide-react';
+import { Navigation, Ruler, Building, TrendingUp, Landmark, LayoutGrid, Warehouse, Gauge, Truck, ChevronRight } from 'lucide-react';
 import CalculatorCard from './CalculatorCard';
 import { Link } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ const FeaturedCalculators = () => {
       id: 'asphalt-tonnage',
       title: 'Asphalt Tonnage Calculator',
       description: 'Calculate the exact tonnage needed for your asphalt paving project with adjustments for density and temperature.',
-      icon: <Road size={20} />,
+      icon: <Navigation size={20} />,
       category: 'Asphalt',
       timeEstimate: '1 min',
       featured: true
