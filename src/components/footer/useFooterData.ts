@@ -11,6 +11,7 @@ export const useFooterData = () => {
   useEffect(() => {
     const fetchFooterLinks = async () => {
       try {
+        console.log('Fetching footer links from database...');
         const { data, error } = await supabase
           .from('footer_links')
           .select('*')
@@ -20,6 +21,8 @@ export const useFooterData = () => {
           console.error('Error fetching footer links:', error);
           return;
         }
+        
+        console.log('Footer links data from DB:', data);
         
         if (data && data.length > 0) {
           // Group links by group_id
@@ -40,7 +43,7 @@ export const useFooterData = () => {
             const formattedUrl = formatUrl(link.url, link.is_external);
             
             // Log each link for debugging
-            console.log(`Processing footer link: ${link.label}, URL: ${formattedUrl}, External: ${link.is_external}`);
+            console.log(`Processing footer link: ${link.label}, URL: ${formattedUrl}, External: ${link.is_external}, Group: ${groupId}`);
             
             groups[groupId].links.push({
               id: link.id,
@@ -50,7 +53,11 @@ export const useFooterData = () => {
             });
           });
           
-          setLinkGroups(Object.values(groups));
+          const groupsArray = Object.values(groups);
+          console.log('Processed footer link groups:', groupsArray);
+          setLinkGroups(groupsArray);
+        } else {
+          console.log('No footer links found in database');
         }
       } catch (error) {
         console.error('Error fetching footer links:', error);

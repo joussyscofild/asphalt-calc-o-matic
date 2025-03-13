@@ -8,6 +8,8 @@ interface FooterLinkProps {
 }
 
 const FooterLink: React.FC<FooterLinkProps> = ({ link }) => {
+  console.log(`Rendering FooterLink: "${link.label}", URL: "${link.url}", External: ${link.isExternal}`);
+  
   if (link.isExternal) {
     return (
       <a 
