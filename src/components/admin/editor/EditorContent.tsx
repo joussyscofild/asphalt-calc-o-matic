@@ -30,7 +30,7 @@ const EditorContent: React.FC<EditorContentProps> = ({
       console.log("EditorContent syncing content, length:", content.length);
       // Only update innerHTML if it's different to avoid cursor jumping
       if (content !== editorRef.current.innerHTML) {
-        editorRef.current.innerHTML = content;
+        editorRef.current.innerHTML = content || ''; // Ensure we never set undefined
       }
     }
   }, [content, editorRef]);

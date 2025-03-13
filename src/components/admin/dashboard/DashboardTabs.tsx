@@ -10,7 +10,7 @@ import FooterManager from "@/components/admin/FooterManager";
 import { FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen, Link as LinkIcon } from "lucide-react";
 import { BlogPost } from '@/utils/blogPosts';
 import DashboardOverview from './DashboardOverview';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface DashboardTabsProps {
   handleSaveBlogPost: (post: BlogPost) => void;
@@ -24,7 +24,9 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
   refreshTrigger
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [tabKey, setTabKey] = useState(Date.now());
   
   // Parse tab from URL hash if present
   useEffect(() => {
@@ -37,12 +39,13 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
   // Force refresh when refreshTrigger changes
   useEffect(() => {
     console.log("Dashboard refreshing due to refresh trigger");
+    setTabKey(Date.now());
   }, [refreshTrigger]);
   
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     // Update URL hash for bookmarking/sharing
-    window.location.hash = value;
+    navigate(`/admin/dashboard#${value}`, { replace: true });
   };
 
   return (
@@ -83,7 +86,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DashboardOverview />
+            <DashboardOverview key={`dashboard-overview-${tabKey}`} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -100,7 +103,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             <BlogPostEditor 
               onSave={handleSaveBlogPost}
               onCancel={handleCancelBlogPost}
-              key={`blog-editor-${refreshTrigger}`}
+              key={`blog-editor-${tabKey}`}
             />
           </CardContent>
         </Card>
@@ -115,7 +118,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CalculatorManager key={`calculator-manager-${refreshTrigger}`} />
+            <CalculatorManager key={`calculator-manager-${tabKey}`} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -129,7 +132,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <PagesManager key={`pages-manager-${refreshTrigger}`} />
+            <PagesManager key={`pages-manager-${tabKey}`} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -143,7 +146,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <FooterManager key={`footer-manager-${refreshTrigger}`} />
+            <FooterManager key={`footer-manager-${tabKey}`} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -157,7 +160,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SiteCustomizer key={`site-customizer-${refreshTrigger}`} />
+            <SiteCustomizer key={`site-customizer-${tabKey}`} />
           </CardContent>
         </Card>
       </TabsContent>

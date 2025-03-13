@@ -24,6 +24,9 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   
   useEffect(() => {
     console.log("BlogPostEditor initialized with post:", post?.id || "new post");
+    if (post) {
+      console.log("Initial post status:", post.status);
+    }
   }, [post]);
   
   const handleSaveComplete = (post: BlogPost, isPublished: boolean) => {
@@ -34,6 +37,7 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     };
     
     console.log("Saving post from editor, ID:", updatedPost.id, "Content length:", updatedPost.content.length);
+    console.log("Post status being set to:", updatedPost.status);
     
     // Call the parent component's onSave function
     onSave(updatedPost);
@@ -66,12 +70,14 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
   useEffect(() => {
     if (selectedPost) {
       console.log("Blog post selected for editing, ID:", selectedPost.id, "Content length:", selectedPost.content.length);
+      console.log("Post status:", selectedPost.status);
       setEditorKey(prev => prev + 1);
     }
   }, [selectedPost]);
 
   const handleEditPost = (blogPost: BlogPost) => {
     console.log("Editing blog post:", blogPost.id, "Content length:", blogPost.content.length);
+    console.log("Post status:", blogPost.status);
     toast({
       title: "Loading post for editing",
       description: `Loading "${blogPost.title}" for editing`,

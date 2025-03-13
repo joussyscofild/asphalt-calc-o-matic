@@ -14,6 +14,12 @@ export const useAdminDashboard = () => {
     // In a real application, you would save the post to your backend
     // For now, we'll update our local data
     console.log("Admin dashboard saving post:", post.id, "Content length:", post.content.length);
+    console.log("Post status:", post.status);
+    
+    // Ensure post has a valid status
+    if (!post.status) {
+      post.status = 'published';
+    }
     
     // First, check if the post already exists
     const existingPostIndex = blogPosts.findIndex(p => p.id === post.id);
@@ -43,7 +49,7 @@ export const useAdminDashboard = () => {
     // Navigate back to dashboard after a brief delay to allow state updates
     setTimeout(() => {
       navigate('/admin/dashboard');
-    }, 100);
+    }, 300);
   };
   
   // Handler for canceling blog post edits

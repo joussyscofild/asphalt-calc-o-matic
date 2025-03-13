@@ -32,6 +32,8 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
   useEffect(() => {
     if (post) {
       console.log("Loading post for editing:", post.id, "Content length:", post.content?.length || 0);
+      console.log("Post status:", post.status);
+      
       setFormData({
         id: post.id || '',
         title: post.title || '',
@@ -145,7 +147,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
       id: postId,
       title: formData.title,
       excerpt: formData.excerpt,
-      content: formData.content,
+      content: formData.content || '', // Ensure content is never undefined
       imageUrl: formData.imageUrl || '',
       author: formData.author,
       authorAvatar: formData.authorAvatar,
@@ -158,6 +160,7 @@ export const useBlogPostForm = (onSave: (post: BlogPost, isPublished: boolean) =
     };
     
     console.log("Saving post with ID:", completedPost.id, "Content length:", completedPost.content.length);
+    console.log("Post status being set to:", completedPost.status);
     
     onSave(completedPost, isPublished);
     

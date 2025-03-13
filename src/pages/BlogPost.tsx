@@ -16,6 +16,13 @@ const BlogPost = () => {
     // Ensure we're getting the latest version of the post
     const currentPost = getBlogPostById(id);
     console.log("BlogPost page loading post:", id, "Content length:", currentPost?.content?.length || 0);
+    console.log("Post status:", currentPost?.status);
+    
+    if (currentPost && currentPost.status !== 'published' && currentPost.status !== 'draft') {
+      console.log("Post is neither published nor draft, setting status to published");
+      currentPost.status = 'published';
+    }
+    
     setPost(currentPost);
   }, [id]);
 

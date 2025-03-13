@@ -9,21 +9,22 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [posts, setPosts] = useState(blogPosts.filter(post => post.status !== 'draft'));
+  const [posts, setPosts] = useState(blogPosts.filter(post => post.status === 'published'));
   const navigate = useNavigate();
   
   // Refresh the posts array when the component mounts or when navigating to this page
   useEffect(() => {
     console.log("Blog page refreshing posts, count:", blogPosts.length);
+    console.log("Published posts:", blogPosts.filter(post => post.status === 'published').length);
     
-    const visiblePosts = blogPosts.filter(post => post.status !== 'draft');
+    const visiblePosts = blogPosts.filter(post => post.status === 'published');
     setPosts(visiblePosts);
   }, [navigate]);
   
   // Filter posts by category
   const filteredPosts = selectedCategory === 'all' 
     ? posts 
-    : getBlogPostsByCategory(selectedCategory).filter(post => post.status !== 'draft');
+    : getBlogPostsByCategory(selectedCategory).filter(post => post.status === 'published');
 
   return (
     <div className="py-8">

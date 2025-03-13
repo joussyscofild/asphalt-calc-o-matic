@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import RichTextEditor from '../RichTextEditor';
 
@@ -24,11 +24,11 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
       </CardHeader>
       <CardContent>
         <RichTextEditor 
-          initialValue={content || ''} 
+          initialValue={content} 
           onChange={handleContentChange}
           minHeight="500px"
           placeholder="Start writing your blog post content here..."
-          key={`editor-${content ? content.length : 0}`}
+          key={`editor-${Date.now()}`} // Force re-render on every mount
         />
       </CardContent>
     </Card>
