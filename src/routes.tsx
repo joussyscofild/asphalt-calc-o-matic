@@ -4,6 +4,9 @@ import Index from './pages/Index';
 import Calculators from './pages/Calculators';
 import Calculator from './pages/Calculator';
 import NotFound from './pages/NotFound';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
+import Admin from './pages/Admin';
 
 export const router = createBrowserRouter([
   {
@@ -17,6 +20,18 @@ export const router = createBrowserRouter([
   {
     path: '/calculator/:id',
     element: <Calculator />,
+  },
+  {
+    path: '/blog',
+    element: <Blog />,
+  },
+  {
+    path: '/blog/:id',
+    element: <BlogPost />,
+  },
+  {
+    path: '/admin',
+    element: <Admin />,
   },
   {
     path: '*',
