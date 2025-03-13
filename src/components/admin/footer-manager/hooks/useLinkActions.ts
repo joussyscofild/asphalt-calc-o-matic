@@ -1,4 +1,3 @@
-
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { FooterLinkGroup, FooterLink, NewLinkData } from '../types';
@@ -29,13 +28,10 @@ export const useLinkActions = (
     if (!currentGroup) return;
     
     try {
-      // Format URL properly
       const formattedUrl = formatUrl(newLinkData.url, newLinkData.isExternal);
       
-      // Determine next sort order
       const nextSortOrder = currentGroup.links.length;
       
-      // Insert into Supabase
       const { data, error } = await supabase
         .from('footer_links')
         .insert({
@@ -114,15 +110,12 @@ export const useLinkActions = (
       const currentGroup = linkGroups.find(group => group.id === activeTab);
       if (!currentGroup) return;
       
-      // Format URL properly
       const formattedUrl = formatUrl(newLinkData.url, newLinkData.isExternal);
       
-      // Log the update operation
       console.log('Updating link:', editingLink.id);
       console.log('New URL:', formattedUrl);
       console.log('Is External:', newLinkData.isExternal);
       
-      // Update in Supabase
       const { error } = await supabase
         .from('footer_links')
         .update({
@@ -155,7 +148,6 @@ export const useLinkActions = (
         })
       );
       
-      // Reset editing state
       resetEditingState(setNewLinkData);
       
       toast({
@@ -174,7 +166,6 @@ export const useLinkActions = (
 
   const handleDeleteLink = async (linkId: string) => {
     try {
-      // Delete from Supabase
       const { error } = await supabase
         .from('footer_links')
         .delete()
@@ -210,12 +201,57 @@ export const useLinkActions = (
     resetEditingState(setNewLinkData);
   };
 
+  const handleReorderLinks = async (sourceIndex: number, destinationIndex: number) => {
+    try {
+      const currentGroup = linkGroups.find(group => group.id === activeTab);
+      if (!currentGroup) return;
+      
+      const newLinks = [...currentGroup.links];
+      const [removed] = newLinks.splice(sourceIndex, 1);
+      newLinks.splice(destinationIndex, 0, removed);
+      
+      updateLinkGroups(
+        linkGroups,
+        setLinkGroups,
+        activeTab,
+        (group) => ({
+          ...group,
+          links: newLinks
+        })
+      );
+      
+      const updatePromises = newLinks.map(async (link, index) => {
+        const { error } = await supabase
+          .from('footer_links')
+          .update({ sort_order: index })
+          .eq('id', link.id);
+          
+        if (error) throw error;
+      });
+      
+      await Promise.all(updatePromises);
+      
+      toast({
+        title: "Links Reordered",
+        description: "The order of links has been updated"
+      });
+    } catch (error) {
+      console.error('Error reordering links:', error);
+      toast({
+        title: "Error reordering links",
+        description: "There was a problem updating the link order",
+        variant: "destructive"
+      });
+    }
+  };
+
   return {
     handleAddLink,
     handleEditLink,
     handleUpdateLink,
     handleDeleteLink,
-    handleCancelEdit
+    handleCancelEdit,
+    handleReorderLinks
   };
 };
 

@@ -29,6 +29,7 @@ const FooterManager: React.FC = () => {
     handleUpdateLink,
     handleDeleteLink,
     handleCancelEdit,
+    handleReorderLinks,
     handleSaveAllChanges
   } = useFooterManager();
 
@@ -76,6 +77,7 @@ const FooterManager: React.FC = () => {
                 links={group.links} 
                 onEdit={handleEditLink}
                 onDelete={handleDeleteLink}
+                onReorder={handleReorderLinks}
               />
 
               {/* Edit/Add Link Form */}

@@ -15,7 +15,8 @@ export const useFooterLinks = (
     handleEditLink, 
     handleUpdateLink, 
     handleDeleteLink, 
-    handleCancelEdit 
+    handleCancelEdit,
+    handleReorderLinks
   } = useLinkActions(
     linkGroups, 
     setLinkGroups, 
@@ -33,6 +34,7 @@ export const useFooterLinks = (
     handleEditLink,
     handleUpdateLink,
     handleDeleteLink,
-    handleCancelEdit
+    handleCancelEdit,
+    handleReorderLinks
   };
 };

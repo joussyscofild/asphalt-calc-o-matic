@@ -34,7 +34,8 @@ export const useFooterManager = () => {
     handleEditLink,
     handleUpdateLink,
     handleDeleteLink,
-    handleCancelEdit
+    handleCancelEdit,
+    handleReorderLinks
   } = useFooterLinks(linkGroups, setLinkGroups, activeTab);
 
   return {
@@ -53,6 +54,7 @@ export const useFooterManager = () => {
     handleUpdateLink,
     handleDeleteLink,
     handleCancelEdit,
+    handleReorderLinks,
     
     // Group state and handlers
     newGroupTitle,
