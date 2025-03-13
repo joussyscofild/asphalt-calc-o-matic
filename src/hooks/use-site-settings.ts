@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { SiteSettings, defaultSettings } from '@/components/admin/site-customizer/types';
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 export const useSiteSettings = () => {
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
@@ -33,7 +34,9 @@ export const useSiteSettings = () => {
           }));
           
           // Force update the favicon in the document
-          updateDocumentFavicon(faviconUrl);
+          if (faviconUrl) {
+            updateDocumentFavicon(faviconUrl);
+          }
         }
       } catch (error) {
         console.error('Error loading site settings:', error);
@@ -49,20 +52,38 @@ export const useSiteSettings = () => {
   const updateDocumentFavicon = (faviconUrl: string) => {
     console.log("Updating favicon to:", faviconUrl);
     
-    // Remove any existing favicon links
-    const existingLinks = document.querySelectorAll("link[rel*='icon']");
-    existingLinks.forEach(link => link.parentNode?.removeChild(link));
+    if (!faviconUrl) {
+      console.error("Invalid favicon URL:", faviconUrl);
+      return;
+    }
     
-    // Create and append the new favicon link with cache busting
-    const timestamp = new Date().getTime();
-    const link = document.createElement('link');
-    link.id = 'favicon';
-    link.rel = 'icon';
-    link.href = `${faviconUrl}?v=${timestamp}`;
-    document.head.appendChild(link);
-    
-    // Store the current favicon URL in localStorage for persistence
-    localStorage.setItem('currentFavicon', faviconUrl);
+    try {
+      // Remove any existing favicon links
+      const existingLinks = document.querySelectorAll("link[rel*='icon']");
+      existingLinks.forEach(link => link.parentNode?.removeChild(link));
+      
+      // Create and append the new favicon link with cache busting
+      const timestamp = new Date().getTime();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const link = document.createElement('link');
+      link.id = 'favicon';
+      link.rel = 'icon';
+      link.href = `${faviconUrl}?v=${timestamp}-${randomStr}`;
+      document.head.appendChild(link);
+      
+      // Update the default favicon in index.html
+      const defaultFavicon = document.getElementById('favicon');
+      if (defaultFavicon) {
+        defaultFavicon.setAttribute('href', faviconUrl);
+      }
+      
+      // Store the current favicon URL in localStorage for persistence
+      localStorage.setItem('currentFavicon', faviconUrl);
+      
+      console.log("Favicon updated successfully with URL:", link.href);
+    } catch (error) {
+      console.error("Error updating favicon:", error);
+    }
   };
 
   return { settings, loading };

@@ -26,21 +26,30 @@ const SiteCustomizer: React.FC = () => {
     handleSave
   } = useSiteCustomizer();
 
-  // Update favicon when component mounts or when the favicon setting changes
+  // Update favicon when component mounts
   useEffect(() => {
     if (settings.favicon) {
-      // Force refresh favicon when it changes
-      const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
-      if (link) {
-        const timestamp = new Date().getTime();
-        link.href = `${settings.favicon}?v=${timestamp}`;
-        
-        // Show toast when favicon is updated
-        toast({
-          title: "Favicon updated",
-          description: "The favicon has been updated. If it doesn't appear immediately, try refreshing the page.",
-        });
-      }
+      console.log("SiteCustomizer: Initial favicon update with:", settings.favicon.substring(0, 50) + "...");
+      
+      // Force refresh favicon
+      const timestamp = new Date().getTime();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      
+      // Remove any existing favicon links
+      const existingLinks = document.querySelectorAll("link[rel*='icon']");
+      existingLinks.forEach(link => {
+        console.log("Removing existing favicon link:", link.getAttribute('href'));
+        link.parentNode?.removeChild(link);
+      });
+      
+      // Create and add new favicon link
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.id = 'favicon';
+      link.href = `${settings.favicon}?v=${timestamp}-${randomStr}`;
+      document.head.appendChild(link);
+      
+      console.log("Created new favicon link:", link.href);
     }
   }, [settings.favicon]);
   

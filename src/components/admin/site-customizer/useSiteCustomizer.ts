@@ -21,7 +21,9 @@ export const useSiteCustomizer = () => {
           const parsedSettings = JSON.parse(savedSettings);
           setSettings(parsedSettings);
           setPreviewLogo(parsedSettings.siteLogo);
-          setPreviewFavicon(parsedSettings.favicon || '/favicon.ico');
+          if (parsedSettings.favicon) {
+            setPreviewFavicon(parsedSettings.favicon);
+          }
         }
         
         // Then try to get settings from the database
@@ -33,12 +35,15 @@ export const useSiteCustomizer = () => {
           
         if (faviconError) {
           console.error('Error fetching favicon:', faviconError);
-        } else if (faviconData) {
+        } else if (faviconData && faviconData.value) {
           setSettings(prev => ({
             ...prev,
             favicon: faviconData.value
           }));
           setPreviewFavicon(faviconData.value);
+          
+          // Update the favicon immediately when loaded
+          updateDocumentFavicon(faviconData.value);
         }
       } catch (error) {
         console.error('Error loading settings:', error);
@@ -79,6 +84,18 @@ export const useSiteCustomizer = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const faviconUrl = reader.result as string;
+        if (!faviconUrl) {
+          console.error("Failed to read favicon file");
+          toast({
+            title: "Error",
+            description: "Failed to read favicon file",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        console.log("Favicon loaded from file:", faviconUrl.substring(0, 50) + "...");
+        
         setPreviewFavicon(faviconUrl);
         setSettings(prev => ({
           ...prev,
@@ -87,6 +104,12 @@ export const useSiteCustomizer = () => {
         
         // Immediately apply the favicon for preview
         updateDocumentFavicon(faviconUrl);
+        
+        // Show success toast
+        toast({
+          title: "Favicon updated",
+          description: "Favicon preview updated. Save changes to make it permanent.",
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -99,6 +122,8 @@ export const useSiteCustomizer = () => {
       
       // Update favicon in the database
       if (settings.favicon) {
+        console.log("Saving favicon to database, length:", settings.favicon.length);
+        
         const { error } = await supabase
           .from('site_settings')
           .upsert(
@@ -111,6 +136,7 @@ export const useSiteCustomizer = () => {
           );
           
         if (error) {
+          console.error("Supabase error saving favicon:", error);
           throw error;
         }
         
@@ -134,23 +160,37 @@ export const useSiteCustomizer = () => {
   
   // Helper function to update the favicon in the document with improved cache busting
   const updateDocumentFavicon = (faviconUrl: string) => {
-    console.log("Updating favicon with aggressive cache busting:", faviconUrl);
+    console.log("Updating favicon with aggressive cache busting:", faviconUrl.substring(0, 50) + "...");
     
-    // Remove any existing favicon links
-    const existingLinks = document.querySelectorAll("link[rel*='icon']");
-    existingLinks.forEach(link => link.parentNode?.removeChild(link));
+    if (!faviconUrl) {
+      console.error("Invalid favicon URL provided");
+      return;
+    }
     
-    // Create and append the new favicon link with improved cache busting
-    const timestamp = new Date().getTime();
-    const randomStr = Math.random().toString(36).substring(2, 8);
-    const link = document.createElement('link');
-    link.id = 'favicon';
-    link.rel = 'icon';
-    link.href = `${faviconUrl}?v=${timestamp}-${randomStr}`;
-    document.head.appendChild(link);
-    
-    // Also update the index.html favicon link for persistence
-    document.getElementById('favicon')?.setAttribute('href', faviconUrl);
+    try {
+      // Remove any existing favicon links
+      const existingLinks = document.querySelectorAll("link[rel*='icon']");
+      existingLinks.forEach(link => link.parentNode?.removeChild(link));
+      
+      // Create and append the new favicon link with improved cache busting
+      const timestamp = new Date().getTime();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const link = document.createElement('link');
+      link.id = 'favicon';
+      link.rel = 'icon';
+      link.href = `${faviconUrl}?v=${timestamp}-${randomStr}`;
+      document.head.appendChild(link);
+      
+      // Also update the index.html favicon link for persistence
+      const defaultFavicon = document.getElementById('favicon');
+      if (defaultFavicon) {
+        defaultFavicon.setAttribute('href', faviconUrl);
+      }
+      
+      console.log("Favicon element created with href:", link.href);
+    } catch (error) {
+      console.error("Error in updateDocumentFavicon:", error);
+    }
   };
 
   return {
