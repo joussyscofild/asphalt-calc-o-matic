@@ -8,6 +8,10 @@ export interface SiteSettings {
   accentColor: string;
   headerLayout: string;
   footerLayout: string;
+  headingFont?: string;
+  bodyFont?: string;
+  baseFontSize?: number;
+  lineHeight?: number;
 }
 
 export const defaultSettings: SiteSettings = {
@@ -18,5 +22,9 @@ export const defaultSettings: SiteSettings = {
   secondaryColor: '#f97316',
   accentColor: '#10b981',
   headerLayout: 'standard',
-  footerLayout: 'standard'
+  footerLayout: 'standard',
+  headingFont: 'inter',
+  bodyFont: 'roboto',
+  baseFontSize: 16,
+  lineHeight: 1.5
 };

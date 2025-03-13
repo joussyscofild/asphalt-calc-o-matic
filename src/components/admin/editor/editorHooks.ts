@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 
 export const useEditorState = (initialValue: string, onChange: (value: string) => void) => {
@@ -44,15 +45,47 @@ export const useEditorState = (initialValue: string, onChange: (value: string) =
   const restoreSelection = () => {
     if (!selection || !editorRef.current) return;
     
-    if (window.getSelection && document.createRange) {
-      const sel = window.getSelection();
-      if (!sel) return;
-      
-      sel.removeAllRanges();
-      const range = document.createRange();
-      range.setStart(editorRef.current, 0);
-      range.collapse(true);
-      sel.addRange(range);
+    const charIndex = (node: Node, index: number): {node: Node, offset: number} => {
+      if (node.nodeType === 3) {
+        if (index <= node.textContent!.length) {
+          return { node, offset: index };
+        }
+        index -= node.textContent!.length;
+      } else {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          const result = charIndex(node.childNodes[i], index);
+          if (result) {
+            index = result.offset;
+            if (index === 0) {
+              return { node: result.node, offset: result.offset };
+            }
+          }
+        }
+      }
+      return { node, offset: 0 };
+    };
+
+    try {
+      if (window.getSelection && document.createRange) {
+        const sel = window.getSelection();
+        if (!sel) return;
+        
+        sel.removeAllRanges();
+        const range = document.createRange();
+        
+        const startInfo = charIndex(editorRef.current, selection.start);
+        const endInfo = charIndex(editorRef.current, selection.end);
+        
+        range.setStart(startInfo.node, startInfo.offset);
+        range.setEnd(endInfo.node, endInfo.offset);
+        
+        sel.addRange(range);
+        editorRef.current.focus();
+      }
+    } catch (e) {
+      console.error("Error restoring selection:", e);
+      // Fallback for selection restoration
+      editorRef.current.focus();
     }
   };
 
@@ -85,12 +118,12 @@ export const useEditorCommands = (
 
   // Handle link insertion
   const insertLink = (url: string, text: string) => {
-    formatText('insertHTML', `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`);
+    formatText('insertHTML', `<a href="${url}" target="_blank" rel="noopener noreferrer">${text || url}</a>`);
   };
 
   // Handle image insertion
   const insertImage = (url: string, alt: string) => {
-    formatText('insertHTML', `<img src="${url}" alt="${alt}" style="max-width: 100%;" />`);
+    formatText('insertHTML', `<img src="${url}" alt="${alt || ''}" style="max-width: 100%;" />`);
   };
 
   // Clear formatting

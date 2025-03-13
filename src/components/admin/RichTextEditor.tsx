@@ -29,8 +29,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   // Update content when initialValue changes (e.g., when switching between posts)
   useEffect(() => {
-    console.log("RichTextEditor initialValue changed:", initialValue);
-    setContent(initialValue);
+    if (initialValue !== content) {
+      console.log("RichTextEditor initialValue changed:", initialValue);
+      setContent(initialValue || '');
+      
+      // Ensure the editor's innerHTML is synchronized
+      if (editorRef.current) {
+        editorRef.current.innerHTML = initialValue || '';
+      }
+    }
   }, [initialValue, setContent]);
 
   // Editor commands
