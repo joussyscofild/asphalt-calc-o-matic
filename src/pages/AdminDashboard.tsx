@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,9 +5,10 @@ import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import SiteCustomizer from "@/components/admin/SiteCustomizer";
 import PagesManager from "@/components/admin/PagesManager";
 import CalculatorManager from "@/components/admin/CalculatorManager";
+import FooterManager from "@/components/admin/FooterManager";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, LogOut, FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen } from "lucide-react";
+import { ArrowLeft, LogOut, FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen, Link as LinkIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BlogPost } from '@/utils/blogPosts';
 
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
       </div>
       
       <Tabs defaultValue="dashboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-8">
+        <TabsList className="grid w-full grid-cols-6 mb-8">
           <TabsTrigger value="dashboard" className="flex items-center gap-1">
             <LayoutDashboard size={14} />
             Dashboard
@@ -84,6 +84,10 @@ const AdminDashboard = () => {
           <TabsTrigger value="pages" className="flex items-center gap-1">
             <FileText size={14} />
             Pages
+          </TabsTrigger>
+          <TabsTrigger value="footer" className="flex items-center gap-1">
+            <LinkIcon size={14} />
+            Footer Links
           </TabsTrigger>
           <TabsTrigger value="appearance" className="flex items-center gap-1">
             <LayoutDashboard size={14} />
@@ -213,6 +217,20 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <PagesManager />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="footer">
+          <Card>
+            <CardHeader>
+              <CardTitle>Footer Links Management</CardTitle>
+              <CardDescription>
+                Create, edit and manage your website footer links.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FooterManager />
             </CardContent>
           </Card>
         </TabsContent>

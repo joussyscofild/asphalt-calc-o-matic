@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Edit, FileText, Image, Wand2 } from 'lucide-react';
+import { Edit, FileText, Image, Wand2, Plus } from 'lucide-react';
 import SEOHelper from './SEOHelper';
 import { BlogPostEditorProps } from './editor/types';
 import { useBlogPostForm } from './editor/useBlogPostForm';
 import GeneralTab from './editor/GeneralTab';
 import ContentTab from './editor/ContentTab';
 import MediaTab from './editor/MediaTab';
+import { BlogPost, blogPosts } from '@/utils/blogPosts';
 
 const BlogPostEditor: React.FC<BlogPostEditorProps> = ({ 
   post,
   onSave,
   onCancel
 }) => {
+  const [selectedPost, setSelectedPost] = useState<BlogPost | undefined>(post);
+  const [isCreating, setIsCreating] = useState<boolean>(!post);
+  
   const {
     formData,
     activeTab,
@@ -27,16 +31,70 @@ const BlogPostEditor: React.FC<BlogPostEditorProps> = ({
     handleSEOUpdate,
     calculateReadTime,
     handleSubmit
-  } = useBlogPostForm(onSave, post);
+  } = useBlogPostForm(onSave, selectedPost);
+
+  const handleEditPost = (blogPost: BlogPost) => {
+    setSelectedPost(blogPost);
+    setIsCreating(true);
+  };
+
+  const handleCreateNew = () => {
+    setSelectedPost(undefined);
+    setIsCreating(true);
+  };
+
+  const handleCancelEdit = () => {
+    if (onCancel) {
+      onCancel();
+    }
+    setIsCreating(false);
+    setSelectedPost(undefined);
+  };
+
+  if (!isCreating) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Blog Posts</h2>
+          <Button onClick={handleCreateNew} className="flex items-center gap-2">
+            <Plus size={16} />
+            Create New Post
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-1 gap-4">
+          {blogPosts.map((blogPost) => (
+            <div
+              key={blogPost.id}
+              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-center"
+            >
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <FileText className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{blogPost.title}</h3>
+                  <p className="text-sm text-muted-foreground">{blogPost.date} • {blogPost.category}</p>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => handleEditPost(blogPost)}>
+                Edit
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">
-          {isNew ? "Create New Blog Post" : `Edit: ${post?.title}`}
+          {isNew ? "Create New Blog Post" : `Edit: ${selectedPost?.title}`}
         </h2>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={handleCancelEdit}>
             Cancel
           </Button>
           <Button type="submit">
