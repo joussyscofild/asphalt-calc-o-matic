@@ -180,6 +180,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   ];
 
+  // Check if content is empty to show placeholder
+  const isContentEmpty = content === '' || content === '<br>' || content === '<p></p>';
+
   return (
     <div className="border rounded-md">
       <div className="border-b bg-gray-50 p-2 flex flex-wrap gap-1">
@@ -462,7 +465,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       <div
         ref={editorRef}
-        className="p-4 outline-none"
+        className={`p-4 outline-none ${isContentEmpty ? 'relative' : ''}`}
         style={{ minHeight }}
         contentEditable
         onInput={handleChange}
@@ -471,8 +474,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         onKeyUp={saveSelection}
         onFocus={restoreSelection}
         dangerouslySetInnerHTML={{ __html: content }}
-        placeholder={placeholder}
-      />
+        data-placeholder={placeholder}
+      >
+      </div>
+      {isContentEmpty && (
+        <div className="absolute pointer-events-none text-gray-400 p-4" style={{top: 0, left: 0, right: 0}}>
+          {placeholder}
+        </div>
+      )}
     </div>
   );
 };
