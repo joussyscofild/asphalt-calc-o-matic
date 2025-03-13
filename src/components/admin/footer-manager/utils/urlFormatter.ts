@@ -1,21 +1,29 @@
 
 /**
- * Formats a URL based on whether it's an external or internal link
- * @param url The URL to format
- * @param isExternal Whether the URL is external
- * @returns The formatted URL
+ * Format URL properly for storage and display
  */
 export const formatUrl = (url: string, isExternal: boolean): string => {
-  let formattedUrl = url.trim();
-  
-  // For external URLs, ensure they have http:// or https://
-  if (isExternal && !formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
-    formattedUrl = `https://${formattedUrl}`;
-  } 
-  // For internal URLs (including page URLs), ensure they start with a forward slash
-  else if (!isExternal && !formattedUrl.startsWith('/')) {
-    formattedUrl = `/${formattedUrl}`;
+  // If it's an external URL, make sure it starts with http:// or https://
+  if (isExternal) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return `https://${url}`;
+    }
+    return url;
   }
   
-  return formattedUrl;
+  // For custom pages
+  if (url.includes('page/')) {
+    // Make sure it has the correct format: /page/slug
+    if (!url.startsWith('/')) {
+      return `/page/${url.replace('page/', '')}`;
+    } else if (!url.startsWith('/page/')) {
+      return `/page/${url.substring(1).replace('page/', '')}`;
+    }
+  } else if (!url.startsWith('/')) {
+    // For other internal URLs, ensure they start with a /
+    return `/${url}`;
+  }
+  
+  // Return URL as is if it already has the correct format
+  return url;
 };

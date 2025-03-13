@@ -20,6 +20,8 @@ const Page = () => {
     const fetchPage = async () => {
       if (!slug) return;
       
+      console.log(`Fetching page with slug: ${slug}`);
+      
       try {
         const { data, error } = await supabase
           .from('custom_pages')
@@ -28,13 +30,16 @@ const Page = () => {
           .single();
         
         if (error) {
+          console.error('Error fetching page:', error);
           throw error;
         }
         
         if (data) {
+          console.log(`Page found: ${data.title}`);
           setPageContent(data);
         } else {
           // Page not found
+          console.error(`Page not found for slug: ${slug}`);
           navigate('/not-found');
         }
       } catch (error) {

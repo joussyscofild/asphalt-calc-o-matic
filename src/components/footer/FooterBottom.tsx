@@ -14,10 +14,10 @@ const FooterBottom: React.FC<FooterBottomProps> = ({ currentYear }) => {
         © {currentYear} asphaltcalculator.co. All rights reserved.
       </p>
       <div className="flex space-x-4 mt-4 md:mt-0">
-        <Link to="/privacy" className="text-gray-500 text-sm hover:text-gray-400">
+        <Link to="/page/privacy" className="text-gray-500 text-sm hover:text-gray-400">
           Privacy Policy
         </Link>
-        <Link to="/terms" className="text-gray-500 text-sm hover:text-gray-400">
+        <Link to="/page/terms" className="text-gray-500 text-sm hover:text-gray-400">
           Terms of Service
         </Link>
         <a href="mailto:info@asphaltcalculator.co" className="text-gray-500 text-sm hover:text-gray-400 flex items-center">

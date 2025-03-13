@@ -35,10 +35,16 @@ export const useFooterData = () => {
               };
             }
             
+            // Ensure URL is properly formatted
+            let url = link.url;
+            
+            // Log all URLs for debugging
+            console.log(`Processing footer link: ${link.label}, URL: ${url}`);
+            
             groups[groupId].links.push({
               id: link.id,
               label: link.label,
-              url: link.url, // We'll format this when rendering
+              url: url,
               isExternal: link.is_external || false
             });
           });
