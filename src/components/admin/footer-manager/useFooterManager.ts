@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -185,6 +184,21 @@ export const useFooterManager = () => {
     }
   };
 
+  const formatUrl = (url: string, isExternal: boolean): string => {
+    let formattedUrl = url.trim();
+    
+    // For external URLs, ensure they have http:// or https://
+    if (isExternal && !formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+    } 
+    // For internal URLs (including page URLs), ensure they start with a forward slash
+    else if (!isExternal && !formattedUrl.startsWith('/')) {
+      formattedUrl = `/${formattedUrl}`;
+    }
+    
+    return formattedUrl;
+  };
+
   const handleAddLink = async () => {
     if (!newLinkData.label.trim() || !newLinkData.url.trim()) {
       toast({
@@ -199,6 +213,9 @@ export const useFooterManager = () => {
     if (!currentGroup) return;
     
     try {
+      // Format URL properly
+      const formattedUrl = formatUrl(newLinkData.url, newLinkData.isExternal);
+      
       // Determine next sort order
       const nextSortOrder = currentGroup.links.length;
       
@@ -209,7 +226,7 @@ export const useFooterManager = () => {
           group_id: activeTab,
           group_title: currentGroup.title,
           label: newLinkData.label,
-          url: newLinkData.url,
+          url: formattedUrl,
           is_external: newLinkData.isExternal,
           sort_order: nextSortOrder
         })
@@ -282,12 +299,15 @@ export const useFooterManager = () => {
       const currentGroup = linkGroups.find(group => group.id === activeTab);
       if (!currentGroup) return;
       
+      // Format URL properly
+      const formattedUrl = formatUrl(newLinkData.url, newLinkData.isExternal);
+      
       // Update in Supabase
       const { error } = await supabase
         .from('footer_links')
         .update({
           label: newLinkData.label,
-          url: newLinkData.url,
+          url: formattedUrl,
           is_external: newLinkData.isExternal,
           last_modified: new Date().toISOString()
         })
@@ -304,7 +324,7 @@ export const useFooterManager = () => {
                 return {
                   ...link,
                   label: newLinkData.label,
-                  url: newLinkData.url,
+                  url: formattedUrl,
                   isExternal: newLinkData.isExternal
                 };
               }

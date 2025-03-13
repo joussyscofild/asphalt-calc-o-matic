@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { FooterLink, NewLinkData } from './types';
+import { useToast } from '@/hooks/use-toast';
 
 interface LinkFormProps {
   editingLink: FooterLink | null;
@@ -23,6 +24,24 @@ const LinkForm: React.FC<LinkFormProps> = ({
   onAdd,
   onCancel
 }) => {
+  const { toast } = useToast();
+
+  // Format URL properly when dealing with page URLs
+  const handleUrlChange = (url: string) => {
+    let formattedUrl = url.trim();
+    
+    // If it's a custom page URL, ensure it starts with /page/
+    if (formattedUrl.includes('page/') && !formattedUrl.startsWith('/')) {
+      formattedUrl = `/${formattedUrl}`;
+      toast({
+        title: "URL Format Corrected",
+        description: "Custom page URLs should start with /page/",
+      });
+    }
+    
+    onLinkDataChange({ ...newLinkData, url: formattedUrl });
+  };
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -46,10 +65,15 @@ const LinkForm: React.FC<LinkFormProps> = ({
               <Input
                 id="link-url"
                 value={newLinkData.url}
-                onChange={(e) => onLinkDataChange({...newLinkData, url: e.target.value})}
-                placeholder="/about or https://example.com"
+                onChange={(e) => handleUrlChange(e.target.value)}
+                placeholder="/about or /page/about-us"
                 className="mt-1"
               />
+              {!newLinkData.isExternal && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  For custom pages, use format: /page/slug (e.g., /page/contact-us)
+                </p>
+              )}
             </div>
           </div>
           
