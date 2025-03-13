@@ -8,7 +8,7 @@ export const useFooterLinks = (
   setLinkGroups: React.Dispatch<React.SetStateAction<FooterLinkGroup[]>>,
   activeTab: string
 ) => {
-  const { editingLink, newLinkData, setNewLinkData } = useLinkState();
+  const { editingLink, newLinkData, setNewLinkData, setEditingLink } = useLinkState();
   
   const { 
     handleAddLink, 
@@ -26,15 +26,27 @@ export const useFooterLinks = (
     setNewLinkData
   );
 
+  // Wrap handleEditLink to also set the editingLink state
+  const handleEdit = (link: any) => {
+    setEditingLink(link);
+    handleEditLink(link);
+  };
+
+  // Wrap handleCancelEdit to also clear the editingLink state
+  const handleCancel = () => {
+    setEditingLink(null);
+    handleCancelEdit();
+  };
+
   return {
     editingLink,
     newLinkData,
     setNewLinkData,
     handleAddLink,
-    handleEditLink,
+    handleEditLink: handleEdit,
     handleUpdateLink,
     handleDeleteLink,
-    handleCancelEdit,
+    handleCancelEdit: handleCancel,
     handleReorderLinks
   };
 };
