@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import EditorToolbar from './editor/EditorToolbar';
 import EditorContent from './editor/EditorContent';
 import { useEditorState, useEditorCommands, useKeyboardShortcuts } from './editor/editorHooks';
@@ -28,16 +28,18 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   } = useEditorState(initialValue, onChange);
 
   // Update content when initialValue changes (e.g., when switching between posts)
-  useEffect(() => {
-    if (initialValue !== content) {
-      console.log("RichTextEditor initialValue changed:", initialValue);
-      setContent(initialValue || '');
-      
-      // Ensure the editor's innerHTML is synchronized
+  useLayoutEffect(() => {
+    console.log("RichTextEditor initialValue changed:", initialValue);
+    
+    // Reset content state
+    setContent(initialValue || '');
+    
+    // Use setTimeout to ensure the DOM is ready before manipulating it
+    setTimeout(() => {
       if (editorRef.current) {
         editorRef.current.innerHTML = initialValue || '';
       }
-    }
+    }, 0);
   }, [initialValue, setContent]);
 
   // Editor commands
@@ -93,7 +95,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   ];
 
   // Check if content is empty to show placeholder
-  const isContentEmpty = content === '' || content === '<br>' || content === '<p></p>';
+  const isContentEmpty = !content || content === '' || content === '<br>' || content === '<p></p>';
 
   return (
     <div className="border rounded-md">

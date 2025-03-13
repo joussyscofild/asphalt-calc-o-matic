@@ -24,10 +24,11 @@ const ContentTab: React.FC<ContentTabProps> = ({ content, handleContentChange })
       </CardHeader>
       <CardContent>
         <RichTextEditor 
-          initialValue={content || ''} 
+          initialValue={content} 
           onChange={handleContentChange}
           minHeight="500px"
           placeholder="Start writing your blog post content here..."
+          key={content} // Add key to force re-render when content changes
         />
       </CardContent>
     </Card>

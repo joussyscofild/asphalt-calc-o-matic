@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BlogPost } from '@/utils/blogPosts';
 import { useToast } from "@/components/ui/use-toast";
 import { FormData } from './types';
@@ -23,6 +23,27 @@ export const useBlogPostForm = (onSave: (post: BlogPost) => void, post?: BlogPos
     tags: post?.tags || [],
     featured: post?.featured || false,
   });
+
+  // Update form data when post changes
+  useEffect(() => {
+    if (post) {
+      setFormData({
+        id: post.id || '',
+        title: post.title || '',
+        excerpt: post.excerpt || '',
+        content: post.content || '',
+        imageUrl: post.imageUrl || '',
+        author: post.author || 'Admin User',
+        authorAvatar: post.authorAvatar || '/placeholder.svg',
+        date: post.date || today,
+        readTime: post.readTime || '3 min read',
+        category: post.category || 'Construction',
+        tags: post.tags || [],
+        featured: post.featured || false,
+      });
+      console.log("Post content loaded:", post.content);
+    }
+  }, [post, today]);
 
   const [activeTab, setActiveTab] = useState('general');
 

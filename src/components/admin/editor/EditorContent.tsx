@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface EditorContentProps {
   content: string;
@@ -24,6 +24,13 @@ const EditorContent: React.FC<EditorContentProps> = ({
   restoreSelection,
   editorRef
 }) => {
+  // Ensure the editor content is up-to-date with the content prop
+  useEffect(() => {
+    if (editorRef.current && content !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = content || '';
+    }
+  }, [content]);
+
   return (
     <div className="relative">
       <div
@@ -36,6 +43,7 @@ const EditorContent: React.FC<EditorContentProps> = ({
         onClick={saveSelection}
         onKeyUp={saveSelection}
         onFocus={restoreSelection}
+        onBlur={saveSelection}
         dangerouslySetInnerHTML={{ __html: content }}
         data-placeholder={placeholder}
       />
