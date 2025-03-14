@@ -27,6 +27,34 @@ if [ -f "package.json" ]; then
   
   echo "Building the project..."
   npm run build || { echo "Build failed"; exit 1; }
+  
+  # Create a server config to properly handle SPA routing and sitemap
+  echo "Setting up server configuration for proper routing..."
+  
+  # Create or update .htaccess file in the dist directory to handle XML content type
+  cat > dist/.htaccess << 'EOF'
+# Handle SPA routing
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Serve sitemap.xml with proper content type
+  <Files "sitemap.xml">
+    ForceType application/xml
+    Header set Content-Type "application/xml; charset=utf-8"
+  </Files>
+  
+  # Don't rewrite files or directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  
+  # Rewrite everything else to index.html to allow SPA routing
+  RewriteRule ^ index.html [L]
+</IfModule>
+EOF
+  
+  echo "Server configuration created."
 else
   echo "No package.json found. Skipping npm steps."
 fi
