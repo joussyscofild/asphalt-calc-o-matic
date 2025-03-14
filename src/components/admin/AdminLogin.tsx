@@ -21,13 +21,12 @@ const AdminLogin: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Query the admin_credentials table to check credentials
+      // Query the admin_credentials table to check credentials using RPC function
       const { data, error } = await supabase
-        .from('admin_credentials')
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
-        .single();
+        .rpc('verify_admin_credentials', { 
+          admin_username: username, 
+          admin_password: password 
+        });
 
       if (error) {
         console.error("Error checking admin credentials:", error);

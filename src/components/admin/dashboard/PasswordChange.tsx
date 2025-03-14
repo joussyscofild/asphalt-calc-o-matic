@@ -42,15 +42,14 @@ const PasswordChange: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // First, verify the current password
-      const { data: adminData, error: verifyError } = await supabase
-        .from('admin_credentials')
-        .select('*')
-        .eq('username', 'admin')
-        .eq('password', data.currentPassword)
-        .single();
+      // First, verify the current password using RPC function
+      const { data: verifyResult, error: verifyError } = await supabase
+        .rpc('verify_admin_credentials', { 
+          admin_username: 'admin', 
+          admin_password: data.currentPassword 
+        });
       
-      if (verifyError || !adminData) {
+      if (verifyError || !verifyResult) {
         toast({
           title: "Error",
           description: "Current password is incorrect",
@@ -60,14 +59,12 @@ const PasswordChange: React.FC = () => {
         return;
       }
       
-      // Update the password in Supabase
+      // Update the password using RPC function
       const { error: updateError } = await supabase
-        .from('admin_credentials')
-        .update({ 
-          password: data.newPassword,
-          updated_at: new Date().toISOString()
-        })
-        .eq('username', 'admin');
+        .rpc('update_admin_password', { 
+          admin_username: 'admin', 
+          new_password: data.newPassword 
+        });
       
       if (updateError) {
         console.error("Error updating password:", updateError);
