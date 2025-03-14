@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Calculator, BookOpen } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,14 +36,14 @@ const Navbar = () => {
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/90 backdrop-blur-sm shadow-sm' : 'bg-transparent'
+        isScrolled ? 'bg-white/90 dark:bg-background/90 backdrop-blur-sm shadow-sm' : 'bg-transparent'
       }`}
     >
       <div className="container-custom">
         <div className="flex items-center justify-between h-16">
           <Link 
             to="/" 
-            className="flex items-center space-x-1 text-asphalt font-merriweather font-bold text-xl animate-fade-in"
+            className="flex items-center space-x-1 text-asphalt dark:text-foreground font-merriweather font-bold text-xl animate-fade-in"
           >
             <span className="text-safety-dark">asphalt</span>
             calculator.co
@@ -64,21 +65,24 @@ const Navbar = () => {
               <BookOpen size={18} />
               <span>Blog</span>
             </Link>
-            {/* Admin link removed from public navigation */}
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden p-2 rounded-md focus:outline-none" 
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? (
-              <X size={24} className="text-asphalt" />
-            ) : (
-              <Menu size={24} className="text-asphalt" />
-            )}
-          </button>
+          <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle />
+            <button 
+              className="p-2 rounded-md focus:outline-none" 
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? (
+                <X size={24} className="text-asphalt dark:text-foreground" />
+              ) : (
+                <Menu size={24} className="text-asphalt dark:text-foreground" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -108,7 +112,6 @@ const Navbar = () => {
               <BookOpen size={18} />
               <span>Blog</span>
             </Link>
-            {/* Admin link removed from mobile navigation */}
           </div>
         </div>
       </div>
