@@ -79,30 +79,9 @@ const Sitemap = () => {
         
         console.log("Sitemap XML generated successfully");
         
-        // Clear existing document content completely
-        document.open();
-        
-        // Set content-type meta tag
-        document.write('<!DOCTYPE html>');
-        document.write('<html>');
-        document.write('<head>');
-        document.write('<meta http-equiv="Content-Type" content="text/xml; charset=utf-8">');
-        document.write('</head>');
-        document.write('<body>');
-        document.write('<pre>');
-        document.write(sitemapXml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-        document.write('</pre>');
-        document.write('</body>');
-        document.write('</html>');
-        document.close();
-        
-        // Hide React's root element to prevent any React rendering
-        const rootElement = document.getElementById('root');
-        if (rootElement) {
-          rootElement.style.display = 'none';
-        }
-        
-        console.log("Sitemap successfully rendered as XML");
+        // Use the HTML approach instead of direct XML writing
+        renderXml(sitemapXml);
+        console.log("Sitemap successfully rendered");
         hasGeneratedRef.current = true;
       } catch (error) {
         console.error('Critical error generating sitemap:', error);
@@ -117,26 +96,8 @@ const Sitemap = () => {
   </url>
 </urlset>`;
         
-        // Write fallback sitemap
-        document.open();
-        document.write('<!DOCTYPE html>');
-        document.write('<html>');
-        document.write('<head>');
-        document.write('<meta http-equiv="Content-Type" content="text/xml; charset=utf-8">');
-        document.write('</head>');
-        document.write('<body>');
-        document.write('<pre>');
-        document.write(basicXml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-        document.write('</pre>');
-        document.write('</body>');
-        document.write('</html>');
-        document.close();
-        
-        // Hide React's root element
-        const rootElement = document.getElementById('root');
-        if (rootElement) {
-          rootElement.style.display = 'none';
-        }
+        // Render fallback XML
+        renderXml(basicXml);
       } finally {
         setIsGenerating(false);
       }
@@ -145,6 +106,33 @@ const Sitemap = () => {
     // Execute the sitemap generation
     generateSitemap();
   }, [isGenerating]);
+  
+  // Helper function to render XML content
+  const renderXml = (xmlContent) => {
+    // Clear existing document content
+    document.open();
+    
+    // Write HTML wrapper with XML content
+    document.write('<!DOCTYPE html>');
+    document.write('<html>');
+    document.write('<head>');
+    document.write('<meta http-equiv="Content-Type" content="text/xml; charset=utf-8">');
+    document.write('</head>');
+    document.write('<body>');
+    document.write('<pre>');
+    // Escape XML special characters for HTML display
+    document.write(xmlContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+    document.write('</pre>');
+    document.write('</body>');
+    document.write('</html>');
+    document.close();
+    
+    // Hide React's root element
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+      rootElement.style.display = 'none';
+    }
+  };
   
   // Helper function to fetch custom pages
   const fetchCustomPages = async () => {
@@ -167,7 +155,7 @@ const Sitemap = () => {
   };
   
   // Helper function to create properly formatted sitemap entries
-  const getSitemapEntry = (url: string, changefreq: string, priority: string) => {
+  const getSitemapEntry = (url, changefreq, priority) => {
     return `  <url>
     <loc>${url}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
