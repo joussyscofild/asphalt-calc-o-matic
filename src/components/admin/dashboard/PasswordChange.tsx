@@ -47,7 +47,7 @@ const PasswordChange: React.FC = () => {
         .rpc('verify_admin_credentials', { 
           admin_username: 'admin', 
           admin_password: data.currentPassword 
-        });
+        } as any);
       
       if (verifyError || verifyResult !== true) {
         toast({
@@ -64,7 +64,7 @@ const PasswordChange: React.FC = () => {
         .rpc('update_admin_password', { 
           admin_username: 'admin', 
           new_password: data.newPassword 
-        });
+        } as any);
       
       if (updateError || updateResult !== true) {
         console.error("Error updating password:", updateError);

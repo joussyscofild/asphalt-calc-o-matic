@@ -26,7 +26,7 @@ const AdminLogin: React.FC = () => {
         .rpc('verify_admin_credentials', { 
           admin_username: username, 
           admin_password: password 
-        });
+        } as any);
 
       if (error) {
         console.error("Error checking admin credentials:", error);
