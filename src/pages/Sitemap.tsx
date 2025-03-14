@@ -1,29 +1,55 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { fetchCalculators } from '@/utils/calculatorService';
 import { getAllPublishedPosts } from '@/utils/blogPosts';
 import { supabase } from "@/integrations/supabase/client";
 
 const Sitemap = () => {
-  const [xmlContent, setXmlContent] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const hasGeneratedRef = useRef(false);
   
   useEffect(() => {
-    // Generate sitemap only once
-    if (xmlContent) return;
+    // Prevent multiple executions
+    if (hasGeneratedRef.current || isGenerating) return;
     
     const generateSitemap = async () => {
+      setIsGenerating(true);
+      
       try {
-        // Base URL for the site
+        console.log("Starting sitemap generation");
+        // Base URL - use window.location.origin or fallback to a hardcoded URL
         const SITE_URL = window.location.origin;
+        console.log("Using site URL:", SITE_URL);
         
-        // Fetch all content that should be in the sitemap
-        const [calculators, blogPosts, customPages] = await Promise.all([
-          fetchCalculators(),
-          getAllPublishedPosts(),
-          fetchCustomPages(),
-        ]);
+        let calculators = [];
+        let blogPosts = [];
+        let customPages = [];
         
-        // Start XML sitemap
+        try {
+          // Fetch calculators with error handling
+          calculators = await fetchCalculators();
+          console.log(`Retrieved ${calculators.length} calculators for sitemap`);
+        } catch (error) {
+          console.error("Error fetching calculators for sitemap:", error);
+        }
+        
+        try {
+          // Fetch blog posts with error handling
+          blogPosts = await getAllPublishedPosts();
+          console.log(`Retrieved ${blogPosts.length} blog posts for sitemap`);
+        } catch (error) {
+          console.error("Error fetching blog posts for sitemap:", error);
+        }
+        
+        try {
+          // Fetch custom pages with error handling
+          customPages = await fetchCustomPages();
+          console.log(`Retrieved ${customPages.length} custom pages for sitemap`);
+        } catch (error) {
+          console.error("Error fetching custom pages for sitemap:", error);
+        }
+        
+        // Start XML sitemap with proper XML declaration and schema references
         let sitemapXml = '<?xml version="1.0" encoding="UTF-8"?>\n';
         sitemapXml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n';
         
@@ -51,29 +77,35 @@ const Sitemap = () => {
         // Close XML
         sitemapXml += '</urlset>';
         
-        setXmlContent(sitemapXml);
+        console.log("Sitemap XML generated successfully");
         
-        // Clear the entire document and set new content
+        // Set the document content type before writing
+        document.contentType = 'text/xml';
+        
+        // Clear existing document content completely
         document.open('text/xml');
         document.write(sitemapXml);
         document.close();
         
-        // Set the content type header with a meta tag
+        // Add content-type meta tag
         const head = document.head || document.getElementsByTagName('head')[0];
         const meta = document.createElement('meta');
         meta.httpEquiv = 'Content-Type';
         meta.content = 'text/xml; charset=utf-8';
         head.appendChild(meta);
         
-        // Hide React's root element to prevent interference
+        // Hide React's root element to prevent any React rendering
         const rootElement = document.getElementById('root');
         if (rootElement) {
           rootElement.style.display = 'none';
         }
-      } catch (error) {
-        console.error('Error generating sitemap:', error);
         
-        // Generate a basic valid XML in case of error
+        console.log("Sitemap successfully rendered as XML");
+        hasGeneratedRef.current = true;
+      } catch (error) {
+        console.error('Critical error generating sitemap:', error);
+        
+        // Generate a minimal valid XML for fallback
         const basicXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -83,42 +115,54 @@ const Sitemap = () => {
   </url>
 </urlset>`;
         
-        setXmlContent(basicXml);
-        
-        // Set basic XML when error occurs
+        // Set content type and write fallback sitemap
+        document.contentType = 'text/xml';
         document.open('text/xml');
         document.write(basicXml);
         document.close();
         
-        // Set the content type header
+        // Add content-type meta tag
         const head = document.head || document.getElementsByTagName('head')[0];
         const meta = document.createElement('meta');
         meta.httpEquiv = 'Content-Type';
         meta.content = 'text/xml; charset=utf-8';
         head.appendChild(meta);
+        
+        // Hide React's root element
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+          rootElement.style.display = 'none';
+        }
+      } finally {
+        setIsGenerating(false);
       }
     };
-
-    // Execute the sitemap generation immediately
+    
+    // Execute the sitemap generation
     generateSitemap();
-  }, [xmlContent]);
-
+  }, [isGenerating]);
+  
   // Helper function to fetch custom pages
   const fetchCustomPages = async () => {
-    const { data, error } = await supabase
-      .from('custom_pages')
-      .select('slug')
-      .eq('status', 'published');
+    try {
+      const { data, error } = await supabase
+        .from('custom_pages')
+        .select('slug')
+        .eq('status', 'published');
+        
+      if (error) {
+        console.error('Error fetching custom pages for sitemap:', error);
+        return [];
+      }
       
-    if (error) {
-      console.error('Error fetching custom pages:', error);
+      return data || [];
+    } catch (e) {
+      console.error('Unexpected error when fetching custom pages:', e);
       return [];
     }
-    
-    return data || [];
   };
   
-  // Helper function to create sitemap entries with improved SEO formatting
+  // Helper function to create properly formatted sitemap entries
   const getSitemapEntry = (url: string, changefreq: string, priority: string) => {
     return `  <url>
     <loc>${url}</loc>
