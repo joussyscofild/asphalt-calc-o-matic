@@ -73,8 +73,14 @@ const Sitemap = () => {
         // Update the pre element with the final sitemap
         pre.textContent = sitemapXml;
         
-        // Also set the document content type programmatically
-        document.contentType = "text/xml";
+        // Instead of trying to set document.contentType directly (which is read-only),
+        // we'll ensure the meta tag is correctly set
+        if (!document.querySelector('meta[http-equiv="Content-Type"]')) {
+          const contentTypeMeta = document.createElement('meta');
+          contentTypeMeta.setAttribute('http-equiv', 'Content-Type');
+          contentTypeMeta.setAttribute('content', 'text/xml; charset=utf-8');
+          document.head.appendChild(contentTypeMeta);
+        }
       } catch (error) {
         console.error('Error generating sitemap:', error);
         // Set a basic valid XML in case of error
