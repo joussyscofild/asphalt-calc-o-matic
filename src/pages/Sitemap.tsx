@@ -64,9 +64,14 @@ const Sitemap = () => {
           sitemapXml += getSitemapEntry(`${SITE_URL}/calculator/${calculator.id}`, 'weekly', '0.8');
         });
         
-        // Add blog posts
+        // Add blog posts - only add if ID is a valid UUID
         blogPosts.forEach(post => {
-          sitemapXml += getSitemapEntry(`${SITE_URL}/blog/${post.id}`, 'weekly', '0.8');
+          // Validate the post ID is a valid UUID before adding to sitemap
+          if (isValidUUID(post.id)) {
+            sitemapXml += getSitemapEntry(`${SITE_URL}/blog/${post.id}`, 'weekly', '0.8');
+          } else {
+            console.warn(`Skipping blog post with invalid UUID: ${post.id}`);
+          }
         });
         
         // Add custom pages
@@ -107,8 +112,14 @@ const Sitemap = () => {
     generateSitemap();
   }, [isGenerating]);
   
+  // Helper function to check if a string is a valid UUID
+  const isValidUUID = (id: string): boolean => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(id);
+  };
+  
   // Helper function to render XML content
-  const renderXml = (xmlContent: string) => {
+  const renderXml = (xmlContent: string): void => {
     // Clear existing document content
     document.open();
     
@@ -135,7 +146,7 @@ const Sitemap = () => {
   };
   
   // Helper function to fetch custom pages
-  const fetchCustomPages = async () => {
+  const fetchCustomPages = async (): Promise<any[]> => {
     try {
       const { data, error } = await supabase
         .from('custom_pages')
@@ -155,7 +166,7 @@ const Sitemap = () => {
   };
   
   // Helper function to create properly formatted sitemap entries
-  const getSitemapEntry = (url: string, changefreq: string, priority: string) => {
+  const getSitemapEntry = (url: string, changefreq: string, priority: string): string => {
     return `  <url>
     <loc>${url}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>

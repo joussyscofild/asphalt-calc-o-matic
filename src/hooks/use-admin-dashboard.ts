@@ -1,6 +1,7 @@
+
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { BlogPost, blogPosts, getAllPublishedPosts, addBlogPostToSupabase, deleteBlogPostFromSupabase, fetchBlogPosts } from '@/utils/blogPosts';
+import { BlogPost, blogPosts, addBlogPostToSupabase, deleteBlogPostFromSupabase, fetchBlogPosts } from '@/utils/blogPosts';
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -123,18 +124,8 @@ export const useAdminDashboard = () => {
         post.id = postId;
       }
       
-      // Update local blogPosts array
-      const existingPostIndex = blogPosts.findIndex(p => p.id === post.id);
-      
-      if (existingPostIndex !== -1) {
-        // Update existing post
-        console.log("Updating existing post in admin dashboard");
-        blogPosts[existingPostIndex] = { ...post };
-      } else {
-        // Add new post
-        console.log("Adding new post in admin dashboard");
-        blogPosts.push({ ...post });
-      }
+      // Force a refresh to show updated posts
+      setRefreshTrigger(prev => prev + 1);
       
       const statusMessage = post.status === 'published' 
         ? "Published" 
@@ -144,9 +135,6 @@ export const useAdminDashboard = () => {
         title: `Blog Post ${statusMessage}`,
         description: `Successfully ${statusMessage.toLowerCase()} "${post.title}"`,
       });
-      
-      // Force a refresh to show updated posts
-      setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error("Error saving blog post:", error);
       toast({
@@ -170,24 +158,36 @@ export const useAdminDashboard = () => {
   // Handler for deleting a blog post
   const handleDeleteBlogPost = async (postId: string) => {
     try {
-      const postIndex = blogPosts.findIndex(p => p.id === postId);
-      if (postIndex !== -1) {
-        const postTitle = blogPosts[postIndex].title;
-        
-        // Delete from Supabase
-        await deleteBlogPostFromSupabase(postId);
-        
-        // Remove from local array
-        blogPosts.splice(postIndex, 1);
-        
+      // Find the post title for the toast notification
+      const postToDelete = posts.find(p => p.id === postId);
+      const postTitle = postToDelete?.title || "Post";
+      
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', postId);
+      
+      if (error) {
+        console.error("Error deleting blog post from Supabase:", error);
         toast({
-          title: "Blog Post Deleted",
-          description: `"${postTitle}" has been deleted.`,
+          title: "Error Deleting Post",
+          description: "There was an error deleting the blog post. Please try again.",
+          variant: "destructive"
         });
-        
-        // Force a refresh
-        setRefreshTrigger(prev => prev + 1);
+        throw error;
       }
+      
+      // Update local state by removing the deleted post
+      setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+      
+      toast({
+        title: "Blog Post Deleted",
+        description: `"${postTitle}" has been deleted.`,
+      });
+      
+      // Force a refresh
+      setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error("Error deleting blog post:", error);
       toast({
