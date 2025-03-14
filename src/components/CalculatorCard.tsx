@@ -51,10 +51,10 @@ const CalculatorCard = ({ id, title, description, icon, category, timeEstimate, 
   return (
     <Link 
       to={`/calculator/${id}`} 
-      className={`calculator-card flex flex-col h-full group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:border-safety/30 ${featured ? 'border-safety/30' : ''}`}
+      className={`calculator-card flex flex-col h-full group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm transition-all duration-300 hover:shadow-md hover:border-safety/30 ${featured ? 'border-safety/30' : ''}`}
     >
       {featured && (
-        <div className="absolute top-2 right-2 bg-safety text-asphalt text-xs px-2 py-1 rounded-full">
+        <div className="absolute top-2 right-2 bg-safety text-asphalt dark:text-gray-900 text-xs px-2 py-1 rounded-full">
           Featured
         </div>
       )}
@@ -62,39 +62,39 @@ const CalculatorCard = ({ id, title, description, icon, category, timeEstimate, 
       <div className="absolute top-2 left-2">
         <button 
           onClick={toggleSaved}
-          className="p-1.5 rounded-full bg-white/90 hover:bg-white shadow-sm transition-colors"
+          className="p-1.5 rounded-full bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 shadow-sm transition-colors"
           aria-label={isSaved ? "Remove from saved" : "Save calculator"}
         >
           {isSaved ? (
             <BookmarkCheck size={16} className="text-safety" />
           ) : (
-            <Bookmark size={16} className="text-concrete" />
+            <Bookmark size={16} className="text-concrete dark:text-gray-400" />
           )}
         </button>
       </div>
       
       <div className="p-5">
         <div className="flex items-start mb-3">
-          <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-asphalt/5 text-asphalt mr-3 group-hover:bg-safety/20 group-hover:text-safety-dark transition-all duration-300">
+          <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-asphalt/5 dark:bg-white/10 text-asphalt dark:text-white mr-3 group-hover:bg-safety/20 group-hover:text-safety-dark dark:group-hover:text-safety transition-all duration-300">
             {icon || <Calculator size={20} />}
           </div>
           <div>
-            <span className="text-xs font-semibold uppercase text-concrete">{category}</span>
-            <h3 className="text-lg font-semibold text-asphalt">{title}</h3>
+            <span className="text-xs font-semibold uppercase text-concrete dark:text-gray-400">{category}</span>
+            <h3 className="text-lg font-semibold text-asphalt dark:text-white">{title}</h3>
           </div>
         </div>
         
-        <p className="text-sm text-concrete-dark flex-grow mb-4">{description}</p>
+        <p className="text-sm text-concrete-dark dark:text-gray-300 flex-grow mb-4">{description}</p>
         
-        <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
+        <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100 dark:border-gray-600">
           {timeEstimate && (
-            <div className="flex items-center text-xs text-concrete">
+            <div className="flex items-center text-xs text-concrete dark:text-gray-400">
               <Clock size={14} className="mr-1" />
               <span>{timeEstimate}</span>
             </div>
           )}
           
-          <span className="inline-flex items-center text-sm font-medium text-asphalt group-hover:text-safety-dark transition-colors">
+          <span className="inline-flex items-center text-sm font-medium text-asphalt dark:text-white group-hover:text-safety-dark dark:group-hover:text-safety-light transition-colors">
             Use Calculator
             <ChevronRight size={16} className="ml-1 transform group-hover:translate-x-1 transition-transform" />
           </span>

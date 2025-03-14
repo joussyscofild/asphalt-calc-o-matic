@@ -37,7 +37,7 @@ const BlogPost = ({ id, title, excerpt, author, date, category, tags, imageUrl, 
           </Link>
           
           {featured && (
-            <span className="bg-safety/10 text-safety-dark dark:text-safety text-xs px-2 py-1 rounded-full">
+            <span className="bg-safety/10 text-safety-dark dark:text-safety-light text-xs px-2 py-1 rounded-full">
               Featured
             </span>
           )}
@@ -65,7 +65,7 @@ const BlogPost = ({ id, title, excerpt, author, date, category, tags, imageUrl, 
         </div>
         
         <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center text-sm text-concrete dark:text-gray-300">
+          <div className="flex items-center text-sm text-concrete dark:text-gray-400">
             <User size={14} className="mr-1" />
             <span>{author}</span>
             <span className="mx-2">•</span>

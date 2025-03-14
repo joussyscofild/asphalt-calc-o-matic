@@ -32,17 +32,17 @@ const FeaturedCalculators = () => {
   }, []);
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-gray-50 dark:bg-gray-800">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
             <h2 className="section-heading mb-3">Professional Construction Calculators</h2>
-            <p className="text-concrete-dark max-w-2xl">
+            <p className="text-concrete-dark dark:text-gray-300 max-w-2xl">
               Our professional-grade calculators are designed for precision and ease of use.
               Save time, reduce material waste, and improve cost estimates with our industry-standard tools.
             </p>
           </div>
-          <Link to="/calculators" className="mt-4 md:mt-0 inline-flex items-center font-medium text-asphalt hover:text-safety-dark transition-colors group">
+          <Link to="/calculators" className="mt-4 md:mt-0 inline-flex items-center font-medium text-asphalt dark:text-white hover:text-safety-dark dark:hover:text-safety-light transition-colors group">
             View All Calculators
             <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
           </Link>
@@ -51,7 +51,7 @@ const FeaturedCalculators = () => {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="h-64 rounded-lg bg-white border border-gray-200 animate-pulse"></div>
+              <div key={index} className="h-64 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 animate-pulse"></div>
             ))}
           </div>
         ) : calculators.length > 0 ? (
@@ -70,20 +70,20 @@ const FeaturedCalculators = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-            <Calculator className="h-12 w-12 mx-auto text-concrete mb-4" />
-            <h3 className="text-xl font-semibold">No Calculators Available</h3>
-            <p className="text-concrete-dark mt-2">
+          <div className="text-center py-12 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+            <Calculator className="h-12 w-12 mx-auto text-concrete dark:text-gray-400 mb-4" />
+            <h3 className="text-xl font-semibold dark:text-white">No Calculators Available</h3>
+            <p className="text-concrete-dark dark:text-gray-300 mt-2">
               Please check back later for our professional construction calculators.
             </p>
           </div>
         )}
         
         <div className="mt-10 text-center">
-          <p className="text-concrete-dark mb-4">
+          <p className="text-concrete-dark dark:text-gray-300 mb-4">
             Can't find what you're looking for? We're constantly adding new calculators.
           </p>
-          <Link to="/calculators" className="btn-outline">
+          <Link to="/calculators" className="btn-outline dark:border-white dark:text-white dark:hover:bg-white/10">
             Explore All Calculators
           </Link>
         </div>

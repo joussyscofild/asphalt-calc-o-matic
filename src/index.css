@@ -81,17 +81,17 @@
     --ring: 240 4.9% 83.9%;
     
     /* Construction theme dark mode colors - improved contrast */
-    --asphalt: 0 0% 95%; /* Increased to 95% for better contrast */
+    --asphalt: 0 0% 98%; /* Increased to 98% for much better contrast */
     --asphalt-light: 0 0% 98%;
     --asphalt-dark: 0 0% 90%;
     
     --concrete: 220 5% 85%; /* Increased to 85% for better visibility */
     --concrete-light: 220 10% 90%;
-    --concrete-dark: 220 5% 75%;
+    --concrete-dark: 220 5% 80%; /* Increased to 80% for much better contrast */
     
     --safety: 52 91% 67%;
-    --safety-light: 52 80% 77%;
-    --safety-dark: 50 100% 50%;
+    --safety-light: 52 80% 80%; /* Increased to 80% for better visibility */
+    --safety-dark: 50 100% 55%; /* Increased to 55% for better visibility */
   }
 }
 
@@ -143,7 +143,7 @@
   }
   
   .input-field {
-    @apply bg-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-safety focus:border-transparent transition-all duration-200 dark:bg-gray-800 dark:border-gray-600;
+    @apply bg-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-safety focus:border-transparent transition-all duration-200 dark:bg-gray-800 dark:border-gray-600 dark:text-white;
   }
   
   .calculator-card {

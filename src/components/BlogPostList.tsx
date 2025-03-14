@@ -38,7 +38,7 @@ const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading
             <span className="dark:text-white">Loading posts...</span>
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
             <p className="text-concrete-dark dark:text-gray-300">No posts available.</p>
           </div>
         ) : (
