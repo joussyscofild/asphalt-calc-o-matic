@@ -31,13 +31,13 @@ const BlogPost = ({ id, title, excerpt, author, date, category, tags, imageUrl, 
         <div className="flex justify-between items-center mb-3">
           <Link 
             to={`/blog/category/${category.toLowerCase().replace(' ', '-')}`}
-            className="text-xs font-semibold uppercase text-concrete hover:text-asphalt dark:hover:text-white transition-colors"
+            className="text-xs font-semibold uppercase text-concrete hover:text-asphalt dark:text-gray-300 dark:hover:text-white transition-colors"
           >
             {category}
           </Link>
           
           {featured && (
-            <span className="bg-safety/10 text-safety-dark text-xs px-2 py-1 rounded-full">
+            <span className="bg-safety/10 text-safety-dark dark:text-safety text-xs px-2 py-1 rounded-full">
               Featured
             </span>
           )}
@@ -65,7 +65,7 @@ const BlogPost = ({ id, title, excerpt, author, date, category, tags, imageUrl, 
         </div>
         
         <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center text-sm text-concrete dark:text-gray-400">
+          <div className="flex items-center text-sm text-concrete dark:text-gray-300">
             <User size={14} className="mr-1" />
             <span>{author}</span>
             <span className="mx-2">•</span>

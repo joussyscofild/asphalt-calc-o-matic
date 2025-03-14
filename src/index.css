@@ -81,13 +81,13 @@
     --ring: 240 4.9% 83.9%;
     
     /* Construction theme dark mode colors - improved contrast */
-    --asphalt: 0 0% 90%; /* Lightened for better contrast in dark mode */
-    --asphalt-light: 0 0% 95%;
-    --asphalt-dark: 0 0% 80%;
+    --asphalt: 0 0% 95%; /* Increased to 95% for better contrast */
+    --asphalt-light: 0 0% 98%;
+    --asphalt-dark: 0 0% 90%;
     
-    --concrete: 220 5% 75%; /* Lightened for visibility */
-    --concrete-light: 220 10% 85%;
-    --concrete-dark: 220 5% 65%;
+    --concrete: 220 5% 85%; /* Increased to 85% for better visibility */
+    --concrete-light: 220 10% 90%;
+    --concrete-dark: 220 5% 75%;
     
     --safety: 52 91% 67%;
     --safety-light: 52 80% 77%;
@@ -173,5 +173,37 @@
   
   .dark .section-subheading {
     @apply text-gray-300;
+  }
+  
+  /* New dark mode specific text enhancements */
+  .dark .text-concrete {
+    @apply text-gray-300;
+  }
+  
+  .dark .text-concrete-dark {
+    @apply text-gray-300;
+  }
+  
+  .dark .text-asphalt {
+    @apply text-white;
+  }
+  
+  .dark .text-asphalt-dark {
+    @apply text-gray-100;
+  }
+  
+  .dark label, 
+  .dark .font-medium,
+  .dark input,
+  .dark .text-sm {
+    @apply text-gray-200;
+  }
+  
+  .dark input {
+    @apply bg-gray-800 border-gray-700;
+  }
+  
+  .dark .bg-gray-100 {
+    @apply bg-gray-800;
   }
 }

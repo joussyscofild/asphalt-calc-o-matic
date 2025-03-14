@@ -150,14 +150,16 @@ const HomeCalculator = () => {
   return (
     <div className="calculator-card">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-bold">Asphalt Tonnage Calculator</h3>
+        <h3 className="text-xl font-bold text-asphalt dark:text-white">Asphalt Tonnage Calculator</h3>
         <div className="flex space-x-2">
-          <div className="text-sm font-medium">Units:</div>
-          <div className="flex p-1 bg-gray-100 rounded-full">
+          <div className="text-sm font-medium dark:text-gray-200">Units:</div>
+          <div className="flex p-1 bg-gray-100 dark:bg-gray-700 rounded-full">
             <button
               onClick={() => unitSystem !== 'imperial' && toggleUnitSystem()}
               className={`px-3 py-1 text-xs font-medium rounded-full transition-all ${
-                unitSystem === 'imperial' ? 'bg-white shadow-sm' : 'text-gray-600'
+                unitSystem === 'imperial' 
+                  ? 'bg-white dark:bg-gray-600 shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               Imperial
@@ -165,7 +167,9 @@ const HomeCalculator = () => {
             <button
               onClick={() => unitSystem !== 'metric' && toggleUnitSystem()}
               className={`px-3 py-1 text-xs font-medium rounded-full transition-all ${
-                unitSystem === 'metric' ? 'bg-white shadow-sm' : 'text-gray-600'
+                unitSystem === 'metric' 
+                  ? 'bg-white dark:bg-gray-600 shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               Metric
@@ -175,14 +179,14 @@ const HomeCalculator = () => {
       </div>
 
       <div className="space-y-5">
-        <h4 className="text-md font-semibold text-asphalt">Project Dimensions</h4>
+        <h4 className="text-md font-semibold text-asphalt dark:text-white">Project Dimensions</h4>
         
         <div>
           <div className="flex justify-between items-center mb-1">
-            <Label htmlFor="length">
+            <Label htmlFor="length" className="dark:text-gray-200">
               Length {unitSystem === 'imperial' ? '(feet)' : '(meters)'}
             </Label>
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{length}</span>
+            <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{length}</span>
           </div>
           <div className="flex space-x-4 items-center">
             <Slider
@@ -201,7 +205,7 @@ const HomeCalculator = () => {
                 value={length}
                 onChange={(e) => setLength(Number(e.target.value))}
                 min={unitSystem === 'imperial' ? 1 : 0.3}
-                className="h-8"
+                className="h-8 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -209,10 +213,10 @@ const HomeCalculator = () => {
         
         <div>
           <div className="flex justify-between items-center mb-1">
-            <Label htmlFor="width">
+            <Label htmlFor="width" className="dark:text-gray-200">
               Width {unitSystem === 'imperial' ? '(feet)' : '(meters)'}
             </Label>
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{width}</span>
+            <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{width}</span>
           </div>
           <div className="flex space-x-4 items-center">
             <Slider
@@ -231,7 +235,7 @@ const HomeCalculator = () => {
                 value={width}
                 onChange={(e) => setWidth(Number(e.target.value))}
                 min={unitSystem === 'imperial' ? 1 : 0.3}
-                className="h-8"
+                className="h-8 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -239,10 +243,10 @@ const HomeCalculator = () => {
         
         <div>
           <div className="flex justify-between items-center mb-1">
-            <Label htmlFor="thickness">
+            <Label htmlFor="thickness" className="dark:text-gray-200">
               Thickness {unitSystem === 'imperial' ? '(inches)' : '(cm)'}
             </Label>
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{thickness}</span>
+            <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{thickness}</span>
           </div>
           <div className="flex space-x-4 items-center">
             <Slider
@@ -262,20 +266,20 @@ const HomeCalculator = () => {
                 onChange={(e) => setThickness(Number(e.target.value))}
                 min={unitSystem === 'imperial' ? 0.5 : 1.25}
                 step={unitSystem === 'imperial' ? 0.25 : 0.5}
-                className="h-8"
+                className="h-8 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           </div>
         </div>
         
-        <h4 className="text-md font-semibold text-asphalt pt-2">Material Properties</h4>
+        <h4 className="text-md font-semibold text-asphalt dark:text-white pt-2">Material Properties</h4>
         
         <div>
           <div className="flex justify-between items-center mb-1">
-            <Label htmlFor="density">
+            <Label htmlFor="density" className="dark:text-gray-200">
               Asphalt Density (lbs/cubic foot)
             </Label>
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{density}</span>
+            <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{density}</span>
           </div>
           <div className="flex space-x-4 items-center">
             <Slider
@@ -295,7 +299,7 @@ const HomeCalculator = () => {
                 onChange={(e) => setDensity(Number(e.target.value))}
                 min={100}
                 max={170}
-                className="h-8"
+                className="h-8 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -303,10 +307,10 @@ const HomeCalculator = () => {
         
         <div>
           <div className="flex justify-between items-center mb-1">
-            <Label htmlFor="costPerTon">
+            <Label htmlFor="costPerTon" className="dark:text-gray-200">
               Cost per Ton ($)
             </Label>
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{costPerTon}</span>
+            <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{costPerTon}</span>
           </div>
           <div className="flex space-x-4 items-center">
             <Slider
@@ -325,7 +329,7 @@ const HomeCalculator = () => {
                 value={costPerTon}
                 onChange={(e) => setCostPerTon(Number(e.target.value))}
                 min={50}
-                className="h-8"
+                className="h-8 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -333,41 +337,41 @@ const HomeCalculator = () => {
       </div>
 
       {calculationResult && (
-        <Card className="mt-6 bg-gray-50 border border-gray-100">
+        <Card className="mt-6 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
           <CardContent className="pt-6">
-            <h3 className="text-lg font-semibold text-asphalt mb-4">Calculation Results</h3>
+            <h3 className="text-lg font-semibold text-asphalt dark:text-white mb-4">Calculation Results</h3>
             
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-concrete-dark">Volume:</span>
-                <span className="text-xl font-bold text-safety-dark">{calculationResult.volume}</span>
+                <span className="text-concrete-dark dark:text-gray-300">Volume:</span>
+                <span className="text-xl font-bold text-safety-dark dark:text-safety">{calculationResult.volume}</span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-concrete-dark">Weight:</span>
-                <span className="text-xl font-bold text-safety-dark">{calculationResult.tons} tons</span>
+                <span className="text-concrete-dark dark:text-gray-300">Weight:</span>
+                <span className="text-xl font-bold text-safety-dark dark:text-safety">{calculationResult.tons} tons</span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-concrete-dark">Estimated Cost:</span>
-                <span className="text-xl font-bold text-safety-dark">${calculationResult.cost}</span>
+                <span className="text-concrete-dark dark:text-gray-300">Estimated Cost:</span>
+                <span className="text-xl font-bold text-safety-dark dark:text-safety">${calculationResult.cost}</span>
               </div>
               
               <div className="flex justify-between items-center pt-1">
-                <span className="text-concrete-dark">Suggested Mix Type:</span>
-                <span className="text-safety font-medium">{calculationResult.mixType}</span>
+                <span className="text-concrete-dark dark:text-gray-300">Suggested Mix Type:</span>
+                <span className="text-safety dark:text-safety-light font-medium">{calculationResult.mixType}</span>
               </div>
             </div>
           </CardContent>
           
           <CardFooter className="pt-2 pb-4 flex justify-center space-x-3">
-            <Button variant="outline" size="sm" onClick={handlePrint}>
+            <Button variant="outline" size="sm" onClick={handlePrint} className="dark:text-white dark:hover:text-white dark:border-gray-600 dark:hover:bg-gray-700">
               <PrinterIcon className="mr-1 h-4 w-4" /> Print
             </Button>
-            <Button variant="outline" size="sm" onClick={handleShare}>
+            <Button variant="outline" size="sm" onClick={handleShare} className="dark:text-white dark:hover:text-white dark:border-gray-600 dark:hover:bg-gray-700">
               <Share2Icon className="mr-1 h-4 w-4" /> Share
             </Button>
-            <Button variant="outline" size="sm" onClick={handleResetCalculator}>
+            <Button variant="outline" size="sm" onClick={handleResetCalculator} className="dark:text-white dark:hover:text-white dark:border-gray-600 dark:hover:bg-gray-700">
               <RefreshCcw className="mr-1 h-4 w-4" /> Reset
             </Button>
           </CardFooter>

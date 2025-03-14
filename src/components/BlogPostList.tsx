@@ -18,7 +18,7 @@ const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading
       <div className="container-custom">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
-            <h2 className="section-heading">{title}</h2>
+            <h2 className="section-heading text-asphalt dark:text-white">{title}</h2>
             {description && (
               <p className="text-concrete-dark dark:text-gray-300 max-w-2xl">{description}</p>
             )}
@@ -35,7 +35,7 @@ const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
-            <span>Loading posts...</span>
+            <span className="dark:text-white">Loading posts...</span>
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-12">
