@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Lock } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -15,26 +16,26 @@ const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // These credentials should be stored securely in a real application
-  // This is a simple implementation for demonstration purposes
-  const validUsername = 'admin';
-  
-  // Check if we have a saved password
-  const getSavedPassword = () => {
-    const savedPassword = localStorage.getItem('adminPassword');
-    return savedPassword || 'admin123'; // Default fallback
-  };
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const validPassword = getSavedPassword();
-      
-      if (username === validUsername && password === validPassword) {
-        // Store authentication in localStorage (use a more secure method in production)
+    try {
+      // Query the admin_credentials table to check credentials
+      const { data, error } = await supabase
+        .from('admin_credentials')
+        .select('*')
+        .eq('username', username)
+        .eq('password', password)
+        .single();
+
+      if (error) {
+        console.error("Error checking admin credentials:", error);
+        throw error;
+      }
+
+      if (data) {
+        // Store authentication in localStorage
         localStorage.setItem('adminAuthenticated', 'true');
         toast({
           title: "Login successful",
@@ -48,8 +49,16 @@ const AdminLogin: React.FC = () => {
           variant: "destructive",
         });
       }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Authentication failed",
+        description: "Invalid username or password.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

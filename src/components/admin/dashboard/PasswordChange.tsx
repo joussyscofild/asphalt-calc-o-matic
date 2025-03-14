@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { supabase } from "@/integrations/supabase/client";
 
 // Form schema for password validation
 const passwordSchema = z.object({
@@ -25,6 +26,7 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const PasswordChange: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
   const form = useForm<PasswordFormValues>({
@@ -36,32 +38,66 @@ const PasswordChange: React.FC = () => {
     },
   });
 
-  const onSubmit = (data: PasswordFormValues) => {
-    // In a real app with Supabase, you would update the password here
-    // For this demo, we're just validating the form and showing a success message
+  const onSubmit = async (data: PasswordFormValues) => {
+    setIsLoading(true);
     
-    // Hardcoded check for the demo - in a real app you'd check against the stored password
-    if (data.currentPassword !== "admin123") {
+    try {
+      // First, verify the current password
+      const { data: adminData, error: verifyError } = await supabase
+        .from('admin_credentials')
+        .select('*')
+        .eq('username', 'admin')
+        .eq('password', data.currentPassword)
+        .single();
+      
+      if (verifyError || !adminData) {
+        toast({
+          title: "Error",
+          description: "Current password is incorrect",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Update the password in Supabase
+      const { error: updateError } = await supabase
+        .from('admin_credentials')
+        .update({ 
+          password: data.newPassword,
+          updated_at: new Date().toISOString()
+        })
+        .eq('username', 'admin');
+      
+      if (updateError) {
+        console.error("Error updating password:", updateError);
+        toast({
+          title: "Error",
+          description: "Failed to update password. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      toast({
+        title: "Password updated",
+        description: "Your password has been changed successfully",
+      });
+      
+      // Reset form and close dialog
+      form.reset();
+      setOpen(false);
+    } catch (error) {
+      console.error("Password change error:", error);
       toast({
         title: "Error",
-        description: "Current password is incorrect",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    // Save new password to localStorage (for demo purposes)
-    // In a real application, you would update this in your authentication system
-    localStorage.setItem('adminPassword', data.newPassword);
-
-    toast({
-      title: "Password updated",
-      description: "Your password has been changed successfully",
-    });
-    
-    // Reset form and close dialog
-    form.reset();
-    setOpen(false);
   };
 
   return (
@@ -133,8 +169,10 @@ const PasswordChange: React.FC = () => {
               )}
             />
             <DialogFooter className="mt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button type="submit">Update Password</Button>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>Cancel</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Updating..." : "Update Password"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>
