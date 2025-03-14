@@ -54,6 +54,8 @@ const Sitemap = () => {
         setXml(sitemapXml);
       } catch (error) {
         console.error('Error generating sitemap:', error);
+        // Set a basic valid XML in case of error
+        setXml('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>'+SITE_URL+'</loc>\n  </url>\n</urlset>');
       } finally {
         setIsLoading(false);
       }
@@ -82,49 +84,25 @@ const Sitemap = () => {
     return `  <url>\n    <loc>${url}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n  </url>\n`;
   };
   
-  // Set correct content type and formatting for XML
+  // Output XML directly instead of rendering a React component
   useEffect(() => {
     if (!isLoading) {
-      // Set content-type for XML
-      const contentTypeMetaTag = document.createElement('meta');
-      contentTypeMetaTag.httpEquiv = 'Content-Type';
-      contentTypeMetaTag.content = 'text/xml; charset=UTF-8';
-      document.head.appendChild(contentTypeMetaTag);
+      // Create a new document and write the XML to it
+      document.open('text/xml');
+      document.write(xml);
+      document.close();
       
-      // Add style to hide page container and properly display XML
-      const style = document.createElement('style');
-      style.innerHTML = `
-        body > div#root { display: none !important; }
-        body::before {
-          content: '${xml.replace(/'/g, "\\'")}';
-          white-space: pre;
-          font-family: monospace;
-        }
-      `;
-      document.head.appendChild(style);
-      
-      // We can't set document.contentType as it's read-only
-      // Instead, we'll use the meta tag above
+      // Set XML content type header (this is a client-side approximation)
+      const meta = document.createElement('meta');
+      meta.httpEquiv = 'Content-Type';
+      meta.content = 'text/xml; charset=utf-8';
+      document.head.appendChild(meta);
     }
-    
-    // Cleanup function
-    return () => {
-      const metaTag = document.querySelector('meta[http-equiv="Content-Type"]');
-      const styleTag = document.querySelector('style');
-      if (metaTag) metaTag.remove();
-      if (styleTag) styleTag.remove();
-    };
   }, [isLoading, xml]);
   
-  if (isLoading) {
-    return <div>Generating sitemap...</div>;
-  }
-  
-  return (
-    <div className="sitemap-container">
-      <pre>{xml}</pre>
-    </div>
-  );
+  // This component doesn't render anything visible in React's virtual DOM
+  // as we're writing directly to the document
+  return null;
 };
 
 export default Sitemap;
