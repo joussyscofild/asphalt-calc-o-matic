@@ -54,6 +54,43 @@ if [ -f "package.json" ]; then
 </IfModule>
 EOF
   
+  # Generate a physical sitemap.xml file in the dist directory as a backup
+  echo "Generating physical sitemap.xml file..."
+  NODE_ENV=production node -e "
+    const fs = require('fs');
+    
+    // Simple sitemap generator for static deployment
+    const generateStaticSitemap = () => {
+      const SITE_URL = 'https://asphaltcalculator.co';
+      
+      // Create basic sitemap with essential pages
+      let sitemapXml = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n';
+      sitemapXml += '<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\">\n';
+      
+      // Add static pages
+      const staticPages = ['', '/calculators', '/blog', '/about', '/contact'];
+      const today = new Date().toISOString().split('T')[0];
+      
+      staticPages.forEach(page => {
+        sitemapXml += `  <url>\n    <loc>${SITE_URL}${page}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+      });
+      
+      // Close XML
+      sitemapXml += '</urlset>';
+      
+      return sitemapXml;
+    };
+    
+    // Write the file
+    try {
+      const sitemap = generateStaticSitemap();
+      fs.writeFileSync('dist/sitemap.xml', sitemap);
+      console.log('Static sitemap.xml file created successfully');
+    } catch (error) {
+      console.error('Error creating static sitemap.xml:', error);
+    }
+  " || { echo "Static sitemap generation failed"; }
+  
   echo "Server configuration created."
 else
   echo "No package.json found. Skipping npm steps."

@@ -17,7 +17,7 @@ const Sitemap = () => {
       
       try {
         console.log("Starting sitemap generation");
-        // Base URL - use hardcoded production URL to ensure correct paths in sitemap
+        // Production URL must be hardcoded to ensure correct absolute URLs
         const SITE_URL = "https://asphaltcalculator.co";
         console.log("Using site URL:", SITE_URL);
         
@@ -84,14 +84,10 @@ const Sitemap = () => {
         
         console.log("Sitemap XML generated successfully");
         
-        // Set proper Content-Type for XML and serve the content
-        const xmlHeader = `Content-Type: application/xml; charset=utf-8`;
-        
-        // Set HTTP header for XML content type
+        // For client-side rendering, serve as XML file
         if (typeof document !== 'undefined') {
-          // Clear existing document content
+          // Set the content type and write the XML content
           document.open('text/xml');
-          // Write XML content directly
           document.write(sitemapXml);
           document.close();
         }
@@ -110,7 +106,7 @@ const Sitemap = () => {
   </url>
 </urlset>`;
         
-        // Set HTTP header for XML content type and serve the fallback content
+        // Serve the fallback content
         if (typeof document !== 'undefined') {
           document.open('text/xml');
           document.write(basicXml);
