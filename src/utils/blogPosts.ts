@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface BlogPost {
@@ -420,14 +419,10 @@ export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
       blogPosts.push(...posts);
       return posts;
     } else {
-      // If no posts in Supabase yet, use default posts and add them to Supabase
-      console.log("No posts found in Supabase, using default posts");
-      for (const post of defaultBlogPosts) {
-        await addBlogPostToSupabase(post);
-      }
+      // If no posts in Supabase, just return an empty array instead of adding default posts
+      console.log("No posts found in Supabase");
       blogPosts.length = 0;
-      blogPosts.push(...defaultBlogPosts);
-      return [...defaultBlogPosts];
+      return [];
     }
   } catch (error) {
     console.error('Error in fetchBlogPosts:', error);
@@ -572,4 +567,33 @@ export const getAllDraftPosts = async (): Promise<BlogPost[]> => {
   const posts = await fetchBlogPosts(); // Ensure we have the latest posts
   
   return posts.filter(post => post.status === 'draft');
+};
+
+// New function to initialize the blog with default posts
+export const initializeDefaultBlogPosts = async (): Promise<void> => {
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('count');
+    
+    if (error) {
+      console.error('Error checking blog posts count:', error);
+      return;
+    }
+    
+    // Only add default posts if there are no posts in the database
+    if (data && data.length === 0) {
+      console.log("Initializing default blog posts...");
+      
+      for (const post of defaultBlogPosts) {
+        await addBlogPostToSupabase(post);
+      }
+      
+      console.log("Default blog posts initialized successfully");
+    } else {
+      console.log("Blog posts already exist, skipping initialization");
+    }
+  } catch (error) {
+    console.error('Error in initializeDefaultBlogPosts:', error);
+  }
 };
