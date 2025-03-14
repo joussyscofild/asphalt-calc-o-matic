@@ -9,16 +9,28 @@ const Sitemap = () => {
   const SITE_URL = window.location.origin;
   
   useEffect(() => {
-    // Immediately display a placeholder while we generate the real sitemap
-    document.open('text/xml');
-    document.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>Generating sitemap...</loc>\n  </url>\n</urlset>');
-    document.close();
+    // Set XML content type
+    document.title = ""; // Remove any title
+    document.documentElement.innerHTML = ""; // Clear entire document
+    document.documentElement.setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
     
-    // Set content type
-    const meta = document.createElement('meta');
-    meta.httpEquiv = 'Content-Type';
-    meta.content = 'text/xml; charset=utf-8';
-    document.head.appendChild(meta);
+    // Create and set XML content type meta tag
+    const head = document.createElement("head");
+    const meta = document.createElement("meta");
+    meta.setAttribute("http-equiv", "Content-Type");
+    meta.setAttribute("content", "text/xml; charset=utf-8");
+    head.appendChild(meta);
+    document.documentElement.appendChild(head);
+    
+    // Create body element
+    const body = document.createElement("body");
+    document.documentElement.appendChild(body);
+    
+    // Display initial loading message
+    const initialXml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>Generating sitemap...</loc>\n  </url>\n</urlset>';
+    const pre = document.createElement("pre");
+    pre.textContent = initialXml;
+    body.appendChild(pre);
     
     // Generate the actual sitemap
     const generateSitemap = async () => {
@@ -58,27 +70,21 @@ const Sitemap = () => {
         // Close XML
         sitemapXml += '</urlset>';
         
-        // Write the final sitemap to the document
-        document.open('text/xml');
-        document.write(sitemapXml);
-        document.close();
+        // Update the pre element with the final sitemap
+        pre.textContent = sitemapXml;
+        
+        // Also set the document content type programmatically
+        document.contentType = "text/xml";
       } catch (error) {
         console.error('Error generating sitemap:', error);
         // Set a basic valid XML in case of error
-        document.open('text/xml');
-        document.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>'+SITE_URL+'</loc>\n  </url>\n</urlset>');
-        document.close();
+        pre.textContent = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>'+SITE_URL+'</loc>\n  </url>\n</urlset>';
       }
     };
     
     // Start generating the sitemap
     generateSitemap();
     
-    // Cleanup function
-    return () => {
-      const metaTag = document.querySelector('meta[http-equiv="Content-Type"]');
-      if (metaTag) metaTag.remove();
-    };
   }, []);
   
   // Helper function to fetch custom pages
