@@ -79,20 +79,22 @@ const Sitemap = () => {
         
         console.log("Sitemap XML generated successfully");
         
-        // Set the document content type before writing
-        document.contentType = 'text/xml';
-        
         // Clear existing document content completely
-        document.open('text/xml');
-        document.write(sitemapXml);
-        document.close();
+        document.open();
         
-        // Add content-type meta tag
-        const head = document.head || document.getElementsByTagName('head')[0];
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'Content-Type';
-        meta.content = 'text/xml; charset=utf-8';
-        head.appendChild(meta);
+        // Set content-type meta tag
+        document.write('<!DOCTYPE html>');
+        document.write('<html>');
+        document.write('<head>');
+        document.write('<meta http-equiv="Content-Type" content="text/xml; charset=utf-8">');
+        document.write('</head>');
+        document.write('<body>');
+        document.write('<pre>');
+        document.write(sitemapXml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+        document.write('</pre>');
+        document.write('</body>');
+        document.write('</html>');
+        document.close();
         
         // Hide React's root element to prevent any React rendering
         const rootElement = document.getElementById('root');
@@ -115,18 +117,20 @@ const Sitemap = () => {
   </url>
 </urlset>`;
         
-        // Set content type and write fallback sitemap
-        document.contentType = 'text/xml';
-        document.open('text/xml');
-        document.write(basicXml);
+        // Write fallback sitemap
+        document.open();
+        document.write('<!DOCTYPE html>');
+        document.write('<html>');
+        document.write('<head>');
+        document.write('<meta http-equiv="Content-Type" content="text/xml; charset=utf-8">');
+        document.write('</head>');
+        document.write('<body>');
+        document.write('<pre>');
+        document.write(basicXml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+        document.write('</pre>');
+        document.write('</body>');
+        document.write('</html>');
         document.close();
-        
-        // Add content-type meta tag
-        const head = document.head || document.getElementsByTagName('head')[0];
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'Content-Type';
-        meta.content = 'text/xml; charset=utf-8';
-        head.appendChild(meta);
         
         // Hide React's root element
         const rootElement = document.getElementById('root');
