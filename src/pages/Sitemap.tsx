@@ -108,7 +108,7 @@ const Sitemap = () => {
   }, [isGenerating]);
   
   // Helper function to render XML content
-  const renderXml = (xmlContent) => {
+  const renderXml = (xmlContent: string) => {
     // Clear existing document content
     document.open();
     
@@ -155,7 +155,7 @@ const Sitemap = () => {
   };
   
   // Helper function to create properly formatted sitemap entries
-  const getSitemapEntry = (url, changefreq, priority) => {
+  const getSitemapEntry = (url: string, changefreq: string, priority: string) => {
     return `  <url>
     <loc>${url}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>

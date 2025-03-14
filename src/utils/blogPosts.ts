@@ -26,9 +26,10 @@ export const blogCategories = [
 ];
 
 // Default blog posts - only used when no posts exist in Supabase
+// Convert default blog post IDs to UUID format before adding to Supabase
 export const defaultBlogPosts: BlogPost[] = [
   {
-    id: 'understanding-asphalt-density',
+    id: 'd2773336-f723-11e9-8f0b-362b9e155667',  // Using a valid UUID instead of "understanding-asphalt-density"
     title: 'Understanding Asphalt Density: The Key to Durable Pavements',
     excerpt: 'Learn how proper asphalt density affects the longevity and performance of your paving project, and why it matters for your calculations.',
     content: `<h1>Understanding Asphalt Density</h1>
@@ -74,7 +75,7 @@ export const defaultBlogPosts: BlogPost[] = [
     status: 'published'
   },
   {
-    id: 'choosing-right-concrete-mix',
+    id: 'd2773598-f723-11e9-8f0b-362b9e155667',  // Using a valid UUID instead of "choosing-right-concrete-mix"
     title: 'How to Choose the Right Concrete Mix for Your Project',
     excerpt: 'A comprehensive guide to selecting the appropriate concrete mix based on project requirements, strength needs, and environmental conditions.',
     content: `<h1>Choosing the Right Concrete Mix</h1>
@@ -129,7 +130,7 @@ export const defaultBlogPosts: BlogPost[] = [
     status: 'published'
   },
   {
-    id: 'asphalt-vs-concrete-driveways',
+    id: 'd2773622-f723-11e9-8f0b-362b9e155667',  // Using a valid UUID instead of "asphalt-vs-concrete-driveways"
     title: 'Asphalt vs. Concrete Driveways: A Cost and Durability Comparison',
     excerpt: 'Compare the pros and cons of asphalt and concrete driveways, including initial costs, maintenance requirements, and long-term value.',
     content: `<h1>Asphalt vs. Concrete Driveways</h1>
@@ -188,7 +189,7 @@ export const defaultBlogPosts: BlogPost[] = [
     status: 'published'
   },
   {
-    id: 'minimizing-material-waste',
+    id: 'd277368c-f723-11e9-8f0b-362b9e155667',  // Using a valid UUID instead of "minimizing-material-waste"
     title: '5 Strategies to Minimize Material Waste on Construction Sites',
     excerpt: 'Practical tips for reducing waste, improving efficiency, and saving money on your construction projects through better material management.',
     content: `<h1>Minimizing Material Waste on Construction Sites</h1>
@@ -253,7 +254,7 @@ export const defaultBlogPosts: BlogPost[] = [
     status: 'published'
   },
   {
-    id: 'parking-lot-design-tips',
+    id: 'd27736ec-f723-11e9-8f0b-362b9e155667',  // Using a valid UUID instead of "parking-lot-design-tips"
     title: 'Essential Parking Lot Design Tips for Maximum Efficiency',
     excerpt: 'Learn how to design efficient, compliant parking lots that maximize space utilization while ensuring proper drainage and traffic flow.',
     content: `<h1>Parking Lot Design Tips for Maximum Efficiency</h1>
@@ -318,7 +319,7 @@ export const defaultBlogPosts: BlogPost[] = [
     status: 'published'
   },
   {
-    id: 'sustainable-paving-practices',
+    id: 'd2773766-f723-11e9-8f0b-362b9e155667',  // Using a valid UUID instead of "sustainable-paving-practices"
     title: 'Sustainable Paving Practices for Environmental Compliance',
     excerpt: 'Discover eco-friendly paving methods and materials that meet regulatory requirements while reducing environmental impact.',
     content: `<h1>Sustainable Paving Practices</h1>
