@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
 
 @tailwind base;
@@ -79,14 +80,14 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     
-    /* Construction theme dark mode colors */
-    --asphalt: 0 0% 15%;
-    --asphalt-light: 0 0% 25%;
-    --asphalt-dark: 0 0% 10%;
+    /* Construction theme dark mode colors - improved contrast */
+    --asphalt: 0 0% 90%; /* Lightened for better contrast in dark mode */
+    --asphalt-light: 0 0% 95%;
+    --asphalt-dark: 0 0% 80%;
     
-    --concrete: 220 5% 65%;
-    --concrete-light: 220 10% 80%;
-    --concrete-dark: 220 5% 50%;
+    --concrete: 220 5% 75%; /* Lightened for visibility */
+    --concrete-light: 220 10% 85%;
+    --concrete-dark: 220 5% 65%;
     
     --safety: 52 91% 67%;
     --safety-light: 52 80% 77%;
@@ -110,7 +111,7 @@
 
 @layer components {
   .glass-card {
-    @apply bg-white/90 backdrop-blur-sm border border-gray-200 shadow-md;
+    @apply bg-white/90 backdrop-blur-sm border border-gray-200 shadow-md dark:bg-gray-800/90 dark:border-gray-700;
   }
   
   .container-custom {
@@ -130,19 +131,19 @@
   }
   
   .btn-primary {
-    @apply bg-asphalt hover:bg-asphalt-light text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out;
+    @apply bg-asphalt hover:bg-asphalt-light text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white;
   }
   
   .btn-secondary {
-    @apply bg-safety hover:bg-safety-dark text-asphalt font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out;
+    @apply bg-safety hover:bg-safety-dark text-asphalt font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out dark:text-gray-900;
   }
   
   .btn-outline {
-    @apply border border-asphalt text-asphalt hover:bg-asphalt hover:text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out;
+    @apply border border-asphalt text-asphalt hover:bg-asphalt hover:text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out dark:border-white dark:text-white dark:hover:bg-white/10;
   }
   
   .input-field {
-    @apply bg-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-safety focus:border-transparent transition-all duration-200;
+    @apply bg-white border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-safety focus:border-transparent transition-all duration-200 dark:bg-gray-800 dark:border-gray-600;
   }
   
   .calculator-card {
@@ -150,11 +151,11 @@
   }
   
   .section-heading {
-    @apply text-3xl md:text-4xl font-bold mb-6 text-asphalt;
+    @apply text-3xl md:text-4xl font-bold mb-6 text-asphalt dark:text-gray-100;
   }
   
   .section-subheading {
-    @apply text-xl font-medium mb-4 text-concrete-dark;
+    @apply text-xl font-medium mb-4 text-concrete-dark dark:text-gray-300;
   }
   
   /* Dark mode enhanced styles */
