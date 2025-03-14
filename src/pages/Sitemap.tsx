@@ -116,7 +116,15 @@ const Sitemap = () => {
     };
   }, [isLoading, xml]);
   
-  return null; // The component doesn't need to render anything as we're using document.body::before
+  if (isLoading) {
+    return <div>Generating sitemap...</div>;
+  }
+  
+  return (
+    <div className="sitemap-container">
+      <pre>{xml}</pre>
+    </div>
+  );
 };
 
 export default Sitemap;
