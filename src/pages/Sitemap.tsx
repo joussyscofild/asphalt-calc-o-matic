@@ -103,8 +103,8 @@ const Sitemap = () => {
       `;
       document.head.appendChild(style);
       
-      // Set the document content type
-      document.contentType = 'text/xml';
+      // We can't set document.contentType as it's read-only
+      // Instead, we'll use the meta tag above
     }
     
     // Cleanup function
