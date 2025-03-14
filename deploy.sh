@@ -1,25 +1,38 @@
 
 #!/bin/bash
 
+# Set the project directory
+PROJECT_DIR="/home/asphaltcalculator.co/public_html"
+
 # Navigate to your project directory
-cd /home/your_website_username/public_html/
+cd $PROJECT_DIR || { echo "Failed to navigate to project directory"; exit 1; }
 
-# Pull the latest changes
-git pull origin main
+# Log start of deployment
+echo "Starting deployment at $(date)" >> /home/asphaltcalculator.co/deploy_log.txt
 
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-
-# Optional: Log deployment time
-echo "Deployment completed at $(date)" >> /home/your_website_username/deploy_log.txt
-
-# Optional: Add error handling
-if [ $? -eq 0 ]; then
-  echo "Build successful!"
+# Check if this is a git repository
+if [ -d ".git" ]; then
+  echo "Git repository detected, pulling latest changes..."
+  git pull origin main || { echo "Git pull failed"; exit 1; }
 else
-  echo "Build failed!"
-  exit 1
+  echo "Not a git repository. Skipping git pull."
+  # You may want to implement an alternative method to update files here
+  # For example, using rsync, scp, or a custom file transfer method
 fi
+
+# Check if package.json exists before trying to run npm commands
+if [ -f "package.json" ]; then
+  echo "Installing dependencies..."
+  npm install || { echo "npm install failed"; exit 1; }
+  
+  echo "Building the project..."
+  npm run build || { echo "Build failed"; exit 1; }
+else
+  echo "No package.json found. Skipping npm steps."
+fi
+
+# Log deployment completion
+echo "Deployment completed at $(date)" >> /home/asphaltcalculator.co/deploy_log.txt
+
+# Report success
+echo "Deployment process completed successfully!"
