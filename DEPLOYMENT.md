@@ -78,26 +78,7 @@ chmod +x /home/asphaltcalculator.co/deploy.sh
 3. Check that the webhook is triggered and the deployment script runs
 4. Verify that your website is updated with the changes
 
-### 5. Sitemap Configuration
-
-The deployment script (`deploy.sh`) includes configuration for properly serving the sitemap:
-
-1. It creates a `.htaccess` file in the `dist` directory with proper MIME type configuration for `sitemap.xml`
-2. It also generates a static `sitemap.xml` file as a fallback
-3. The React application includes a dynamic `Sitemap` component at the `/sitemap.xml` route
-
-To verify the sitemap is working correctly:
-1. After deployment, visit `https://asphaltcalculator.co/sitemap.xml`
-2. The response should have the content type `application/xml`
-3. Use online XML validators to ensure the sitemap is properly formatted
-
-If the sitemap is not working:
-1. Check that the `.htaccess` file is present in the root directory
-2. Ensure Apache is configured to read `.htaccess` files (AllowOverride All)
-3. Verify that the `mod_rewrite` module is enabled in Apache
-4. Check the server logs for any errors related to the sitemap
-
-### 6. Troubleshooting
+### 5. Troubleshooting
 
 - Check webhook logs in GitHub or CyberPanel
 - Examine the deploy_log.txt file for errors
