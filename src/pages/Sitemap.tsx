@@ -84,14 +84,24 @@ const Sitemap = () => {
         
         console.log("Sitemap XML generated successfully");
         
-        // Set proper content type for XML
-        const contentType = 'application/xml';
-        const blob = new Blob([sitemapXml], { type: contentType });
-        const url = URL.createObjectURL(blob);
+        // Set proper XML MIME type headers
+        document.documentElement.innerHTML = '';
+        document.documentElement.appendChild(document.createElement('head'));
+        const metaTag = document.createElement('meta');
+        metaTag.httpEquiv = 'Content-Type';
+        metaTag.content = 'application/xml; charset=utf-8';
+        document.head.appendChild(metaTag);
         
-        // Redirect the browser to the XML blob
-        window.location.href = url;
-
+        // Write the XML directly to the document
+        document.documentElement.appendChild(document.createElement('body'));
+        document.body.textContent = sitemapXml;
+        
+        // Set proper Content-Type header through meta tag
+        const http = document.createElement('meta');
+        http.httpEquiv = 'Content-Type';
+        http.content = 'text/xml; charset=utf-8';
+        document.getElementsByTagName('head')[0].appendChild(http);
+        
         hasGeneratedRef.current = true;
       } catch (error) {
         console.error('Critical error generating sitemap:', error);
@@ -106,13 +116,17 @@ const Sitemap = () => {
   </url>
 </urlset>`;
         
-        // Set proper content type for XML
-        const contentType = 'application/xml';
-        const blob = new Blob([basicXml], { type: contentType });
-        const url = URL.createObjectURL(blob);
+        // Set proper XML MIME type headers for fallback
+        document.documentElement.innerHTML = '';
+        document.documentElement.appendChild(document.createElement('head'));
+        const metaTag = document.createElement('meta');
+        metaTag.httpEquiv = 'Content-Type';
+        metaTag.content = 'application/xml; charset=utf-8';
+        document.head.appendChild(metaTag);
         
-        // Redirect the browser to the XML blob
-        window.location.href = url;
+        // Write the fallback XML directly to the document
+        document.documentElement.appendChild(document.createElement('body'));
+        document.body.textContent = basicXml;
       } finally {
         setIsGenerating(false);
       }
@@ -159,7 +173,7 @@ const Sitemap = () => {
 `;
   };
   
-  // Return null as we're handling the rendering via the XML blob
+  // Return null as we're handling the rendering directly
   return null;
 };
 
