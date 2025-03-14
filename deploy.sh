@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Set the project directory
-PROJECT_DIR="/home/asphaltcalculator.co/public_html"
+PROJECT_DIR="/home/asphaltcalculator.co/public_html/asphalt-calc-o-matic"
 
 # Navigate to your project directory
 cd $PROJECT_DIR || { echo "Failed to navigate to project directory"; exit 1; }

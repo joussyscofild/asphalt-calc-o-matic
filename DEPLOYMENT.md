@@ -9,8 +9,8 @@ Before setting up automatic deployment, ensure your server environment is correc
 
 1. If using Git-based deployment:
    ```bash
-   # Navigate to your public_html directory
-   cd /home/asphaltcalculator.co/public_html
+   # Navigate to your application directory
+   cd /home/asphaltcalculator.co/public_html/asphalt-calc-o-matic
    
    # Initialize a Git repository if not already done
    git init
@@ -28,7 +28,7 @@ Before setting up automatic deployment, ensure your server environment is correc
 
 ### Git-based Deployment
 1. Connect to your server via SSH
-2. Navigate to your project directory: `cd /home/asphaltcalculator.co/public_html/`
+2. Navigate to your project directory: `cd /home/asphaltcalculator.co/public_html/asphalt-calc-o-matic`
 3. Pull the latest code: `git pull origin main`
 4. Install dependencies: `npm install`
 5. Build the project: `npm run build`
