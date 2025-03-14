@@ -17,8 +17,8 @@ const Sitemap = () => {
       
       try {
         console.log("Starting sitemap generation");
-        // Base URL - use hardcoded production URL to ensure correct paths in sitemap
-        const SITE_URL = "https://asphaltcalculator.co";
+        // Base URL - use window.location.origin or fallback to a hardcoded URL
+        const SITE_URL = window.location.origin;
         console.log("Using site URL:", SITE_URL);
         
         let calculators = [];
@@ -84,17 +84,23 @@ const Sitemap = () => {
         
         console.log("Sitemap XML generated successfully");
         
-        // Set proper Content-Type for XML and serve the content
-        const xmlHeader = `Content-Type: application/xml; charset=utf-8`;
+        // Set proper XML MIME type headers
+        document.documentElement.innerHTML = '';
+        document.documentElement.appendChild(document.createElement('head'));
+        const metaTag = document.createElement('meta');
+        metaTag.httpEquiv = 'Content-Type';
+        metaTag.content = 'application/xml; charset=utf-8';
+        document.head.appendChild(metaTag);
         
-        // Set HTTP header for XML content type
-        if (typeof document !== 'undefined') {
-          // Clear existing document content
-          document.open('text/xml');
-          // Write XML content directly
-          document.write(sitemapXml);
-          document.close();
-        }
+        // Write the XML directly to the document
+        document.documentElement.appendChild(document.createElement('body'));
+        document.body.textContent = sitemapXml;
+        
+        // Set proper Content-Type header through meta tag
+        const http = document.createElement('meta');
+        http.httpEquiv = 'Content-Type';
+        http.content = 'text/xml; charset=utf-8';
+        document.getElementsByTagName('head')[0].appendChild(http);
         
         hasGeneratedRef.current = true;
       } catch (error) {
@@ -104,18 +110,23 @@ const Sitemap = () => {
         const basicXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://asphaltcalculator.co</loc>
+    <loc>${window.location.origin}</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 </urlset>`;
         
-        // Set HTTP header for XML content type and serve the fallback content
-        if (typeof document !== 'undefined') {
-          document.open('text/xml');
-          document.write(basicXml);
-          document.close();
-        }
+        // Set proper XML MIME type headers for fallback
+        document.documentElement.innerHTML = '';
+        document.documentElement.appendChild(document.createElement('head'));
+        const metaTag = document.createElement('meta');
+        metaTag.httpEquiv = 'Content-Type';
+        metaTag.content = 'application/xml; charset=utf-8';
+        document.head.appendChild(metaTag);
+        
+        // Write the fallback XML directly to the document
+        document.documentElement.appendChild(document.createElement('body'));
+        document.body.textContent = basicXml;
       } finally {
         setIsGenerating(false);
       }
