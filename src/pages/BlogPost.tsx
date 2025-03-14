@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, User, ChevronLeft, Tag, Clock } from 'lucide-react';
@@ -52,12 +53,12 @@ const BlogPost = () => {
         <Navbar />
         <div className="py-12 container-custom mt-16">
           <div className="text-center">
-            <div className="h-6 w-32 bg-gray-200 animate-pulse rounded mx-auto mb-4"></div>
-            <div className="h-12 w-3/4 bg-gray-200 animate-pulse rounded mx-auto mb-8"></div>
-            <div className="h-64 bg-gray-200 animate-pulse rounded mb-6"></div>
-            <div className="h-4 bg-gray-200 animate-pulse rounded mb-3"></div>
-            <div className="h-4 bg-gray-200 animate-pulse rounded mb-3"></div>
-            <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+            <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mx-auto mb-4"></div>
+            <div className="h-12 w-3/4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mx-auto mb-8"></div>
+            <div className="h-64 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mb-6"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mb-3"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mb-3"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
           </div>
         </div>
         <Footer />
@@ -70,14 +71,14 @@ const BlogPost = () => {
   return (
     <>
       <Navbar />
-      <div className="py-8 bg-gray-50 mt-16">
+      <div className="py-8 bg-gray-50 dark:bg-gray-900 mt-16">
         <div className="container-custom">
-          <Link to="/blog" className="inline-flex items-center text-sm font-medium text-concrete hover:text-concrete-dark mb-6">
+          <Link to="/blog" className="inline-flex items-center text-sm font-medium text-concrete hover:text-concrete-dark dark:text-gray-400 dark:hover:text-gray-300 mb-6">
             <ChevronLeft size={16} className="mr-1" />
             Back to all posts
           </Link>
           
-          <article className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-12">
+          <article className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 mb-12">
             {post.imageUrl && (
               <div className="aspect-video w-full overflow-hidden">
                 <img 
@@ -92,7 +93,7 @@ const BlogPost = () => {
               <div className="flex flex-wrap gap-2 mb-4">
                 <Link 
                   to={`/blog/category/${post.category.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="text-sm bg-gray-100 text-concrete-dark px-3 py-1 rounded-full hover:bg-safety/10 hover:text-safety-dark transition-colors"
+                  className="text-sm bg-gray-100 dark:bg-gray-700 text-concrete-dark dark:text-gray-300 px-3 py-1 rounded-full hover:bg-safety/10 hover:text-safety-dark dark:hover:bg-safety/20 dark:hover:text-safety-light transition-colors"
                 >
                   {post.category}
                 </Link>
@@ -101,7 +102,7 @@ const BlogPost = () => {
                   <Link 
                     key={tag}
                     to={`/blog/tag/${tag.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="inline-flex items-center text-sm bg-gray-100 text-concrete-dark px-3 py-1 rounded-full hover:bg-safety/10 hover:text-safety-dark transition-colors"
+                    className="inline-flex items-center text-sm bg-gray-100 dark:bg-gray-700 text-concrete-dark dark:text-gray-300 px-3 py-1 rounded-full hover:bg-safety/10 hover:text-safety-dark dark:hover:bg-safety/20 dark:hover:text-safety-light transition-colors"
                   >
                     <Tag size={14} className="mr-1" />
                     {tag}
@@ -109,22 +110,22 @@ const BlogPost = () => {
                 ))}
               </div>
               
-              <h1 className="text-3xl md:text-4xl font-bold text-asphalt mb-6">
+              <h1 className="text-3xl md:text-4xl font-bold text-asphalt dark:text-white mb-6">
                 {post.title}
               </h1>
               
-              <div className="flex items-center text-concrete-dark mb-8 flex-wrap gap-y-2">
+              <div className="flex items-center text-concrete-dark dark:text-gray-400 mb-8 flex-wrap gap-y-2">
                 <div className="flex items-center">
                   {post.authorAvatar ? (
                     <img 
                       src={post.authorAvatar} 
                       alt={post.author} 
-                      className="w-10 h-10 rounded-full mr-3 border border-gray-200"
+                      className="w-10 h-10 rounded-full mr-3 border border-gray-200 dark:border-gray-600"
                     />
                   ) : (
-                    <User size={24} className="mr-3 p-1 bg-gray-100 rounded-full" />
+                    <User size={24} className="mr-3 p-1 bg-gray-100 dark:bg-gray-700 rounded-full" />
                   )}
-                  <span className="font-medium text-asphalt">{post.author}</span>
+                  <span className="font-medium text-asphalt dark:text-white">{post.author}</span>
                 </div>
                 
                 <span className="mx-3">•</span>
@@ -146,7 +147,7 @@ const BlogPost = () => {
               </div>
               
               <div 
-                className="prose prose-lg max-w-none"
+                className="prose prose-lg dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               ></div>
             </div>
@@ -155,8 +156,8 @@ const BlogPost = () => {
           {recentPosts.length > 0 && (
             <div className="mb-12">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-asphalt">More Articles</h2>
-                <Link to="/blog" className="text-sm font-medium text-concrete hover:text-concrete-dark">
+                <h2 className="text-2xl font-bold text-asphalt dark:text-white">More Articles</h2>
+                <Link to="/blog" className="text-sm font-medium text-concrete dark:text-gray-400 hover:text-concrete-dark dark:hover:text-gray-300">
                   View all posts
                 </Link>
               </div>

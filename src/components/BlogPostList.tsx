@@ -14,18 +14,18 @@ interface BlogPostListProps {
 
 const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading = false }: BlogPostListProps) => {
   return (
-    <section className="py-16">
+    <section className="py-16 dark:bg-gray-900">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
             <h2 className="section-heading">{title}</h2>
             {description && (
-              <p className="text-concrete-dark max-w-2xl">{description}</p>
+              <p className="text-concrete-dark dark:text-gray-300 max-w-2xl">{description}</p>
             )}
           </div>
           
           {showViewAll && (
-            <Link to="/blog" className="mt-4 md:mt-0 inline-flex items-center font-medium text-asphalt hover:text-safety-dark">
+            <Link to="/blog" className="mt-4 md:mt-0 inline-flex items-center font-medium text-asphalt dark:text-white hover:text-safety-dark dark:hover:text-safety-light">
               View All Articles
               <ChevronRight size={18} className="ml-1" />
             </Link>
@@ -39,7 +39,7 @@ const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-concrete-dark">No posts available.</p>
+            <p className="text-concrete-dark dark:text-gray-300">No posts available.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

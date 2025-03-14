@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -64,7 +65,7 @@ const Blog = () => {
   return (
     <>
       <Navbar />
-      <div className="py-8 bg-gray-50 mt-16">
+      <div className="py-8 bg-gray-50 dark:bg-gray-900 mt-16">
         <div className="container-custom">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8">
             <div>
@@ -118,8 +119,8 @@ const Blog = () => {
               <div className="spinner">Loading...</div>
             </div>
           ) : filteredPosts.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-lg shadow-sm">
-              <BookOpen size={48} className="mx-auto text-gray-300 mb-4" />
+            <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <BookOpen size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
               <h2 className="text-2xl font-bold text-asphalt mb-2">No Posts Found</h2>
               <p className="text-concrete-dark max-w-md mx-auto mb-8">
                 {searchQuery 
