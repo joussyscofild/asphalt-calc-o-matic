@@ -33,7 +33,7 @@ const AdminLogin: React.FC = () => {
         throw error;
       }
 
-      if (data) {
+      if (data === true) {
         // Store authentication in localStorage
         localStorage.setItem('adminAuthenticated', 'true');
         toast({
