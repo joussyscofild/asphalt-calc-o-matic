@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Lock } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const AdminLogin: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -61,7 +62,10 @@ const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-background">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-[350px]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">Admin Login</CardTitle>

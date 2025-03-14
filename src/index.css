@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
 
 @tailwind base;
@@ -36,6 +35,19 @@
     --ring: 240 5.9% 10%;
 
     --radius: 0.5rem;
+    
+    /* Construction theme base colors */
+    --asphalt: 0 0% 10%;
+    --asphalt-light: 0 0% 20%;
+    --asphalt-dark: 0 0% 7%;
+    
+    --concrete: 220 5% 57%;
+    --concrete-light: 220 10% 75%;
+    --concrete-dark: 220 5% 40%;
+    
+    --safety: 52 91% 63%;
+    --safety-light: 52 80% 73%;
+    --safety-dark: 50 100% 45%;
   }
 
   .dark {
@@ -66,6 +78,19 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+    
+    /* Construction theme dark mode colors */
+    --asphalt: 0 0% 15%;
+    --asphalt-light: 0 0% 25%;
+    --asphalt-dark: 0 0% 10%;
+    
+    --concrete: 220 5% 65%;
+    --concrete-light: 220 10% 80%;
+    --concrete-dark: 220 5% 50%;
+    
+    --safety: 52 91% 67%;
+    --safety-light: 52 80% 77%;
+    --safety-dark: 50 100% 50%;
   }
 }
 
@@ -130,5 +155,22 @@
   
   .section-subheading {
     @apply text-xl font-medium mb-4 text-concrete-dark;
+  }
+  
+  /* Dark mode enhanced styles */
+  .dark .glass-card {
+    @apply bg-gray-900/90 backdrop-blur-sm border border-gray-800 shadow-md;
+  }
+  
+  .dark .calculator-card {
+    @apply bg-gray-900/90 border-gray-800 hover:bg-gray-800/90;
+  }
+  
+  .dark .section-heading {
+    @apply text-gray-100;
+  }
+  
+  .dark .section-subheading {
+    @apply text-gray-300;
   }
 }
