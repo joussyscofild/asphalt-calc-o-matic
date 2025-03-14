@@ -4,7 +4,7 @@ import { fetchCalculators } from '@/utils/calculatorService';
 import { getAllPublishedPosts } from '@/utils/blogPosts';
 import { supabase } from "@/integrations/supabase/client";
 
-// Base URL for the site - replace with actual domain in production
+// Base URL for the site - should be updated for production
 const SITE_URL = window.location.origin;
 
 const Sitemap = () => {
@@ -52,13 +52,6 @@ const Sitemap = () => {
         sitemapXml += '</urlset>';
         
         setXml(sitemapXml);
-        
-        // Set content type to XML
-        document.querySelector('html')?.setAttribute('content-type', 'application/xml');
-        // Create a style to hide other page elements
-        const style = document.createElement('style');
-        style.textContent = 'body > *:not(pre) { display: none !important; }';
-        document.head.appendChild(style);
       } catch (error) {
         console.error('Error generating sitemap:', error);
       } finally {
@@ -67,12 +60,6 @@ const Sitemap = () => {
     };
     
     generateSitemap();
-    
-    // Cleanup function to remove style when component unmounts
-    return () => {
-      const style = document.querySelector('style');
-      if (style) style.remove();
-    };
   }, []);
   
   // Helper function to fetch custom pages
@@ -92,26 +79,44 @@ const Sitemap = () => {
   
   // Helper function to create sitemap entries
   const getSitemapEntry = (url: string) => {
-    return `  <url>\n    <loc>${url}</loc>\n    <changefreq>weekly</changefreq>\n  </url>\n`;
+    return `  <url>\n    <loc>${url}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n  </url>\n`;
   };
   
-  // Use useEffect to set the document content type
+  // Set correct content type and formatting for XML
   useEffect(() => {
     if (!isLoading) {
-      // Set response headers for XML
+      // Set content-type for XML
       const contentTypeMetaTag = document.createElement('meta');
       contentTypeMetaTag.httpEquiv = 'Content-Type';
-      contentTypeMetaTag.content = 'application/xml; charset=UTF-8';
+      contentTypeMetaTag.content = 'text/xml; charset=UTF-8';
       document.head.appendChild(contentTypeMetaTag);
+      
+      // Add style to hide page container and properly display XML
+      const style = document.createElement('style');
+      style.innerHTML = `
+        body > div#root { display: none !important; }
+        body::before {
+          content: '${xml.replace(/'/g, "\\'")}';
+          white-space: pre;
+          font-family: monospace;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Set the document content type
+      document.contentType = 'text/xml';
     }
-  }, [isLoading]);
+    
+    // Cleanup function
+    return () => {
+      const metaTag = document.querySelector('meta[http-equiv="Content-Type"]');
+      const styleTag = document.querySelector('style');
+      if (metaTag) metaTag.remove();
+      if (styleTag) styleTag.remove();
+    };
+  }, [isLoading, xml]);
   
-  // Return XML content as plain text
-  return (
-    <pre style={{ display: 'block', whiteSpace: 'pre', margin: 0, padding: 0 }}>
-      {isLoading ? '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>Generating sitemap...</loc>\n  </url>\n</urlset>' : xml}
-    </pre>
-  );
+  return null; // The component doesn't need to render anything as we're using document.body::before
 };
 
 export default Sitemap;
