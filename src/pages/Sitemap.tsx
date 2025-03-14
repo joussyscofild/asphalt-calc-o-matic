@@ -84,9 +84,14 @@ const Sitemap = () => {
         
         console.log("Sitemap XML generated successfully");
         
-        // Use the HTML approach instead of direct XML writing
-        renderXml(sitemapXml);
-        console.log("Sitemap successfully rendered");
+        // Set proper content type for XML
+        const contentType = 'application/xml';
+        const blob = new Blob([sitemapXml], { type: contentType });
+        const url = URL.createObjectURL(blob);
+        
+        // Redirect the browser to the XML blob
+        window.location.href = url;
+
         hasGeneratedRef.current = true;
       } catch (error) {
         console.error('Critical error generating sitemap:', error);
@@ -101,8 +106,13 @@ const Sitemap = () => {
   </url>
 </urlset>`;
         
-        // Render fallback XML
-        renderXml(basicXml);
+        // Set proper content type for XML
+        const contentType = 'application/xml';
+        const blob = new Blob([basicXml], { type: contentType });
+        const url = URL.createObjectURL(blob);
+        
+        // Redirect the browser to the XML blob
+        window.location.href = url;
       } finally {
         setIsGenerating(false);
       }
@@ -116,33 +126,6 @@ const Sitemap = () => {
   const isValidUUID = (id: string): boolean => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(id);
-  };
-  
-  // Helper function to render XML content
-  const renderXml = (xmlContent: string): void => {
-    // Clear existing document content
-    document.open();
-    
-    // Write HTML wrapper with XML content
-    document.write('<!DOCTYPE html>');
-    document.write('<html>');
-    document.write('<head>');
-    document.write('<meta http-equiv="Content-Type" content="text/xml; charset=utf-8">');
-    document.write('</head>');
-    document.write('<body>');
-    document.write('<pre>');
-    // Escape XML special characters for HTML display
-    document.write(xmlContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-    document.write('</pre>');
-    document.write('</body>');
-    document.write('</html>');
-    document.close();
-    
-    // Hide React's root element
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-      rootElement.style.display = 'none';
-    }
   };
   
   // Helper function to fetch custom pages
@@ -176,7 +159,7 @@ const Sitemap = () => {
 `;
   };
   
-  // Return null as we're handling the rendering via document API
+  // Return null as we're handling the rendering via the XML blob
   return null;
 };
 
