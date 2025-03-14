@@ -1,98 +1,21 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { fetchCalculators } from '@/utils/calculatorService';
 import { getAllPublishedPosts } from '@/utils/blogPosts';
 import { supabase } from "@/integrations/supabase/client";
 
 const Sitemap = () => {
-  // Base URL for the site - should be updated for production
-  const SITE_URL = window.location.origin;
-  
+  const hasGeneratedRef = useRef(false);
+
   useEffect(() => {
-    // Set XML content type
-    document.title = ""; // Remove any title
-    document.documentElement.innerHTML = ""; // Clear entire document
-    document.documentElement.setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
-    
-    // Create and set XML content type meta tag
-    const head = document.createElement("head");
-    const meta = document.createElement("meta");
-    meta.setAttribute("http-equiv", "Content-Type");
-    meta.setAttribute("content", "text/xml; charset=utf-8");
-    head.appendChild(meta);
-    document.documentElement.appendChild(head);
-    
-    // Create body element
-    const body = document.createElement("body");
-    document.documentElement.appendChild(body);
-    
-    // Display initial loading message
-    const initialXml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>Generating sitemap...</loc>\n  </url>\n</urlset>';
-    const pre = document.createElement("pre");
-    pre.textContent = initialXml;
-    body.appendChild(pre);
-    
-    // Generate the actual sitemap
-    const generateSitemap = async () => {
-      try {
-        // Fetch all content that should be in the sitemap
-        const [calculators, blogPosts, customPages] = await Promise.all([
-          fetchCalculators(),
-          getAllPublishedPosts(),
-          fetchCustomPages(),
-        ]);
-        
-        // Start XML sitemap
-        let sitemapXml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-        sitemapXml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-        
-        // Add static pages
-        const staticPages = ['', '/calculators', '/blog'];
-        staticPages.forEach(page => {
-          sitemapXml += getSitemapEntry(`${SITE_URL}${page}`);
-        });
-        
-        // Add calculator pages
-        calculators.forEach(calculator => {
-          sitemapXml += getSitemapEntry(`${SITE_URL}/calculator/${calculator.id}`);
-        });
-        
-        // Add blog posts
-        blogPosts.forEach(post => {
-          sitemapXml += getSitemapEntry(`${SITE_URL}/blog/${post.id}`);
-        });
-        
-        // Add custom pages
-        customPages.forEach(page => {
-          sitemapXml += getSitemapEntry(`${SITE_URL}/page/${page.slug}`);
-        });
-        
-        // Close XML
-        sitemapXml += '</urlset>';
-        
-        // Update the pre element with the final sitemap
-        pre.textContent = sitemapXml;
-        
-        // Instead of trying to set document.contentType directly (which is read-only),
-        // we'll ensure the meta tag is correctly set
-        if (!document.querySelector('meta[http-equiv="Content-Type"]')) {
-          const contentTypeMeta = document.createElement('meta');
-          contentTypeMeta.setAttribute('http-equiv', 'Content-Type');
-          contentTypeMeta.setAttribute('content', 'text/xml; charset=utf-8');
-          document.head.appendChild(contentTypeMeta);
-        }
-      } catch (error) {
-        console.error('Error generating sitemap:', error);
-        // Set a basic valid XML in case of error
-        pre.textContent = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>'+SITE_URL+'</loc>\n  </url>\n</urlset>';
-      }
-    };
-    
-    // Start generating the sitemap
+    // Prevent multiple executions
+    if (hasGeneratedRef.current) return;
+    hasGeneratedRef.current = true;
+
+    // Set the XML content type and generate the sitemap
     generateSitemap();
-    
   }, []);
-  
+
   // Helper function to fetch custom pages
   const fetchCustomPages = async () => {
     const { data, error } = await supabase
@@ -112,8 +35,79 @@ const Sitemap = () => {
   const getSitemapEntry = (url: string) => {
     return `  <url>\n    <loc>${url}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n  </url>\n`;
   };
+
+  // Generate the actual sitemap
+  const generateSitemap = async () => {
+    try {
+      // First, create a basic document structure for XML
+      document.open('text/xml');
+      document.write('<?xml version="1.0" encoding="UTF-8"?>\n');
+      document.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n');
+      document.write('  <url>\n    <loc>Generating sitemap...</loc>\n  </url>\n');
+      document.write('</urlset>');
+      document.close();
+
+      // Set XML MIME type with a meta tag
+      const metaTag = document.createElement('meta');
+      metaTag.setAttribute('http-equiv', 'Content-Type');
+      metaTag.setAttribute('content', 'text/xml; charset=utf-8');
+      document.head.appendChild(metaTag);
+
+      // Base URL for the site - should be updated for production
+      const SITE_URL = window.location.origin;
+      
+      // Fetch all content that should be in the sitemap
+      const [calculators, blogPosts, customPages] = await Promise.all([
+        fetchCalculators(),
+        getAllPublishedPosts(),
+        fetchCustomPages(),
+      ]);
+      
+      // Start XML sitemap
+      let sitemapXml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      sitemapXml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+      
+      // Add static pages
+      const staticPages = ['', '/calculators', '/blog'];
+      staticPages.forEach(page => {
+        sitemapXml += getSitemapEntry(`${SITE_URL}${page}`);
+      });
+      
+      // Add calculator pages
+      calculators.forEach(calculator => {
+        sitemapXml += getSitemapEntry(`${SITE_URL}/calculator/${calculator.id}`);
+      });
+      
+      // Add blog posts
+      blogPosts.forEach(post => {
+        sitemapXml += getSitemapEntry(`${SITE_URL}/blog/${post.id}`);
+      });
+      
+      // Add custom pages
+      customPages.forEach(page => {
+        sitemapXml += getSitemapEntry(`${SITE_URL}/page/${page.slug}`);
+      });
+      
+      // Close XML
+      sitemapXml += '</urlset>';
+      
+      // Replace the document content with our generated sitemap
+      document.open('text/xml');
+      document.write(sitemapXml);
+      document.close();
+    } catch (error) {
+      console.error('Error generating sitemap:', error);
+      // Generate a basic valid XML in case of error
+      document.open('text/xml');
+      document.write('<?xml version="1.0" encoding="UTF-8"?>\n');
+      document.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n');
+      document.write(`  <url>\n    <loc>${window.location.origin}</loc>\n  </url>\n`);
+      document.write('</urlset>');
+      document.close();
+    }
+  };
   
-  // This component doesn't render anything
+  // No need to render anything - we're directly manipulating the document
   return null;
 };
 
