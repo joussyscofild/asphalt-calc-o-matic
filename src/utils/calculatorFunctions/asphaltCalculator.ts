@@ -52,22 +52,26 @@ export const calculateAsphalt = (formData: Record<string, any>): CalculatorResul
       {
         label: 'Volume',
         value: `${cubicFeet.toFixed(2)} cubic feet`,
-        description: 'Total volume of asphalt needed'
+        description: 'Total volume of asphalt needed',
+        highlight: false
       },
       {
         label: 'Weight',
         value: `${tons.toFixed(2)} tons`,
-        description: 'Total weight of asphalt needed'
+        description: 'Total weight of asphalt needed',
+        highlight: false
       },
       {
         label: 'Estimated Cost',
         value: `$${cost.toFixed(2)}`,
-        description: 'Estimated cost based on current price per ton'
+        description: 'Estimated cost based on current price per ton',
+        highlight: true
       },
       {
         label: 'Recommended Mix Type',
         value: mixType,
-        description: 'Suggested asphalt mix based on thickness'
+        description: 'Suggested asphalt mix based on thickness',
+        highlight: false
       }
     ],
     recommendations: [
