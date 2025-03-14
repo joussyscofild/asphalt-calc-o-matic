@@ -17,8 +17,8 @@ const Sitemap = () => {
       
       try {
         console.log("Starting sitemap generation");
-        // Base URL - use window.location.origin or fallback to a hardcoded URL
-        const SITE_URL = window.location.origin;
+        // Production URL must be hardcoded to ensure correct absolute URLs
+        const SITE_URL = "https://asphaltcalculator.co";
         console.log("Using site URL:", SITE_URL);
         
         let calculators = [];
@@ -84,23 +84,13 @@ const Sitemap = () => {
         
         console.log("Sitemap XML generated successfully");
         
-        // Set proper XML MIME type headers
-        document.documentElement.innerHTML = '';
-        document.documentElement.appendChild(document.createElement('head'));
-        const metaTag = document.createElement('meta');
-        metaTag.httpEquiv = 'Content-Type';
-        metaTag.content = 'application/xml; charset=utf-8';
-        document.head.appendChild(metaTag);
-        
-        // Write the XML directly to the document
-        document.documentElement.appendChild(document.createElement('body'));
-        document.body.textContent = sitemapXml;
-        
-        // Set proper Content-Type header through meta tag
-        const http = document.createElement('meta');
-        http.httpEquiv = 'Content-Type';
-        http.content = 'text/xml; charset=utf-8';
-        document.getElementsByTagName('head')[0].appendChild(http);
+        // For client-side rendering, serve as XML file
+        if (typeof document !== 'undefined') {
+          // Set the content type and write the XML content
+          document.open('text/xml');
+          document.write(sitemapXml);
+          document.close();
+        }
         
         hasGeneratedRef.current = true;
       } catch (error) {
@@ -110,23 +100,18 @@ const Sitemap = () => {
         const basicXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>${window.location.origin}</loc>
+    <loc>https://asphaltcalculator.co</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 </urlset>`;
         
-        // Set proper XML MIME type headers for fallback
-        document.documentElement.innerHTML = '';
-        document.documentElement.appendChild(document.createElement('head'));
-        const metaTag = document.createElement('meta');
-        metaTag.httpEquiv = 'Content-Type';
-        metaTag.content = 'application/xml; charset=utf-8';
-        document.head.appendChild(metaTag);
-        
-        // Write the fallback XML directly to the document
-        document.documentElement.appendChild(document.createElement('body'));
-        document.body.textContent = basicXml;
+        // Serve the fallback content
+        if (typeof document !== 'undefined') {
+          document.open('text/xml');
+          document.write(basicXml);
+          document.close();
+        }
       } finally {
         setIsGenerating(false);
       }
