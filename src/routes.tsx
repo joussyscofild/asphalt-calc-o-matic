@@ -4,15 +4,10 @@ import Index from './pages/Index';
 import Calculators from './pages/Calculators';
 import Calculator from './pages/Calculator';
 import NotFound from './pages/NotFound';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import BlogTagResults from './pages/BlogTagResults';
 import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
-import BlogPostEditPage from './pages/BlogPostEditPage';
 import Page from './pages/Page';
-import Sitemap from './pages/Sitemap';
 
 export const router = createBrowserRouter([
   {
@@ -28,22 +23,6 @@ export const router = createBrowserRouter([
     element: <Calculator />,
   },
   {
-    path: '/blog',
-    element: <Blog />,
-  },
-  {
-    path: '/blog/:id',
-    element: <BlogPost />,
-  },
-  {
-    path: '/blog/tag/:tag',
-    element: <BlogTagResults />,
-  },
-  {
-    path: '/blog/category/:category',
-    element: <BlogTagResults />,
-  },
-  {
     path: '/admin',
     element: <Admin />,
   },
@@ -52,16 +31,8 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>,
   },
   {
-    path: '/admin/blog/edit/:id?',
-    element: <ProtectedRoute><BlogPostEditPage /></ProtectedRoute>,
-  },
-  {
     path: '/page/:slug',
     element: <Page />,
-  },
-  {
-    path: '/sitemap.xml',
-    element: <Sitemap />,
   },
   {
     path: '*',

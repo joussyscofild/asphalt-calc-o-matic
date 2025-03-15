@@ -1,7 +1,7 @@
 
 # Deployment Guide
 
-This document outlines how to set up automatic deployment for your website.
+This document outlines how to set up automatic deployment for your website and integrate WordPress for blog management.
 
 ## Initial Setup
 
@@ -38,6 +38,81 @@ Before setting up automatic deployment, ensure your server environment is correc
 2. Connect to your server via SSH
 3. Navigate to your project directory
 4. Install dependencies and build the project
+
+## WordPress Integration Setup
+
+### 1. Create a Subdomain for WordPress
+
+1. Log in to your hosting control panel (CyberPanel, cPanel, etc.)
+2. Create a new subdomain: `blog.asphaltcalculator.co`
+3. Point it to a separate directory: `/home/asphaltcalculator.co/public_html/wordpress`
+
+### 2. Install WordPress on the Subdomain
+
+1. Download WordPress from wordpress.org
+2. Upload the files to your WordPress directory:
+   ```bash
+   cd /home/asphaltcalculator.co/public_html
+   wget https://wordpress.org/latest.tar.gz
+   tar -xzvf latest.tar.gz -C wordpress
+   ```
+3. Create a MySQL database for WordPress
+4. Navigate to `http://blog.asphaltcalculator.co` in your browser
+5. Follow the WordPress setup wizard
+6. Configure WordPress settings:
+   - Site Title: "Asphalt Calculator Blog"
+   - WordPress Address (URL): `http://blog.asphaltcalculator.co`
+   - Site Address (URL): `http://blog.asphaltcalculator.co`
+
+### 3. Configure Apache for Reverse Proxy
+
+The deploy.sh script automatically creates an .htaccess file with the necessary reverse proxy configuration. Make sure Apache has the following modules enabled:
+
+```bash
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+sudo a2enmod headers
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+```
+
+### 4. Verify Proxy Configuration in Your Virtual Host
+
+Add these lines to your virtual host configuration in Apache (if not using .htaccess):
+
+```apache
+<VirtualHost *:80>
+    ServerName asphaltcalculator.co
+    ServerAlias www.asphaltcalculator.co
+    
+    DocumentRoot /home/asphaltcalculator.co/public_html/asphalt-calc-o-matic/dist
+    
+    ProxyRequests Off
+    ProxyPreserveHost On
+    
+    ProxyPass /blog http://blog.asphaltcalculator.co
+    ProxyPassReverse /blog http://blog.asphaltcalculator.co
+    
+    # Other directives...
+</VirtualHost>
+```
+
+### 5. WordPress Theme and SEO Optimization
+
+1. Install the "Yoast SEO" plugin in WordPress for SEO optimization
+2. Choose a responsive theme that matches your main site design
+3. Consider these plugins for enhanced functionality:
+   - Advanced Custom Fields
+   - WP Rocket (caching)
+   - Wordfence (security)
+   - Contact Form 7 (if needed)
+   - W3 Total Cache (performance)
+
+### 6. Update WordPress Permalinks
+
+1. Go to WordPress Admin → Settings → Permalinks
+2. Select "Post name" (/%postname%/) for SEO-friendly URLs
+3. Save changes
 
 ## Automatic Deployment
 
@@ -78,35 +153,20 @@ chmod +x /home/asphaltcalculator.co/deploy.sh
 3. Check that the webhook is triggered and the deployment script runs
 4. Verify that your website is updated with the changes
 
-### 5. Sitemap Configuration
-
-The deployment script (`deploy.sh`) includes configuration for properly serving the sitemap:
-
-1. It creates a `.htaccess` file in the `dist` directory with proper MIME type configuration for `sitemap.xml`
-2. It also generates a static `sitemap.xml` file as a fallback
-3. The React application includes a dynamic `Sitemap` component at the `/sitemap.xml` route
-
-To verify the sitemap is working correctly:
-1. After deployment, visit `https://asphaltcalculator.co/sitemap.xml`
-2. The response should have the content type `application/xml`
-3. Use online XML validators to ensure the sitemap is properly formatted
-
-If the sitemap is not working:
-1. Check that the `.htaccess` file is present in the root directory
-2. Ensure Apache is configured to read `.htaccess` files (AllowOverride All)
-3. Verify that the `mod_rewrite` module is enabled in Apache
-4. Check the server logs for any errors related to the sitemap
-
-### 6. Troubleshooting
+### 5. Troubleshooting
 
 - Check webhook logs in GitHub or CyberPanel
 - Examine the deploy_log.txt file for errors
 - Ensure the script has proper permissions
 - Verify that Git has proper authentication set up on your server
-- If using Git, check if the repository is properly initialized and configured
+- Check Apache error logs for any proxy-related issues:
+  ```bash
+  sudo tail -f /var/log/apache2/error.log
+  ```
 
 ### Note About Security
 
 - Never expose your webhook without proper authentication
 - Consider IP restricting the webhook to only accept requests from GitHub's IP ranges
 - Use HTTPS for all webhook communications
+- Configure WordPress security plugins to prevent common attacks

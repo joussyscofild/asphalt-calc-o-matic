@@ -60,13 +60,13 @@ const Navbar = () => {
               <Calculator size={18} />
               <span>Calculators</span>
             </Link>
-            <Link 
-              to="/blog" 
-              className={`nav-link flex items-center space-x-1 ${isActive('/blog') ? 'text-foreground font-semibold' : ''}`}
+            <a 
+              href="/blog" 
+              className="nav-link flex items-center space-x-1"
             >
               <BookOpen size={18} />
               <span>Blog</span>
-            </Link>
+            </a>
             <ThemeToggle />
           </div>
 
@@ -105,15 +105,13 @@ const Navbar = () => {
               <Calculator size={18} />
               <span>Calculators</span>
             </Link>
-            <Link 
-              to="/blog" 
-              className={`flex items-center space-x-2 p-2 rounded-md ${
-                isActive('/blog') ? 'bg-muted font-medium' : ''
-              }`}
+            <a 
+              href="/blog" 
+              className="flex items-center space-x-2 p-2 rounded-md"
             >
               <BookOpen size={18} />
               <span>Blog</span>
-            </Link>
+            </a>
           </div>
         </div>
       </div>
