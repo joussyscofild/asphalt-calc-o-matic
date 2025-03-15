@@ -35,7 +35,7 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Ensure the blog URL is absolute and has the correct protocol
+  // Direct link to WordPress blog subdomain with explicit protocol
   const blogUrl = 'https://blog.asphaltcalculator.co';
 
   return (

@@ -28,7 +28,7 @@ if [ -f "package.json" ]; then
   npm run build || { echo "Build failed" >> $DEPLOY_LOG; exit 1; }
   
   # Create or update .htaccess file in the dist directory
-  echo "Setting up server configuration for proper routing and WordPress integration..." >> $DEPLOY_LOG
+  echo "Setting up server configuration for proper routing..." >> $DEPLOY_LOG
   
   cat > dist/.htaccess << 'EOF'
 # Handle XML files with proper MIME type
@@ -39,32 +39,16 @@ AddType application/xml .xml
   RewriteEngine On
   RewriteBase /
   
-  # Reverse proxy for /blog to WordPress subdomain
-  RewriteCond %{REQUEST_URI} ^/blog
-  RewriteRule ^blog(.*)$ http://blog.asphaltcalculator.co$1 [P,L]
-  
   # Don't rewrite files or directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
   
+  # Redirect /blog requests to the subdomain
+  RewriteRule ^blog/?(.*)$ https://blog.asphaltcalculator.co/$1 [R=301,L]
+  
   # Rewrite everything else to index.html to allow SPA routing
   RewriteRule ^ index.html [L]
-</IfModule>
-
-# Configure proxy settings for WordPress
-<IfModule mod_proxy.c>
-  ProxyRequests Off
-  ProxyPreserveHost On
-  
-  <Proxy *>
-    Require all granted
-  </Proxy>
-  
-  # Enable needed proxy modules
-  <IfModule !mod_proxy_http.c>
-    LoadModule proxy_http_module modules/mod_proxy_http.so
-  </IfModule>
 </IfModule>
 EOF
   
