@@ -35,6 +35,9 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
+  // Ensure the blog URL is absolute and has the correct protocol
+  const blogUrl = 'https://blog.asphaltcalculator.co';
+
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -61,7 +64,7 @@ const Navbar = () => {
               <span>Calculators</span>
             </Link>
             <a 
-              href="https://blog.asphaltcalculator.co" 
+              href={blogUrl}
               className="nav-link flex items-center space-x-1"
               target="_blank"
               rel="noopener noreferrer"
@@ -108,7 +111,7 @@ const Navbar = () => {
               <span>Calculators</span>
             </Link>
             <a 
-              href="https://blog.asphaltcalculator.co" 
+              href={blogUrl}
               className="flex items-center space-x-2 p-2 rounded-md"
               target="_blank"
               rel="noopener noreferrer"
