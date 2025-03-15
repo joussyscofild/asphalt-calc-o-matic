@@ -61,8 +61,10 @@ const Navbar = () => {
               <span>Calculators</span>
             </Link>
             <a 
-              href="/blog" 
+              href="https://blog.asphaltcalculator.co" 
               className="nav-link flex items-center space-x-1"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <BookOpen size={18} />
               <span>Blog</span>
@@ -106,8 +108,10 @@ const Navbar = () => {
               <span>Calculators</span>
             </Link>
             <a 
-              href="/blog" 
+              href="https://blog.asphaltcalculator.co" 
               className="flex items-center space-x-2 p-2 rounded-md"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <BookOpen size={18} />
               <span>Blog</span>
