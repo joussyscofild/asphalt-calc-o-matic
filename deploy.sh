@@ -44,8 +44,9 @@ AddType application/xml .xml
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
   
-  # Redirect /blog requests to the subdomain
-  RewriteRule ^blog/?(.*)$ https://blog.asphaltcalculator.co/$1 [R=301,L]
+  # Redirect /blog requests to the subdomain - Make sure this is handled first
+  # Adding NC flag for case-insensitive matching
+  RewriteRule ^blog(.*)$ https://blog.asphaltcalculator.co$1 [R=301,NC,L]
   
   # Rewrite everything else to index.html to allow SPA routing
   RewriteRule ^ index.html [L]

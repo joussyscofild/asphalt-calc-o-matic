@@ -19,6 +19,7 @@ const Sitemap = () => {
         console.log("Starting sitemap generation");
         // Production URL must be hardcoded to ensure correct absolute URLs
         const SITE_URL = "https://asphaltcalculator.co";
+        const BLOG_URL = "https://blog.asphaltcalculator.co";
         console.log("Using site URL:", SITE_URL);
         
         let calculators = [];
@@ -53,22 +54,25 @@ const Sitemap = () => {
         let sitemapXml = '<?xml version="1.0" encoding="UTF-8"?>\n';
         sitemapXml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n';
         
-        // Add static pages
-        const staticPages = ['', '/calculators', '/blog', '/about', '/contact'];
+        // Add static pages (note: /blog is removed as it should redirect to the subdomain)
+        const staticPages = ['', '/calculators', '/about', '/contact'];
         staticPages.forEach(page => {
           sitemapXml += getSitemapEntry(`${SITE_URL}${page}`, 'weekly', '1.0');
         });
+        
+        // Add blog homepage as a separate entity
+        sitemapXml += getSitemapEntry(BLOG_URL, 'weekly', '0.9');
         
         // Add calculator pages
         calculators.forEach(calculator => {
           sitemapXml += getSitemapEntry(`${SITE_URL}/calculator/${calculator.id}`, 'weekly', '0.8');
         });
         
-        // Add blog posts - only add if ID is a valid UUID
+        // Add blog posts - only add if ID is a valid UUID and use the blog subdomain
         blogPosts.forEach(post => {
           // Validate the post ID is a valid UUID before adding to sitemap
           if (isValidUUID(post.id)) {
-            sitemapXml += getSitemapEntry(`${SITE_URL}/blog/${post.id}`, 'weekly', '0.8');
+            sitemapXml += getSitemapEntry(`${BLOG_URL}/${post.id}`, 'weekly', '0.8');
           } else {
             console.warn(`Skipping blog post with invalid UUID: ${post.id}`);
           }

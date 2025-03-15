@@ -39,6 +39,11 @@ export const router = createBrowserRouter([
     path: '/sitemap.xml',
     element: <Sitemap />,
   },
+  // Catch-all for /blog to help with debugging
+  {
+    path: '/blog/*',
+    element: <NotFound />,
+  },
   {
     path: '*',
     element: <NotFound />,

@@ -35,8 +35,12 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Direct link to WordPress blog subdomain with explicit protocol
-  const blogUrl = 'https://blog.asphaltcalculator.co';
+  // Direct link to WordPress blog subdomain with explicit protocol 
+  // Using window.location.href for the blog link to force a full page navigation
+  const handleBlogClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = 'https://blog.asphaltcalculator.co';
+  };
 
   return (
     <nav 
@@ -64,10 +68,9 @@ const Navbar = () => {
               <span>Calculators</span>
             </Link>
             <a 
-              href={blogUrl}
+              href="https://blog.asphaltcalculator.co"
               className="nav-link flex items-center space-x-1"
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={handleBlogClick}
             >
               <BookOpen size={18} />
               <span>Blog</span>
@@ -111,10 +114,9 @@ const Navbar = () => {
               <span>Calculators</span>
             </Link>
             <a 
-              href={blogUrl}
+              href="https://blog.asphaltcalculator.co"
               className="flex items-center space-x-2 p-2 rounded-md"
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={handleBlogClick}
             >
               <BookOpen size={18} />
               <span>Blog</span>
