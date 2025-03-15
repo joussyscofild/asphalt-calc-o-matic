@@ -8,6 +8,7 @@ import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import Page from './pages/Page';
+import Sitemap from './pages/Sitemap';
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
     element: <Calculator />,
   },
   {
+    path: '/page/:slug',
+    element: <Page />,
+  },
+  {
     path: '/admin',
     element: <Admin />,
   },
@@ -31,8 +36,8 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>,
   },
   {
-    path: '/page/:slug',
-    element: <Page />,
+    path: '/sitemap.xml',
+    element: <Sitemap />,
   },
   {
     path: '*',
