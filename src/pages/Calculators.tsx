@@ -73,8 +73,8 @@ const Calculators = () => {
         <div className="container-custom">
           {/* Header */}
           <div className="mb-10 md:mb-16 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-asphalt">Construction Calculators</h1>
-            <p className="text-concrete-dark max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-asphalt dark:text-white">Construction Calculators</h1>
+            <p className="text-concrete-dark max-w-2xl mx-auto dark:text-gray-300">
               Professional-grade calculators designed for precision in asphalt, concrete, 
               and general construction projects. Save time and reduce material waste.
             </p>
@@ -97,7 +97,7 @@ const Calculators = () => {
               </form>
               
               <div className="flex items-center">
-                <span className="text-concrete mr-3 flex items-center">
+                <span className="text-concrete mr-3 flex items-center dark:text-gray-300">
                   <Filter size={18} className="mr-1" />
                   Filter:
                 </span>
@@ -108,8 +108,8 @@ const Calculators = () => {
                       onClick={() => handleCategoryClick(category.id)}
                       className={`px-3 py-1 text-sm rounded-full transition-colors ${
                         selectedCategory === category.id
-                          ? 'bg-asphalt text-white'
-                          : 'bg-gray-100 text-concrete-dark hover:bg-gray-200'
+                          ? 'bg-asphalt text-white dark:bg-safety dark:text-gray-900'
+                          : 'bg-gray-100 text-concrete-dark hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                       }`}
                     >
                       {category.label}
@@ -124,7 +124,7 @@ const Calculators = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="h-64 rounded-lg bg-white border border-gray-200 animate-pulse"></div>
+                <div key={index} className="h-64 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 animate-pulse"></div>
               ))}
             </div>
           ) : filteredCalculators.length > 0 ? (
@@ -143,9 +143,9 @@ const Calculators = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <h3 className="text-xl font-semibold text-asphalt mb-2">No calculators found</h3>
-              <p className="text-concrete-dark mb-4">
+            <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <h3 className="text-xl font-semibold text-asphalt dark:text-white mb-2">No calculators found</h3>
+              <p className="text-concrete-dark dark:text-gray-300 mb-4">
                 Try adjusting your search or filter criteria.
               </p>
               <button 
@@ -153,7 +153,7 @@ const Calculators = () => {
                   setSearchQuery('');
                   setSelectedCategory(null);
                 }}
-                className="text-safety-dark hover:text-safety hover:underline"
+                className="text-safety-dark hover:text-safety hover:underline dark:text-safety-light"
               >
                 Clear all filters
               </button>

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { fetchCalculators } from '@/utils/calculatorService';
 import { Calculator as CalculatorType, CalculatorField } from '@/utils/calculatorTypes';
 import { useToast } from '@/hooks/use-toast';
@@ -84,11 +84,13 @@ const Calculator = () => {
             <Link to="/" className="text-white dark:text-gray-200 hover:text-safety-light dark:hover:text-safety-light">Home</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
+        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link to="/calculators" className="text-white dark:text-gray-200 hover:text-safety-light dark:hover:text-safety-light">Calculators</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
+        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink className="text-white dark:text-gray-200">{calculator.title}</BreadcrumbLink>
         </BreadcrumbItem>

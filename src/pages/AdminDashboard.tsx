@@ -6,25 +6,15 @@ import { useAdminDashboard } from '@/hooks/use-admin-dashboard';
 
 const AdminDashboard = () => {
   const { 
-    handleSaveBlogPost, 
-    handleCancelBlogPost, 
-    handleDeleteBlogPost,
     handleLogout,
-    refreshTrigger,
-    posts,
-    isLoading
+    refreshTrigger
   } = useAdminDashboard();
   
   return (
     <div className="container-custom py-8">
       <DashboardHeader handleLogout={handleLogout} />
       <DashboardTabs 
-        handleSaveBlogPost={handleSaveBlogPost} 
-        handleCancelBlogPost={handleCancelBlogPost}
-        handleDeleteBlogPost={handleDeleteBlogPost}
         refreshTrigger={refreshTrigger}
-        posts={posts}
-        isLoading={isLoading}
       />
     </div>
   );
