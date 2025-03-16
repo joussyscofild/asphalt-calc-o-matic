@@ -1,203 +1,14 @@
 
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { BlogPost, blogPosts, addBlogPostToSupabase, deleteBlogPostFromSupabase, fetchBlogPosts } from '@/utils/blogPosts';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useAdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   
-  // Load posts from Supabase on component mount
-  useEffect(() => {
-    const loadPosts = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch all posts, not just published ones
-        const { data, error } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .order('created_at', { ascending: false });
-          
-        if (error) {
-          throw error;
-        }
-        
-        // Transform Supabase data to BlogPost format
-        const loadedPosts: BlogPost[] = data.map((post: any) => ({
-          id: post.id,
-          title: post.title,
-          excerpt: post.excerpt,
-          content: post.content,
-          imageUrl: post.image_url,
-          author: post.author,
-          authorAvatar: post.author_avatar,
-          date: post.date,
-          readTime: post.read_time,
-          category: post.category,
-          tags: post.tags || [],
-          featured: post.featured,
-          status: post.status || 'published',
-        }));
-        
-        setPosts(loadedPosts);
-        console.log("Loaded", loadedPosts.length, "posts from Supabase in admin dashboard");
-        console.log("Posts statuses:", loadedPosts.map(p => p.status).join(', '));
-      } catch (error) {
-        console.error("Error loading posts:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadPosts();
-  }, [refreshTrigger]);
-  
-  // Helper function to generate a UUID
-  const generateUUID = () => {
-    return crypto.randomUUID ? crypto.randomUUID() : 
-      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-  };
-  
-  // Check if a string is a valid UUID
-  const isValidUUID = (id: string) => {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(id);
-  };
-  
-  // Handler for saving blog posts
-  const handleSaveBlogPost = async (post: BlogPost) => {
-    // Ensure post has a valid status
-    if (!post.status) {
-      post.status = 'published';
-    }
-    
-    console.log("Admin dashboard saving post:", post.id, "Content length:", post.content.length);
-    console.log("Post status:", post.status);
-    
-    try {
-      // Ensure we have a valid UUID for the post ID
-      const postId = isValidUUID(post.id) ? post.id : generateUUID();
-      
-      // Save post to Supabase
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .upsert({
-          id: postId,
-          title: post.title,
-          excerpt: post.excerpt,
-          content: post.content,
-          image_url: post.imageUrl,
-          author: post.author,
-          author_avatar: post.authorAvatar,
-          date: post.date,
-          read_time: post.readTime,
-          category: post.category,
-          tags: post.tags,
-          featured: post.featured,
-          status: post.status,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'id'
-        });
-      
-      if (error) {
-        console.error("Error saving blog post to Supabase:", error);
-        toast({
-          title: "Error Saving Post",
-          description: "There was an error saving your blog post. Please try again.",
-          variant: "destructive"
-        });
-        throw error;
-      }
-      
-      // Update post ID if it was generated
-      if (post.id !== postId) {
-        post.id = postId;
-      }
-      
-      // Force a refresh to show updated posts
-      setRefreshTrigger(prev => prev + 1);
-      
-      const statusMessage = post.status === 'published' 
-        ? "Published" 
-        : "Saved as draft";
-        
-      toast({
-        title: `Blog Post ${statusMessage}`,
-        description: `Successfully ${statusMessage.toLowerCase()} "${post.title}"`,
-      });
-    } catch (error) {
-      console.error("Error saving blog post:", error);
-      toast({
-        title: "Error Saving Post",
-        description: "There was an error saving your blog post. Please try again.",
-        variant: "destructive"
-      });
-      throw error;
-    }
-  };
-  
-  // Handler for canceling blog post edits
-  const handleCancelBlogPost = () => {
-    toast({
-      title: "Editing Canceled",
-      description: "Changes to the blog post have been discarded.",
-    });
-    navigate('/admin/dashboard#blog');
-  };
-
-  // Handler for deleting a blog post
-  const handleDeleteBlogPost = async (postId: string) => {
-    try {
-      // Find the post title for the toast notification
-      const postToDelete = posts.find(p => p.id === postId);
-      const postTitle = postToDelete?.title || "Post";
-      
-      // Delete from Supabase
-      const { error } = await supabase
-        .from('blog_posts')
-        .delete()
-        .eq('id', postId);
-      
-      if (error) {
-        console.error("Error deleting blog post from Supabase:", error);
-        toast({
-          title: "Error Deleting Post",
-          description: "There was an error deleting the blog post. Please try again.",
-          variant: "destructive"
-        });
-        throw error;
-      }
-      
-      // Update local state by removing the deleted post
-      setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
-      
-      toast({
-        title: "Blog Post Deleted",
-        description: `"${postTitle}" has been deleted.`,
-      });
-      
-      // Force a refresh
-      setRefreshTrigger(prev => prev + 1);
-    } catch (error) {
-      console.error("Error deleting blog post:", error);
-      toast({
-        title: "Error Deleting Post",
-        description: "There was an error deleting the blog post. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
   // Handle admin logout
   const handleLogout = () => {
     localStorage.removeItem('adminAuthenticated');
@@ -209,12 +20,7 @@ export const useAdminDashboard = () => {
   };
   
   return {
-    handleSaveBlogPost,
-    handleCancelBlogPost,
-    handleDeleteBlogPost,
     handleLogout,
     refreshTrigger,
-    posts,
-    isLoading
   };
 };

@@ -13,9 +13,7 @@ const AdminDashboard = () => {
   return (
     <div className="container-custom py-8">
       <DashboardHeader handleLogout={handleLogout} />
-      <DashboardTabs 
-        refreshTrigger={refreshTrigger}
-      />
+      <DashboardTabs refreshTrigger={refreshTrigger} />
     </div>
   );
 };

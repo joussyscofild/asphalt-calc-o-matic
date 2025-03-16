@@ -2,32 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import SiteCustomizer from "@/components/admin/SiteCustomizer";
 import PagesManager from "@/components/admin/pages-manager";
 import CalculatorManager from "@/components/admin/CalculatorManager";
 import FooterManager from "@/components/admin/footer-manager";
 import { FileText, Calculator as CalculatorIcon, LayoutDashboard, BookOpen, Link as LinkIcon } from "lucide-react";
-import { BlogPost } from '@/utils/blogPosts';
 import DashboardOverview from './DashboardOverview';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface DashboardTabsProps {
-  handleSaveBlogPost: (post: BlogPost) => void;
-  handleCancelBlogPost: () => void;
-  handleDeleteBlogPost?: (postId: string) => void;
   refreshTrigger?: number;
-  posts?: BlogPost[];
-  isLoading?: boolean;
 }
 
 const DashboardTabs: React.FC<DashboardTabsProps> = ({
-  handleSaveBlogPost,
-  handleCancelBlogPost,
-  handleDeleteBlogPost,
-  refreshTrigger,
-  posts = [],
-  isLoading = false
+  refreshTrigger
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,7 +25,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
   // Parse tab from URL hash if present
   useEffect(() => {
     const hash = location.hash.replace('#', '');
-    if (hash && ['dashboard', 'blog', 'calculators', 'pages', 'footer', 'appearance'].includes(hash)) {
+    if (hash && ['dashboard', 'calculators', 'pages', 'footer', 'appearance'].includes(hash)) {
       setActiveTab(hash);
       // Force refresh when tab changes from URL
       setTabKey(Date.now());
@@ -60,14 +48,10 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-6 mb-8">
+      <TabsList className="grid w-full grid-cols-5 mb-8">
         <TabsTrigger value="dashboard" className="flex items-center gap-1">
           <LayoutDashboard size={14} />
           Dashboard
-        </TabsTrigger>
-        <TabsTrigger value="blog" className="flex items-center gap-1">
-          <BookOpen size={14} />
-          Blog Posts
         </TabsTrigger>
         <TabsTrigger value="calculators" className="flex items-center gap-1">
           <CalculatorIcon size={14} />
@@ -97,27 +81,6 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
           </CardHeader>
           <CardContent>
             <DashboardOverview key={`dashboard-overview-${tabKey}`} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="blog" key={`blog-content-${tabKey}`}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Blog Management</CardTitle>
-            <CardDescription>
-              Create, edit and manage your blog posts.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <BlogPostEditor 
-              onSave={handleSaveBlogPost}
-              onCancel={handleCancelBlogPost}
-              onDelete={handleDeleteBlogPost}
-              key={`blog-editor-${tabKey}`}
-              posts={posts}
-              isLoading={isLoading}
-            />
           </CardContent>
         </Card>
       </TabsContent>
