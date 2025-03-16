@@ -53,20 +53,21 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Updated color palette for a modern calculator site
 				asphalt: {
-					DEFAULT: '#1A1A1A',
-					light: '#333333',
-					dark: '#121212',
+					DEFAULT: '#2D3748', // Deeper blue-gray for main elements
+					light: '#4A5568',   // Lighter blue-gray for secondary elements
+					dark: '#1A202C',    // Darker blue-gray for emphasis
 				},
 				concrete: {
-					DEFAULT: '#8E9196',
-					light: '#B8BDC5',
-					dark: '#5F646C',
+					DEFAULT: '#718096', // Modern neutral mid-gray
+					light: '#A0AEC0',   // Lighter gray for backgrounds
+					dark: '#4A5568',    // Darker gray for text
 				},
 				safety: {
-					DEFAULT: '#F5DF4D',
-					light: '#F8E77D',
-					dark: '#E6C400',
+					DEFAULT: '#4299E1', // Vibrant blue for accents/highlights
+					light: '#63B3ED',   // Lighter blue for hover states
+					dark: '#3182CE',    // Darker blue for active states
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

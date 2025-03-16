@@ -13,33 +13,33 @@ const CalculatorSidebar: React.FC<CalculatorSidebarProps> = ({
 }) => {
   return (
     <div className="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-20 bg-white dark:bg-gray-800">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Calculator Information</h2>
+      <h2 className="text-lg font-semibold mb-4 text-asphalt dark:text-white">Calculator Information</h2>
       
       {calculator.formula && (
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Formula Used:</h3>
-          <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded text-gray-700 dark:text-gray-300 font-mono text-sm">
+          <h3 className="text-sm font-medium text-concrete-dark dark:text-gray-300 mb-1">Formula Used:</h3>
+          <div className="bg-secondary/50 dark:bg-gray-700 p-3 rounded text-asphalt dark:text-gray-300 font-mono text-sm">
             {calculator.formula}
           </div>
         </div>
       )}
       
       <div className="mb-4">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estimated Time:</h3>
-        <p className="text-gray-700 dark:text-gray-300">{calculator.timeEstimate}</p>
+        <h3 className="text-sm font-medium text-concrete-dark dark:text-gray-300 mb-1">Estimated Time:</h3>
+        <p className="text-concrete-dark dark:text-gray-300">{calculator.timeEstimate}</p>
       </div>
       
       {calculator.relatedCalculators && calculator.relatedCalculators.length > 0 && (
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Related Calculators:</h3>
+          <h3 className="text-sm font-medium text-concrete-dark dark:text-gray-300 mb-1">Related Calculators:</h3>
           <ul className="space-y-1">
             {calculator.relatedCalculators.map(calcId => (
               <li key={calcId}>
                 <Link 
                   to={`/calculator/${calcId}`} 
-                  className="text-gray-700 dark:text-gray-300 hover:text-safety-dark dark:hover:text-safety-light text-sm flex items-center"
+                  className="text-concrete-dark dark:text-gray-300 hover:text-safety dark:hover:text-safety-light text-sm flex items-center"
                 >
-                  <ArrowLeft size={12} className="mr-1" />
+                  <ArrowLeft size={12} className="mr-1 text-safety" />
                   {calcId}
                 </Link>
               </li>

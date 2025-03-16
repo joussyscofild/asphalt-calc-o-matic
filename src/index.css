@@ -7,91 +7,65 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --accent: 214 32% 91%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
     --radius: 0.5rem;
-    
-    /* Construction theme base colors */
-    --asphalt: 0 0% 10%;
-    --asphalt-light: 0 0% 20%;
-    --asphalt-dark: 0 0% 7%;
-    
-    --concrete: 220 5% 57%;
-    --concrete-light: 220 10% 75%;
-    --concrete-dark: 220 5% 40%;
-    
-    --safety: 52 91% 63%;
-    --safety-light: 52 80% 73%;
-    --safety-dark: 50 100% 45%;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 217 19% 27%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 217 19% 27%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 217 19% 27%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    
-    /* Construction theme dark mode colors - improved contrast */
-    --asphalt: 0 0% 98%; /* Increased to 98% for much better contrast */
-    --asphalt-light: 0 0% 98%;
-    --asphalt-dark: 0 0% 90%;
-    
-    --concrete: 220 5% 85%; /* Increased to 85% for better visibility */
-    --concrete-light: 220 10% 90%;
-    --concrete-dark: 220 5% 80%; /* Increased to 80% for much better contrast */
-    
-    --safety: 52 91% 67%;
-    --safety-light: 52 80% 80%; /* Increased to 80% for better visibility */
-    --safety-dark: 50 100% 55%; /* Increased to 55% for better visibility */
+    --border: 217 19% 27%;
+    --input: 217 19% 27%;
+    --ring: 224 76% 48%;
   }
 }
 
@@ -131,15 +105,15 @@
   }
   
   .btn-primary {
-    @apply bg-asphalt hover:bg-asphalt-light text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white;
+    @apply bg-safety hover:bg-safety-dark text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out;
   }
   
   .btn-secondary {
-    @apply bg-safety hover:bg-safety-dark text-asphalt font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out dark:text-gray-900;
+    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out;
   }
   
   .btn-outline {
-    @apply border border-asphalt text-asphalt hover:bg-asphalt hover:text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out dark:border-white dark:text-white dark:hover:bg-white/10;
+    @apply border border-safety text-safety hover:bg-safety/10 font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out;
   }
   
   .input-field {
@@ -147,7 +121,7 @@
   }
   
   .calculator-card {
-    @apply glass-card rounded-xl p-6 transition-all duration-300 hover:shadow-lg;
+    @apply glass-card rounded-xl p-6 transition-all duration-300 hover:shadow-lg hover:border-safety/30;
   }
   
   .section-heading {
@@ -164,7 +138,7 @@
   }
   
   .dark .calculator-card {
-    @apply bg-gray-900/90 border-gray-800 hover:bg-gray-800/90;
+    @apply bg-gray-900/90 border-gray-800 hover:bg-gray-800/90 hover:border-safety/30;
   }
   
   .dark .section-heading {
@@ -175,7 +149,7 @@
     @apply text-gray-300;
   }
   
-  /* New dark mode specific text enhancements */
+  /* Dark mode specific text enhancements */
   .dark .text-concrete {
     @apply text-gray-300;
   }

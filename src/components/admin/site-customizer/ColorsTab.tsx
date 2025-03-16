@@ -67,31 +67,31 @@ const ColorInput: React.FC<ColorInputProps> = ({ id, name, value, label, onChang
   </div>
 );
 
-// Brand color palettes
+// Updated modern calculator-focused color palettes
 const colorPresets = [
   {
-    name: "Construction",
-    primary: "#2563eb",
-    secondary: "#f97316",
-    accent: "#10b981",
+    name: "Modern Calculator",
+    primary: "#4299E1",
+    secondary: "#A0AEC0",
+    accent: "#805AD5",
   },
   {
     name: "Professional",
-    primary: "#1e40af",
-    secondary: "#475569",
-    accent: "#0ea5e9",
+    primary: "#3182CE",
+    secondary: "#718096",
+    accent: "#3182CE",
   },
   {
-    name: "Modern",
-    primary: "#4f46e5",
-    secondary: "#0f172a",
-    accent: "#06b6d4",
+    name: "Tech-Focused",
+    primary: "#3B82F6",
+    secondary: "#1E293B",
+    accent: "#6366F1",
   },
   {
-    name: "Earthy",
-    primary: "#78350f",
-    secondary: "#a16207",
-    accent: "#65a30d",
+    name: "Soft UI",
+    primary: "#60A5FA",
+    secondary: "#94A3B8",
+    accent: "#8B5CF6",
   }
 ];
 
@@ -124,15 +124,15 @@ const ColorsTab: React.FC<ColorsTabProps> = ({ settings, handleChange }) => {
   
   return (
     <>
-      <div className="mb-8 p-4 border border-amber-200 bg-amber-50 rounded-md">
+      <div className="mb-8 p-4 border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800 rounded-md">
         <div className="flex items-start space-x-3">
-          <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+          <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
           <div>
-            <h3 className="font-medium text-amber-800">Brand Identity Guideline</h3>
-            <p className="text-sm text-amber-700 mt-1">
-              Choose colors that align with your brand identity. For construction sites, we recommend 
-              using blues for primary, oranges for secondary, and greens for accent colors. 
-              Use the presets below for professionally selected combinations.
+            <h3 className="font-medium text-blue-800 dark:text-blue-300">Calculator Site Color Guidelines</h3>
+            <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
+              For calculator websites, we recommend using blues and purples for primary colors to convey trust and precision.
+              Use neutral grays for secondary colors and vibrant accents for interactive elements.
+              Choose from our presets below for optimized combinations.
             </p>
           </div>
         </div>
@@ -145,7 +145,7 @@ const ColorsTab: React.FC<ColorsTabProps> = ({ settings, handleChange }) => {
             <Button 
               key={index} 
               variant="outline" 
-              className="flex flex-col items-center p-3 h-auto"
+              className="flex flex-col items-center p-3 h-auto border-gray-200 hover:border-safety hover:bg-gray-50"
               onClick={() => applyPreset(preset)}
             >
               <span className="mb-2">{preset.name}</span>
@@ -166,7 +166,7 @@ const ColorsTab: React.FC<ColorsTabProps> = ({ settings, handleChange }) => {
           value={settings.primaryColor}
           label="Primary Color"
           onChange={handleChange}
-          info="Used for main buttons, links and important UI elements. Blues work well for construction sites."
+          info="Used for main buttons, links and important UI elements. Blues work well for calculator sites."
         />
         
         <ColorInput 
@@ -175,7 +175,7 @@ const ColorsTab: React.FC<ColorsTabProps> = ({ settings, handleChange }) => {
           value={settings.secondaryColor}
           label="Secondary Color"
           onChange={handleChange}
-          info="Used for secondary elements, highlights and call-to-actions. Orange tones provide good contrast to blue."
+          info="Used for secondary elements, backgrounds, and supporting UI. Neutral grays work well."
         />
         
         <ColorInput 
@@ -184,7 +184,7 @@ const ColorsTab: React.FC<ColorsTabProps> = ({ settings, handleChange }) => {
           value={settings.accentColor}
           label="Accent Color"
           onChange={handleChange}
-          info="Used sparingly for highlighting important items. Green suggests eco-friendliness in construction."
+          info="Used sparingly for highlighting important items, calls-to-action, and results."
         />
       </div>
       
@@ -192,19 +192,19 @@ const ColorsTab: React.FC<ColorsTabProps> = ({ settings, handleChange }) => {
         <h3 className="text-lg font-medium mb-4">Color Preview</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div 
-            className="h-24 rounded-md flex items-center justify-center text-white font-medium"
+            className="h-24 rounded-md flex items-center justify-center text-white font-medium shadow-sm"
             style={{ backgroundColor: settings.primaryColor }}
           >
             Primary Color
           </div>
           <div 
-            className="h-24 rounded-md flex items-center justify-center text-white font-medium"
+            className="h-24 rounded-md flex items-center justify-center text-white font-medium shadow-sm"
             style={{ backgroundColor: settings.secondaryColor }}
           >
             Secondary Color
           </div>
           <div 
-            className="h-24 rounded-md flex items-center justify-center text-white font-medium"
+            className="h-24 rounded-md flex items-center justify-center text-white font-medium shadow-sm"
             style={{ backgroundColor: settings.accentColor }}
           >
             Accent Color
@@ -214,30 +214,45 @@ const ColorsTab: React.FC<ColorsTabProps> = ({ settings, handleChange }) => {
       
       <div className="mt-8">
         <h3 className="text-lg font-medium mb-4">UI Elements Preview</h3>
-        <div className="p-6 border rounded-lg bg-gray-50">
+        <div className="p-6 border rounded-lg bg-white dark:bg-gray-800 shadow-sm">
           <div className="mb-6">
-            <button className="py-2 px-4 rounded-md text-white mr-3" style={{ backgroundColor: settings.primaryColor }}>
+            <button className="py-2 px-4 rounded-md text-white mr-3 shadow-sm" style={{ backgroundColor: settings.primaryColor }}>
               Primary Button
             </button>
-            <button className="py-2 px-4 rounded-md text-white" style={{ backgroundColor: settings.secondaryColor }}>
+            <button className="py-2 px-4 rounded-md text-white shadow-sm" style={{ backgroundColor: settings.secondaryColor }}>
               Secondary Button
             </button>
           </div>
           <div className="mb-6">
-            <div className="rounded-md p-4" style={{ backgroundColor: `${settings.primaryColor}20` }}>
+            <div className="rounded-md p-4 shadow-sm" style={{ backgroundColor: `${settings.primaryColor}10` }}>
               <div className="text-lg font-bold mb-2" style={{ color: settings.primaryColor }}>
-                Information Alert
+                Calculator Result
               </div>
-              <p>This is how information alerts will look with your chosen primary color.</p>
-              <a href="#" className="font-medium" style={{ color: settings.primaryColor }}>Learn more</a>
+              <p>This shows how calculation results might appear with your chosen primary color.</p>
+              <div className="mt-2 p-2 rounded bg-white dark:bg-gray-700 border" style={{ borderColor: `${settings.primaryColor}50` }}>
+                <span className="font-mono font-bold" style={{ color: settings.accentColor }}>42.5 sq ft</span>
+              </div>
             </div>
           </div>
           <div>
-            <div className="p-4 rounded-md" style={{ border: `2px solid ${settings.accentColor}` }}>
+            <div className="p-4 rounded-md shadow-sm" style={{ border: `2px solid ${settings.accentColor}` }}>
               <div className="text-lg mb-2 font-bold" style={{ color: settings.accentColor }}>
-                Feature Box 
+                Calculator Input
               </div>
-              <p>This shows how feature boxes and bordered elements will appear with your accent color.</p>
+              <p>This demonstrates how calculator inputs and form elements will appear with your accent color.</p>
+              <div className="mt-3 flex items-end gap-2">
+                <div className="flex-1">
+                  <label className="block mb-1 text-sm font-medium">Length (ft)</label>
+                  <input type="text" className="w-full p-2 border rounded" style={{ borderColor: settings.secondaryColor }} value="10" readOnly />
+                </div>
+                <div className="flex-1">
+                  <label className="block mb-1 text-sm font-medium">Width (ft)</label>
+                  <input type="text" className="w-full p-2 border rounded" style={{ borderColor: settings.secondaryColor }} value="12" readOnly />
+                </div>
+                <button className="py-2 px-4 rounded-md text-white" style={{ backgroundColor: settings.accentColor }}>
+                  Calculate
+                </button>
+              </div>
             </div>
           </div>
         </div>

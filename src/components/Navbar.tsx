@@ -62,9 +62,9 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link 
               to="/calculators" 
-              className={`nav-link flex items-center space-x-1 ${isActive('/calculators') || isActive('/calculator') ? 'text-foreground font-semibold' : ''}`}
+              className={`nav-link flex items-center space-x-1 ${isActive('/calculators') || isActive('/calculator') ? 'text-safety font-semibold' : ''}`}
             >
-              <Calculator size={18} />
+              <Calculator size={18} className={isActive('/calculators') || isActive('/calculator') ? 'text-safety' : ''} />
               <span>Calculators</span>
             </Link>
             <a 
@@ -107,10 +107,10 @@ const Navbar = () => {
             <Link 
               to="/calculators" 
               className={`flex items-center space-x-2 p-2 rounded-md ${
-                isActive('/calculators') || isActive('/calculator') ? 'bg-muted font-medium' : ''
+                isActive('/calculators') || isActive('/calculator') ? 'bg-secondary text-safety font-medium' : ''
               }`}
             >
-              <Calculator size={18} />
+              <Calculator size={18} className={isActive('/calculators') || isActive('/calculator') ? 'text-safety' : ''} />
               <span>Calculators</span>
             </Link>
             <a 
