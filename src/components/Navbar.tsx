@@ -32,7 +32,7 @@ const Navbar = () => {
   }, [location]);
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   // Direct link to WordPress blog subdomain with explicit protocol 
@@ -45,7 +45,7 @@ const Navbar = () => {
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/90 dark:bg-background/90 backdrop-blur-sm shadow-sm' : 'bg-transparent dark:bg-transparent'
+        isScrolled ? 'bg-white/90 dark:bg-background/90 backdrop-blur-sm shadow-sm' : 'bg-white dark:bg-background'
       }`}
     >
       <div className="container-custom">
@@ -62,7 +62,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link 
               to="/calculators" 
-              className={`nav-link flex items-center space-x-1 ${isActive('/calculators') ? 'text-foreground font-semibold' : ''}`}
+              className={`nav-link flex items-center space-x-1 ${isActive('/calculators') || isActive('/calculator') ? 'text-foreground font-semibold' : ''}`}
             >
               <Calculator size={18} />
               <span>Calculators</span>
@@ -107,7 +107,7 @@ const Navbar = () => {
             <Link 
               to="/calculators" 
               className={`flex items-center space-x-2 p-2 rounded-md ${
-                isActive('/calculators') ? 'bg-muted font-medium' : ''
+                isActive('/calculators') || isActive('/calculator') ? 'bg-muted font-medium' : ''
               }`}
             >
               <Calculator size={18} />

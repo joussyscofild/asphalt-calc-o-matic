@@ -10,7 +10,8 @@ import CalculatorForm from '@/components/calculator/CalculatorForm';
 import CalculatorSidebar from '@/components/calculator/CalculatorSidebar';
 import CalculatorLoader from '@/components/calculator/CalculatorLoader';
 import CalculatorNotFound from '@/components/calculator/CalculatorNotFound';
-import { supabase } from '@/integrations/supabase/client';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const Calculator = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -63,11 +64,25 @@ const Calculator = () => {
   }, [id, toast]);
 
   if (isLoading) {
-    return <CalculatorLoader />;
+    return (
+      <>
+        <Navbar />
+        <div className="mt-16">
+          <CalculatorLoader />
+        </div>
+      </>
+    );
   }
 
   if (!calculator) {
-    return <CalculatorNotFound />;
+    return (
+      <>
+        <Navbar />
+        <div className="mt-16">
+          <CalculatorNotFound />
+        </div>
+      </>
+    );
   }
 
   // Default fields for calculators that don't have them defined yet
@@ -77,53 +92,57 @@ const Calculator = () => {
     : getDefaultFields(id) as CalculatorField[];
 
   return (
-    <div className="container-custom py-12">
-      <Breadcrumb className="mb-8">
-        <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to="/" className="text-white dark:text-gray-200 hover:text-safety-light dark:hover:text-safety-light">Home</Link>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to="/calculators" className="text-white dark:text-gray-200 hover:text-safety-light dark:hover:text-safety-light">Calculators</Link>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink className="text-white dark:text-gray-200">{calculator.title}</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
+    <>
+      <Navbar />
+      <div className="container-custom py-12 mt-16">
+        <Breadcrumb className="mb-8">
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="text-gray-600 dark:text-gray-400 hover:text-safety-dark dark:hover:text-safety-light">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/calculators" className="text-gray-600 dark:text-gray-400 hover:text-safety-dark dark:hover:text-safety-light">Calculators</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink className="text-gray-800 dark:text-gray-200 font-medium">{calculator.title}</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-asphalt/10 dark:bg-asphalt/20 text-asphalt dark:text-safety-light mr-4">
-                {React.createElement(calculator.icon, { size: 24 })}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-asphalt/10 dark:bg-asphalt/20 text-asphalt dark:text-safety-light mr-4">
+                  {React.createElement(calculator.icon, { size: 24 })}
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-asphalt dark:text-white">{calculator.title}</h1>
+                  <p className="text-concrete-dark dark:text-gray-300">{calculator.category}</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-asphalt dark:text-white">{calculator.title}</h1>
-                <p className="text-concrete-dark dark:text-gray-300">{calculator.category}</p>
-              </div>
+
+              <p className="mb-8 text-concrete-dark dark:text-gray-300">{calculator.longDescription || calculator.description}</p>
+
+              <CalculatorForm
+                calculatorId={id}
+                fields={calculatorFields}
+                initialFormData={formData}
+              />
             </div>
+          </div>
 
-            <p className="mb-8 text-concrete-dark dark:text-gray-300">{calculator.longDescription || calculator.description}</p>
-
-            <CalculatorForm
-              calculatorId={id}
-              fields={calculatorFields}
-              initialFormData={formData}
-            />
+          <div className="lg:col-span-1">
+            <CalculatorSidebar calculator={calculator} />
           </div>
         </div>
-
-        <div className="lg:col-span-1">
-          <CalculatorSidebar calculator={calculator} />
-        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
