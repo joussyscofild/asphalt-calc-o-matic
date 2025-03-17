@@ -77,8 +77,13 @@ export const fetchWordPressPosts = async (count: number = 3): Promise<BlogPost[]
         imageUrl = post._embedded['wp:featuredmedia'][0].source_url;
       }
       
-      // Create date object from WordPress date string
+      // Create date object from WordPress date string and format it
       const date = new Date(post.date);
+      const formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
       
       // Clean excerpt by removing HTML tags
       const cleanExcerpt = post.excerpt.rendered
@@ -92,7 +97,7 @@ export const fetchWordPressPosts = async (count: number = 3): Promise<BlogPost[]
         excerpt: cleanExcerpt,
         content: post.content.rendered,
         slug: post.slug,
-        date: date,
+        date: formattedDate, // Use the formatted date string instead of Date object
         tags: tags,
         imageUrl: imageUrl,
         author: 'Asphalt Calculator Team', // Default author when not available

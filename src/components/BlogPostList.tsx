@@ -50,7 +50,7 @@ const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading
                 title={post.title}
                 excerpt={post.excerpt}
                 author={post.author}
-                date={post.date instanceof Date ? post.date.toLocaleDateString() : post.date}
+                date={post.date}
                 category={post.category}
                 tags={post.tags}
                 imageUrl={post.imageUrl}
