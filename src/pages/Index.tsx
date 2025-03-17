@@ -4,7 +4,8 @@ import { toast } from 'sonner';
 import Hero from '@/components/Hero';
 import FeaturedCalculators from '@/components/FeaturedCalculators';
 import BlogPostList from '@/components/BlogPostList';
-import { BlogPost, getRecentBlogPosts } from '@/utils/blogPosts';
+import { BlogPost } from '@/utils/blogPosts';
+import { fetchWordPressPosts, navigateToBlog } from '@/utils/wordpressBlogService';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ArrowRight, Check, ArrowUpRight } from 'lucide-react';
@@ -15,11 +16,11 @@ const Index = () => {
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   
   useEffect(() => {
-    // Load recent posts
+    // Load recent posts from WordPress blog
     const loadRecentPosts = async () => {
       setIsLoadingPosts(true);
       try {
-        const posts = await getRecentBlogPosts(3);
+        const posts = await fetchWordPressPosts(3);
         setRecentPosts(posts);
       } catch (error) {
         console.error("Error loading recent posts:", error);
@@ -36,6 +37,11 @@ const Index = () => {
     
     // We would add meta description here in production (not currently possible in React without helmet)
   }, []);
+  
+  const handleReadOurGuides = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = 'https://blog.asphaltcalculator.co';
+  };
   
   return (
     <>
@@ -93,7 +99,7 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Featured Blog Posts */}
+        {/* Featured Blog Posts - Now fetching from WordPress */}
         <BlogPostList 
           title="Latest Construction Insights" 
           description="Expert knowledge and practical advice to help you make informed decisions for your construction projects."
@@ -116,10 +122,14 @@ const Index = () => {
                     Get Started Now
                     <ArrowRight size={18} className="ml-2" />
                   </Link>
-                  <Link to="/blog" className="border border-white text-white font-medium py-3 px-6 rounded-md hover:bg-white/10 transition-colors inline-flex items-center justify-center">
+                  <a 
+                    href="https://blog.asphaltcalculator.co"
+                    className="border border-white text-white font-medium py-3 px-6 rounded-md hover:bg-white/10 transition-colors inline-flex items-center justify-center"
+                    onClick={handleReadOurGuides}
+                  >
                     Read Our Guides
                     <ArrowUpRight size={18} className="ml-2" />
-                  </Link>
+                  </a>
                 </div>
               </div>
               

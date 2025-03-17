@@ -16,6 +16,12 @@ const Hero = () => {
     }
   };
   
+  // Direct link to WordPress blog subdomain
+  const handleBlogClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = 'https://blog.asphaltcalculator.co';
+  };
+  
   return (
     <div className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
       {/* Background Pattern */}
@@ -46,10 +52,14 @@ const Hero = () => {
                 <Calculator size={18} className="mr-2" />
                 Explore Calculators
               </Link>
-              <Link to="/blog" className="btn-outline flex items-center justify-center">
+              <a 
+                href="https://blog.asphaltcalculator.co"
+                className="btn-outline flex items-center justify-center"
+                onClick={handleBlogClick}
+              >
                 Learn More
                 <ChevronRight size={18} className="ml-1" />
-              </Link>
+              </a>
             </div>
             
             {/* Search Form */}
