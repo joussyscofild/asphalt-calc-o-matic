@@ -44,7 +44,18 @@ const BlogPostList = ({ posts, title, description, showViewAll = true, isLoading
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <BlogPost key={post.id} {...post} />
+              <BlogPost 
+                key={post.id} 
+                id={post.id}
+                title={post.title}
+                excerpt={post.excerpt}
+                author={post.author}
+                date={post.date instanceof Date ? post.date.toLocaleDateString() : post.date}
+                category={post.category}
+                tags={post.tags}
+                imageUrl={post.imageUrl}
+                featured={post.featured}
+              />
             ))}
           </div>
         )}

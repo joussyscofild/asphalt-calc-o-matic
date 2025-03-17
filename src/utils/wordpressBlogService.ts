@@ -23,6 +23,7 @@ interface WordPressPost {
       id: number;
       name: string;
       slug: string;
+      taxonomy?: string;
     }>>;
   };
 }
@@ -49,11 +50,19 @@ export const fetchWordPressPosts = async (count: number = 3): Promise<BlogPost[]
     console.log(`Successfully fetched ${wpPosts.length} WordPress posts`);
     
     return wpPosts.map(post => {
-      // Extract tags from _embedded['wp:term'] if available
+      // Extract tags and categories from _embedded['wp:term'] if available
       const tags: string[] = [];
+      let category = 'General'; // Default category
+      
       if (post._embedded && post._embedded['wp:term']) {
         const terms = post._embedded['wp:term'];
         if (terms && terms.length > 0) {
+          // Categories are usually in the first position of the wp:term array
+          const categoryTerms = terms[0];
+          if (categoryTerms && categoryTerms.length > 0) {
+            category = categoryTerms[0].name;
+          }
+          
           // Tags are usually in the second position of the wp:term array
           const tagTerms = terms[1];
           if (tagTerms) {
@@ -88,6 +97,8 @@ export const fetchWordPressPosts = async (count: number = 3): Promise<BlogPost[]
         imageUrl: imageUrl,
         author: 'Asphalt Calculator Team', // Default author when not available
         readTime: '5 min read', // Default read time
+        category: category, // Add the category
+        status: 'published' as const // Add the status with correct type
       };
     });
   } catch (error) {
