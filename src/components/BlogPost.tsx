@@ -15,6 +15,12 @@ export interface BlogPostProps {
 }
 
 const BlogPost = ({ id, title, excerpt, author, date, category, tags, imageUrl, featured }: BlogPostProps) => {
+  // Handle external WordPress links
+  const isWordpressId = id.toString().match(/^\d+$/); // WordPress IDs are typically numeric
+  const postUrl = isWordpressId 
+    ? `https://blog.asphaltcalculator.co/?p=${id}` // Direct link to WordPress post
+    : `/blog/${id}`; // Internal app route
+    
   return (
     <article className={`bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md ${featured ? 'border-l-4 border-safety' : ''}`}>
       {imageUrl && (
@@ -43,11 +49,11 @@ const BlogPost = ({ id, title, excerpt, author, date, category, tags, imageUrl, 
           )}
         </div>
         
-        <Link to={`/blog/${id}`}>
+        <a href={postUrl} target={isWordpressId ? "_blank" : undefined}>
           <h3 className="text-xl font-bold text-asphalt dark:text-white mb-3 hover:text-safety-dark dark:hover:text-safety-light transition-colors">
             {title}
           </h3>
-        </Link>
+        </a>
         
         <p className="text-concrete-dark dark:text-gray-300 mb-4">{excerpt}</p>
         
@@ -73,13 +79,14 @@ const BlogPost = ({ id, title, excerpt, author, date, category, tags, imageUrl, 
             <span>{date}</span>
           </div>
           
-          <Link 
-            to={`/blog/${id}`}
+          <a 
+            href={postUrl}
+            target={isWordpressId ? "_blank" : undefined}
             className="inline-flex items-center text-sm font-medium text-asphalt dark:text-white hover:text-safety-dark dark:hover:text-safety-light transition-colors"
           >
             Read More
             <ChevronRight size={16} className="ml-1" />
-          </Link>
+          </a>
         </div>
       </div>
     </article>

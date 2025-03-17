@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import Page from './pages/Page';
 import Sitemap from './pages/Sitemap';
+import BlogPost from './pages/BlogPost';
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
   {
     path: '/sitemap.xml',
     element: <Sitemap />,
+  },
+  {
+    path: '/blog/:id',
+    element: <BlogPost />,
   },
   // Catch-all for /blog to help with debugging
   {
