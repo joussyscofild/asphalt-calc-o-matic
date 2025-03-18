@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Globe, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useFooterBottomLinks } from './useFooterBottomLinks';
 import FooterLink from './FooterLink';
 
@@ -34,14 +34,6 @@ const FooterBottom: React.FC<FooterBottomProps> = ({ currentYear }) => {
             <Link to="/page/terms" className="text-gray-500 text-sm hover:text-gray-400">
               Terms of Service
             </Link>
-            <a href="mailto:info@asphaltcalculator.co" className="text-gray-500 text-sm hover:text-gray-400 flex items-center">
-              <Mail size={14} className="mr-1" />
-              Contact
-            </a>
-            <a href="#" className="text-gray-500 text-sm hover:text-gray-400 flex items-center">
-              <Globe size={14} className="mr-1" />
-              Sitemap
-            </a>
           </>
         )}
       </div>

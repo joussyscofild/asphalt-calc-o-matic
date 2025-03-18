@@ -82,6 +82,11 @@ const LinkGroup: React.FC<LinkGroupProps> = ({ links, onEdit, onDelete, onReorde
               </Draggable>
             ))}
             {provided.placeholder}
+            {links.length === 0 && (
+              <div className="text-center p-4 border border-dashed rounded-md">
+                <p className="text-muted-foreground">No links in this group. Add one below.</p>
+              </div>
+            )}
           </div>
         )}
       </Droppable>
