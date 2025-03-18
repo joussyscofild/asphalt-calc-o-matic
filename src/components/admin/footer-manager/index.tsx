@@ -37,6 +37,9 @@ const FooterManager: React.FC = () => {
     return <LoadingState />;
   }
 
+  // Check if current group is the social media group
+  const isSocialGroup = activeTab === 'social-media';
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -88,6 +91,7 @@ const FooterManager: React.FC = () => {
                 onUpdate={handleUpdateLink}
                 onAdd={handleAddLink}
                 onCancel={handleCancelEdit}
+                isSocialGroup={group.id === 'social-media'}
               />
             </TabsContent>
           ))}

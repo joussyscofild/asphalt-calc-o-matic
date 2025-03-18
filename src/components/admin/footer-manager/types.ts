@@ -13,3 +13,7 @@ export type FooterLinkGroup = {
 };
 
 export type NewLinkData = Omit<FooterLink, 'id'>;
+
+export type SocialLink = FooterLink & {
+  icon: string;
+};
