@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { FooterLinkGroup } from '../types';
@@ -8,86 +9,70 @@ export const useFooterGroups = (
   linkGroups: FooterLinkGroup[],
   setLinkGroups: React.Dispatch<React.SetStateAction<FooterLinkGroup[]>>,
   activeTab: string,
-  setActiveTab: (tab: string) => void
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const { toast } = useToast();
   const [newGroupTitle, setNewGroupTitle] = useState('');
   const [isAddingGroup, setIsAddingGroup] = useState(false);
-
-  const handleAddGroup = async () => {
-    if (!newGroupTitle.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Group title cannot be empty",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const newId = newGroupTitle.toLowerCase().replace(/\s+/g, '-');
-    
-    // Check if ID already exists
-    if (linkGroups.some(group => group.id === newId)) {
-      toast({
-        title: "Validation Error",
-        description: "A group with a similar name already exists",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  
+  const handleAddGroup = async (predefinedId?: string, predefinedTitle?: string) => {
     try {
-      // Create a placeholder link for this group (needed to establish the group)
-      const { error } = await supabase
-        .from('footer_links')
-        .insert({
-          group_id: newId,
-          group_title: newGroupTitle,
-          label: "Example Link",
-          url: "#",
-          is_external: false,
-          sort_order: 0
+      // Use either predefined values or from state
+      const groupId = predefinedId || uuidv4();
+      const title = predefinedTitle || newGroupTitle;
+      
+      if (!title.trim()) {
+        toast({
+          title: "Error adding group",
+          description: "Group title cannot be empty",
+          variant: "destructive"
         });
+        return;
+      }
       
-      if (error) throw error;
-      
-      const newGroup: FooterLinkGroup = {
-        id: newId,
-        title: newGroupTitle,
-        links: [{
-          id: Date.now().toString(), // Temporary ID until we refresh
-          label: "Example Link",
-          url: "#",
-          isExternal: false
-        }]
+      // Add the new group to state
+      const newGroup = {
+        id: groupId,
+        title: title,
+        links: []
       };
-
-      setLinkGroups([...linkGroups, newGroup]);
-      setActiveTab(newId);
+      
+      setLinkGroups(prev => [...prev, newGroup]);
+      
+      // Set active tab to the new group
+      setActiveTab(groupId);
+      
+      // Reset form
       setNewGroupTitle('');
       setIsAddingGroup(false);
       
       toast({
         title: "Group Added",
-        description: `"${newGroupTitle}" group has been added`
+        description: `"${title}" group has been added`
       });
-      
-      // Refresh to get proper IDs - this should be replaced with a proper refresh function
-      setTimeout(() => window.location.reload(), 500);
-      
     } catch (error) {
       console.error('Error adding group:', error);
       toast({
         title: "Error adding group",
-        description: "There was a problem adding the group. Please try again.",
+        description: "There was a problem adding the group",
         variant: "destructive"
       });
     }
   };
-
+  
   const handleDeleteGroup = async (groupId: string) => {
+    // Prevent deletion of special groups
+    if (groupId === 'bottom-links') {
+      toast({
+        title: "Cannot Delete",
+        description: "Bottom links are required for the footer",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
-      // Delete all links in the group
+      // Delete all links in the group from Supabase
       const { error } = await supabase
         .from('footer_links')
         .delete()
@@ -95,30 +80,29 @@ export const useFooterGroups = (
       
       if (error) throw error;
       
-      const updatedGroups = linkGroups.filter(group => group.id !== groupId);
-      setLinkGroups(updatedGroups);
+      // Remove the group from state
+      setLinkGroups(prev => prev.filter(group => group.id !== groupId));
       
-      // Set active tab to first group or empty if no groups
-      if (updatedGroups.length > 0) {
-        setActiveTab(updatedGroups[0].id);
-      } else {
-        setActiveTab('');
-      }
+      // Set active tab to the first available group, if any
+      setActiveTab(prev => {
+        const remainingGroups = linkGroups.filter(group => group.id !== groupId);
+        return remainingGroups.length > 0 ? remainingGroups[0].id : '';
+      });
       
       toast({
         title: "Group Deleted",
-        description: "The link group has been deleted"
+        description: "The group and all its links have been deleted"
       });
     } catch (error) {
       console.error('Error deleting group:', error);
       toast({
         title: "Error deleting group",
-        description: "There was a problem deleting the group. Please try again.",
+        description: "There was a problem deleting the group",
         variant: "destructive"
       });
     }
   };
-
+  
   return {
     newGroupTitle,
     setNewGroupTitle,

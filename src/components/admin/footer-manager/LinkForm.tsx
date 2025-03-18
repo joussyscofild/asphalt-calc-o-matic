@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { FooterLink, NewLinkData } from './types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Mail, Globe, AlertCircle, FileText, ShieldCheck } from 'lucide-react';
 
 interface LinkFormProps {
   editingLink: FooterLink | null;
@@ -15,6 +16,7 @@ interface LinkFormProps {
   onAdd: () => void;
   onCancel: () => void;
   isSocialGroup?: boolean;
+  isBottomLinksGroup?: boolean;
 }
 
 const socialNetworks = [
@@ -26,6 +28,14 @@ const socialNetworks = [
   { value: 'Pinterest', label: 'Pinterest' },
 ];
 
+const bottomLinkTypes = [
+  { value: 'Privacy Policy', label: 'Privacy Policy', icon: <ShieldCheck size={14} /> },
+  { value: 'Terms of Service', label: 'Terms of Service', icon: <FileText size={14} /> },
+  { value: 'Contact', label: 'Contact', icon: <Mail size={14} /> },
+  { value: 'Sitemap', label: 'Sitemap', icon: <Globe size={14} /> },
+  { value: 'Custom', label: 'Custom Link', icon: <AlertCircle size={14} /> },
+];
+
 const LinkForm: React.FC<LinkFormProps> = ({
   editingLink,
   newLinkData,
@@ -33,13 +43,45 @@ const LinkForm: React.FC<LinkFormProps> = ({
   onUpdate,
   onAdd,
   onCancel,
-  isSocialGroup = false
+  isSocialGroup = false,
+  isBottomLinksGroup = false
 }) => {
   const handleSocialNetworkSelect = (value: string) => {
     onLinkDataChange({
       ...newLinkData,
       label: value,
       isExternal: true // Social media links are always external
+    });
+  };
+
+  const handleBottomLinkSelect = (value: string) => {
+    let url = '';
+    let isExternal = false;
+    
+    // Set default URLs based on link type
+    switch(value) {
+      case 'Privacy Policy':
+        url = '/page/privacy';
+        break;
+      case 'Terms of Service':
+        url = '/page/terms';
+        break;
+      case 'Contact':
+        url = 'mailto:info@asphaltcalculator.co';
+        isExternal = true;
+        break;
+      case 'Sitemap':
+        url = '/sitemap';
+        break;
+      default:
+        url = '';
+    }
+    
+    onLinkDataChange({
+      ...newLinkData,
+      label: value,
+      url,
+      isExternal
     });
   };
 
@@ -66,6 +108,48 @@ const LinkForm: React.FC<LinkFormProps> = ({
                 </SelectContent>
               </Select>
             </div>
+          ) : isBottomLinksGroup ? (
+            <div>
+              <Label htmlFor="bottom-link-type">Link Type</Label>
+              <Select 
+                value={newLinkData.label === 'Privacy Policy' || 
+                       newLinkData.label === 'Terms of Service' || 
+                       newLinkData.label === 'Contact' || 
+                       newLinkData.label === 'Sitemap' ? 
+                       newLinkData.label : 'Custom'} 
+                onValueChange={handleBottomLinkSelect}
+              >
+                <SelectTrigger id="bottom-link-type" className="mt-1">
+                  <SelectValue placeholder="Select link type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {bottomLinkTypes.map(type => (
+                    <SelectItem key={type.value} value={type.value}>
+                      <div className="flex items-center">
+                        {type.icon}
+                        <span className="ml-2">{type.label}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {newLinkData.label !== 'Privacy Policy' && 
+               newLinkData.label !== 'Terms of Service' && 
+               newLinkData.label !== 'Contact' && 
+               newLinkData.label !== 'Sitemap' && (
+                <div className="mt-2">
+                  <Label htmlFor="custom-link-label">Custom Link Label</Label>
+                  <Input
+                    id="custom-link-label"
+                    value={newLinkData.label}
+                    onChange={(e) => onLinkDataChange({...newLinkData, label: e.target.value})}
+                    placeholder="Custom Link"
+                    className="mt-1"
+                  />
+                </div>
+              )}
+            </div>
           ) : (
             <div>
               <Label htmlFor="link-label">Link Label</Label>
@@ -85,7 +169,13 @@ const LinkForm: React.FC<LinkFormProps> = ({
               id="link-url"
               value={newLinkData.url}
               onChange={(e) => onLinkDataChange({...newLinkData, url: e.target.value})}
-              placeholder={isSocialGroup ? "https://twitter.com/yourusername" : (newLinkData.isExternal ? "https://example.com" : "/about-us")}
+              placeholder={
+                isSocialGroup ? 
+                  "https://twitter.com/yourusername" : 
+                isBottomLinksGroup ? 
+                  (newLinkData.isExternal ? "https://example.com" : "/page/example") :
+                  (newLinkData.isExternal ? "https://example.com" : "/about-us")
+              }
               className="mt-1"
             />
             {!newLinkData.isExternal && !isSocialGroup && (

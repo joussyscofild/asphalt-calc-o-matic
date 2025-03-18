@@ -37,8 +37,13 @@ const FooterManager: React.FC = () => {
     return <LoadingState />;
   }
 
-  // Check if current group is the social media group
+  // Special group IDs
   const isSocialGroup = activeTab === 'social-media';
+  const isBottomLinksGroup = activeTab === 'bottom-links';
+
+  // Ensure Bottom Links group exists
+  const bottomLinksGroup = linkGroups.find(group => group.id === 'bottom-links');
+  const hasBottomLinks = !!bottomLinksGroup;
 
   return (
     <div className="space-y-6">
@@ -59,14 +64,33 @@ const FooterManager: React.FC = () => {
           <div className="flex justify-between items-center mb-4">
             <TabsList>
               {linkGroups.map(group => (
-                <TabsTrigger key={group.id} value={group.id}>{group.title}</TabsTrigger>
+                <TabsTrigger key={group.id} value={group.id}>
+                  {group.id === 'bottom-links' ? 'Bottom Links' : group.title}
+                </TabsTrigger>
               ))}
+              
+              {!hasBottomLinks && (
+                <TabsTrigger 
+                  value="create-bottom-links"
+                  onClick={() => {
+                    // Create the bottom links group if it doesn't exist
+                    if (!hasBottomLinks) {
+                      handleAddGroup('bottom-links', 'Bottom Links');
+                      // After creating, set active tab to this new group
+                      setTimeout(() => setActiveTab('bottom-links'), 100);
+                    }
+                  }}
+                >
+                  Bottom Links
+                </TabsTrigger>
+              )}
             </TabsList>
             
             <Button 
               variant="destructive" 
               size="sm"
               onClick={() => handleDeleteGroup(activeTab)}
+              disabled={isBottomLinksGroup} // Prevent deletion of bottom links group
               className="flex items-center gap-1"
             >
               <Trash2 size={14} />
@@ -92,6 +116,7 @@ const FooterManager: React.FC = () => {
                 onAdd={handleAddLink}
                 onCancel={handleCancelEdit}
                 isSocialGroup={group.id === 'social-media'}
+                isBottomLinksGroup={group.id === 'bottom-links'}
               />
             </TabsContent>
           ))}
