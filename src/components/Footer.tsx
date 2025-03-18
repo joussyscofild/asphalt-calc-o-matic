@@ -3,11 +3,13 @@ import React from 'react';
 import FooterBrand from './footer/FooterBrand';
 import FooterLinks from './footer/FooterLinks';
 import FooterNewsletter from './footer/FooterNewsletter';
+import FooterBottom from './footer/FooterBottom';
 import { useFooterData } from './footer/useFooterData';
 import { Loader2 } from 'lucide-react';
 
 const Footer = () => {
   const { linkGroups, isLoading } = useFooterData();
+  const currentYear = new Date().getFullYear();
   
   console.log('Footer rendering with link groups:', linkGroups);
   
@@ -35,6 +37,8 @@ const Footer = () => {
           {/* Newsletter */}
           <FooterNewsletter />
         </div>
+        
+        <FooterBottom currentYear={currentYear} />
       </div>
     </footer>
   );
