@@ -62,10 +62,10 @@ export const useFooterGroups = (
   
   const handleDeleteGroup = async (groupId: string) => {
     // Prevent deletion of special groups
-    if (groupId === 'bottom-links') {
+    if (groupId === 'social-media') {
       toast({
         title: "Cannot Delete",
-        description: "Bottom links are required for the footer",
+        description: "Social media links are required for the footer",
         variant: "destructive"
       });
       return;

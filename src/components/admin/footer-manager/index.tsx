@@ -37,16 +37,13 @@ const FooterManager: React.FC = () => {
     return <LoadingState />;
   }
 
-  // Check if special groups exist
-  const bottomLinksGroup = linkGroups.find(group => group.id === 'bottom-links');
+  // Check if social media group exists
   const socialMediaGroup = linkGroups.find(group => group.id === 'social-media');
   
-  // Create flags for special groups
-  const hasBottomLinks = !!bottomLinksGroup;
+  // Create flag for social media group
   const hasSocialMedia = !!socialMediaGroup;
   
   // Check if current tab is a special group
-  const isBottomLinksGroup = activeTab === 'bottom-links';
   const isSocialGroup = activeTab === 'social-media';
   
   return (
@@ -69,25 +66,9 @@ const FooterManager: React.FC = () => {
             <TabsList>
               {linkGroups.map(group => (
                 <TabsTrigger key={group.id} value={group.id}>
-                  {group.id === 'bottom-links' ? 'Bottom Links' : 
-                   group.id === 'social-media' ? 'Social Media' : 
-                   group.title}
+                  {group.id === 'social-media' ? 'Social Media' : group.title}
                 </TabsTrigger>
               ))}
-              
-              {!hasBottomLinks && (
-                <TabsTrigger 
-                  value="create-bottom-links"
-                  onClick={() => {
-                    // Create the bottom links group if it doesn't exist
-                    handleAddGroup('bottom-links', 'Bottom Links');
-                    // After creating, set active tab to this new group
-                    setTimeout(() => setActiveTab('bottom-links'), 100);
-                  }}
-                >
-                  Bottom Links
-                </TabsTrigger>
-              )}
               
               {!hasSocialMedia && (
                 <TabsTrigger 
@@ -108,7 +89,7 @@ const FooterManager: React.FC = () => {
               variant="destructive" 
               size="sm"
               onClick={() => handleDeleteGroup(activeTab)}
-              disabled={isBottomLinksGroup || isSocialGroup} // Prevent deletion of special groups
+              disabled={isSocialGroup} // Prevent deletion of social media group
               className="flex items-center gap-1"
             >
               <Trash2 size={14} />
@@ -134,7 +115,7 @@ const FooterManager: React.FC = () => {
                 onAdd={handleAddLink}
                 onCancel={handleCancelEdit}
                 isSocialGroup={group.id === 'social-media'}
-                isBottomLinksGroup={group.id === 'bottom-links'}
+                isBottomLinksGroup={false}
               />
             </TabsContent>
           ))}
