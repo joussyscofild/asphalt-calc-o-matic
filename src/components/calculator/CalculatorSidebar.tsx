@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Calculator } from '@/utils/calculatorTypes';
 
 interface CalculatorSidebarProps {
@@ -42,6 +42,27 @@ const CalculatorSidebar: React.FC<CalculatorSidebarProps> = ({
                   <ArrowLeft size={12} className="mr-1 text-safety" />
                   {calcId}
                 </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {calculator.externalArticles && calculator.externalArticles.length > 0 && (
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-concrete-dark dark:text-gray-300 mb-1">Related Articles:</h3>
+          <ul className="space-y-1">
+            {calculator.externalArticles.map((article, index) => (
+              <li key={index}>
+                <a 
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-concrete-dark dark:text-gray-300 hover:text-safety dark:hover:text-safety-light text-sm flex items-center"
+                >
+                  <ExternalLink size={12} className="mr-1 text-safety" />
+                  {article.title}
+                </a>
               </li>
             ))}
           </ul>

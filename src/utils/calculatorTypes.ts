@@ -16,6 +16,7 @@ export interface Calculator {
   fields?: CalculatorField[];
   relatedCalculators?: string[];
   relatedArticles?: string[];
+  externalArticles?: ExternalArticle[];
   tags?: string[];
 }
 
@@ -32,4 +33,9 @@ export interface CalculatorField {
   max?: number;
   step?: number;
   helperText?: string;
+}
+
+export interface ExternalArticle {
+  title: string;
+  url: string;
 }

@@ -21,6 +21,7 @@ export const saveCalculator = async (calculator: Calculator): Promise<void> => {
         time_estimate: calculator.timeEstimate,
         featured: calculator.featured,
         formula: calculator.formula,
+        external_articles: calculator.externalArticles,
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'id'
