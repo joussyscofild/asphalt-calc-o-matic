@@ -309,10 +309,13 @@ export const calculateProjectTimeline = (formData: Record<string, any>): Calcula
         highlight: false
       }
     ],
-    recommendations: phases.map(phase => ({
-      text: `${phase.name}: ${phase.duration} working days - ${phase.description}`,
-      type: 'info'
-    })).concat([
+    // Fix: Ensure all recommendation types are strictly 'info', 'warning', 'tip', or 'error'
+    recommendations: [
+      // Map phases to recommendations with explicit 'info' type
+      ...phases.map(phase => ({
+        text: `${phase.name}: ${phase.duration} working days - ${phase.description}`,
+        type: 'info' as const // Use 'as const' to ensure TypeScript recognizes this as a literal
+      })),
       {
         text: seasonalFactor === 'challenging' 
           ? 'Consider scheduling buffer days to account for weather delays.' 
@@ -323,7 +326,7 @@ export const calculateProjectTimeline = (formData: Record<string, any>): Calcula
         text: 'Communicate this timeline with all stakeholders and develop a detailed project schedule.',
         type: 'tip'
       }
-    ])
+    ]
   };
 };
 
