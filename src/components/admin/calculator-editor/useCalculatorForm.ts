@@ -24,7 +24,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
     relatedCalculators: calculator?.relatedCalculators || [],
     relatedArticles: calculator?.relatedArticles || [],
     externalArticles: calculator?.externalArticles || [],
-    featuredImage: calculator?.featuredImage || '',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -329,7 +328,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
       relatedCalculators: formData.relatedCalculators,
       relatedArticles: formData.relatedArticles,
       externalArticles: formData.externalArticles?.filter(a => a.title && a.url) || [],
-      featuredImage: formData.featuredImage || undefined,
     };
     
     if (onSave) {

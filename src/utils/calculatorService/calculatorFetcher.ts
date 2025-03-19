@@ -79,20 +79,9 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           .map(item => item.related_id) || [];
 
         // Parse external articles from the database
-        let externalArticles: ExternalArticle[] = [];
-        if (calc.external_articles) {
-          try {
-            // First cast to unknown, then to our expected type
-            const parsedArticles = calc.external_articles as unknown as ExternalArticle[];
-            // Validate that the parsed data has the expected structure
-            externalArticles = Array.isArray(parsedArticles) ? 
-              parsedArticles.filter(article => typeof article === 'object' && 'title' in article && 'url' in article) : 
-              [];
-          } catch (e) {
-            console.error(`Error parsing external articles for calculator ${calc.id}:`, e);
-            externalArticles = [];
-          }
-        }
+        // Use a proper type assertion and provide a fallback empty array
+        const externalArticles: ExternalArticle[] = 
+          calc.external_articles ? (calc.external_articles as ExternalArticle[]) : [];
 
         // Get the icon from Lucide
         const iconName = calc.icon as keyof typeof LucideIcons;
@@ -116,7 +105,6 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           relatedCalculators: relatedCalculators,
           relatedArticles: relatedArticles,
           externalArticles: externalArticles,
-          featuredImage: calc.featured_image || undefined,
           tags: tags
         };
       })

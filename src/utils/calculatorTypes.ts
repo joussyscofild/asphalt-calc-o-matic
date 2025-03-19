@@ -17,7 +17,6 @@ export interface Calculator {
   relatedCalculators?: string[];
   relatedArticles?: string[];
   externalArticles?: ExternalArticle[];
-  featuredImage?: string;
   tags?: string[];
 }
 
