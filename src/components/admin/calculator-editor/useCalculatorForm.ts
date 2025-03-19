@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calculator, CalculatorField, ExternalArticle } from '@/utils/calculatorTypes';
+import { Calculator, CalculatorField } from '@/utils/calculatorTypes';
 import { FormData } from './types';
 import { useToast } from '@/components/ui/use-toast';
 import { Calculator as CalculatorIcon } from 'lucide-react';
@@ -23,7 +23,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
     icon: calculator?.icon || CalculatorIcon,
     relatedCalculators: calculator?.relatedCalculators || [],
     relatedArticles: calculator?.relatedArticles || [],
-    externalArticles: calculator?.externalArticles || [],
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -64,10 +63,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
     } else {
       setFormData(prev => ({ ...prev, relatedArticles: items }));
     }
-  };
-
-  const handleExternalArticlesChange = (articles: ExternalArticle[]) => {
-    setFormData(prev => ({ ...prev, externalArticles: articles }));
   };
 
   const addField = () => {
@@ -327,7 +322,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
       fields: formData.fields,
       relatedCalculators: formData.relatedCalculators,
       relatedArticles: formData.relatedArticles,
-      externalArticles: formData.externalArticles?.filter(a => a.title && a.url) || [],
     };
     
     if (onSave) {
@@ -351,7 +345,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
     handleRichTextChange,
     handleSEOUpdate,
     handleRelatedContentChange,
-    handleExternalArticlesChange,
     addField,
     updateField,
     removeField,

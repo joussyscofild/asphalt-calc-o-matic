@@ -227,7 +227,6 @@ export type Database = {
           category: string
           created_at: string | null
           description: string
-          external_articles: Json | null
           featured: boolean | null
           formula: string | null
           icon: string
@@ -241,7 +240,6 @@ export type Database = {
           category: string
           created_at?: string | null
           description: string
-          external_articles?: Json | null
           featured?: boolean | null
           formula?: string | null
           icon: string
@@ -255,7 +253,6 @@ export type Database = {
           category?: string
           created_at?: string | null
           description?: string
-          external_articles?: Json | null
           featured?: boolean | null
           formula?: string | null
           icon?: string

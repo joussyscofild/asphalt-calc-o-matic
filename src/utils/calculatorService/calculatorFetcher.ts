@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Calculator, CalculatorField, ExternalArticle } from '../calculatorTypes';
+import { Calculator, CalculatorField } from '../calculatorTypes';
 import { LucideIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { calculators as localCalculators } from '../calculators'; // Import local calculator definitions for fallback
@@ -78,11 +78,6 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           ?.filter(item => item.related_type === 'article')
           .map(item => item.related_id) || [];
 
-        // Parse external articles from the database
-        // Use a proper type assertion and provide a fallback empty array
-        const externalArticles: ExternalArticle[] = 
-          calc.external_articles ? (calc.external_articles as ExternalArticle[]) : [];
-
         // Get the icon from Lucide
         const iconName = calc.icon as keyof typeof LucideIcons;
         const icon = LucideIcons[iconName] || LucideIcons.Calculator;
@@ -104,7 +99,6 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           fields: fields,
           relatedCalculators: relatedCalculators,
           relatedArticles: relatedArticles,
-          externalArticles: externalArticles,
           tags: tags
         };
       })
