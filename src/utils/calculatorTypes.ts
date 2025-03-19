@@ -12,6 +12,7 @@ export interface Calculator {
   subCategory?: string;
   timeEstimate: string;
   featured?: boolean;
+  featuredImage?: string;
   formula?: string;
   fields?: CalculatorField[];
   relatedCalculators?: string[];
@@ -38,4 +39,5 @@ export interface CalculatorField {
 export interface ExternalArticle {
   title: string;
   url: string;
+  imageUrl?: string;
 }

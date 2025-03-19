@@ -20,6 +20,7 @@ export const saveCalculator = async (calculator: Calculator): Promise<void> => {
         category: calculator.category,
         time_estimate: calculator.timeEstimate,
         featured: calculator.featured,
+        featured_image: calculator.featuredImage,
         formula: calculator.formula,
         external_articles: calculator.externalArticles,
         updated_at: new Date().toISOString()
