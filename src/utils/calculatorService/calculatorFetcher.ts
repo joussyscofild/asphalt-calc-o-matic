@@ -78,8 +78,10 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           ?.filter(item => item.related_type === 'article')
           .map(item => item.related_id) || [];
 
-        // Get external articles if they exist
-        const externalArticles: ExternalArticle[] = calc.external_articles || [];
+        // Parse external articles from the database
+        // Use a proper type assertion and provide a fallback empty array
+        const externalArticles: ExternalArticle[] = 
+          calc.external_articles ? (calc.external_articles as ExternalArticle[]) : [];
 
         // Get the icon from Lucide
         const iconName = calc.icon as keyof typeof LucideIcons;
