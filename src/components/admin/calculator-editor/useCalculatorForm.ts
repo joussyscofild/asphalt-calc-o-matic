@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Calculator, CalculatorField, ExternalArticle } from '@/utils/calculatorTypes';
 import { FormData } from './types';
@@ -19,7 +18,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
     category: calculator?.category || 'Asphalt',
     timeEstimate: calculator?.timeEstimate || '1 min',
     featured: calculator?.featured || false,
-    featuredImage: calculator?.featuredImage || '',
     formula: calculator?.formula || '',
     fields: calculator?.fields || [],
     icon: calculator?.icon || CalculatorIcon,
@@ -325,7 +323,6 @@ export const useCalculatorForm = (calculator?: Calculator, onSave?: (calculator:
       category: formData.category || 'Asphalt',
       timeEstimate: formData.timeEstimate || '1 min',
       featured: formData.featured || false,
-      featuredImage: formData.featuredImage,
       formula: formData.formula,
       fields: formData.fields,
       relatedCalculators: formData.relatedCalculators,

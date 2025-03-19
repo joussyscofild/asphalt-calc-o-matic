@@ -100,7 +100,6 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           category: calc.category,
           timeEstimate: calc.time_estimate,
           featured: calc.featured,
-          featuredImage: calc.featured_image,
           formula: calc.formula,
           fields: fields,
           relatedCalculators: relatedCalculators,

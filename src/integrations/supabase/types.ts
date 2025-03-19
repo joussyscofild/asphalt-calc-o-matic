@@ -229,7 +229,6 @@ export type Database = {
           description: string
           external_articles: Json | null
           featured: boolean | null
-          featured_image: string | null
           formula: string | null
           icon: string
           id: string
@@ -244,7 +243,6 @@ export type Database = {
           description: string
           external_articles?: Json | null
           featured?: boolean | null
-          featured_image?: string | null
           formula?: string | null
           icon: string
           id: string
@@ -259,7 +257,6 @@ export type Database = {
           description?: string
           external_articles?: Json | null
           featured?: boolean | null
-          featured_image?: string | null
           formula?: string | null
           icon?: string
           id?: string
