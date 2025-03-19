@@ -1,4 +1,3 @@
-
 import { CalculatorResults } from '@/components/calculator/CalculatorForm';
 
 export const calculateMaterialConversion = (formData: Record<string, any>): CalculatorResults => {
@@ -140,12 +139,15 @@ export const calculateMaterialConversion = (formData: Record<string, any>): Calc
     }
   };
   
+  // Fix: Simplify the type assertions to avoid parser confusion
   let costEstimate = 0;
-  if (
-    unitCosts[materialType as keyof typeof unitCosts] && 
-    unitCosts[materialType as keyof typeof unitCosts][toUnit as keyof typeof unitCosts[typeof materialType as keyof typeof unitCosts]]
-  ) {
-    costEstimate = result * unitCosts[materialType as keyof typeof unitCosts][toUnit as keyof typeof unitCosts[typeof materialType as keyof typeof unitCosts]];
+  const materialCosts = unitCosts[materialType as keyof typeof unitCosts];
+  
+  if (materialCosts && toUnit in materialCosts) {
+    // Use type assertion in a simplified way
+    const materialType2 = materialType as keyof typeof unitCosts;
+    const toUnit2 = toUnit as keyof (typeof unitCosts)[typeof materialType2];
+    costEstimate = result * unitCosts[materialType2][toUnit2];
   }
   
   return {
