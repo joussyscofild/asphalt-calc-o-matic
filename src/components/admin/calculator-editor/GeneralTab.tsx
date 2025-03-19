@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { categories } from '@/utils/calculators';
 import RichTextEditor from '../RichTextEditor';
 import { FormData } from './types';
+import { Image } from 'lucide-react';
 
 interface GeneralTabProps {
   formData: FormData;
@@ -77,6 +78,23 @@ const GeneralTab: React.FC<GeneralTabProps> = ({
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="featuredImage" className="flex items-center gap-2">
+              <Image size={16} />
+              Featured Image URL
+            </Label>
+            <Input 
+              id="featuredImage" 
+              name="featuredImage"
+              value={formData.featuredImage || ''} 
+              onChange={handleInputChange}
+              placeholder="https://example.com/image.jpg"
+            />
+            <p className="text-sm text-muted-foreground">
+              URL to an image that will be displayed on the calculator page.
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select 
               defaultValue={formData.category} 
@@ -141,6 +159,26 @@ const GeneralTab: React.FC<GeneralTabProps> = ({
           />
         </CardContent>
       </Card>
+
+      {formData.featuredImage && (
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Featured Image Preview</CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <div className="border rounded-lg overflow-hidden max-w-md">
+              <img 
+                src={formData.featuredImage} 
+                alt={formData.title} 
+                className="object-cover w-full"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

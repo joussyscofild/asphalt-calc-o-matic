@@ -1,12 +1,18 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Calculator } from '../calculatorTypes';
+import { Json } from '@/integrations/supabase/types';
 
 // Save a calculator to Supabase
 export const saveCalculator = async (calculator: Calculator): Promise<void> => {
   try {
     // Ensure we have a valid icon name from the icon object
     const iconName = calculator.icon.name || 'Calculator';
+    
+    // Convert external articles to Json type for database storage
+    const externalArticlesJson: Json = calculator.externalArticles ? 
+      calculator.externalArticles as unknown as Json : 
+      [];
     
     // Save the calculator basic info
     const { error: calculatorError } = await supabase
@@ -21,7 +27,8 @@ export const saveCalculator = async (calculator: Calculator): Promise<void> => {
         time_estimate: calculator.timeEstimate,
         featured: calculator.featured,
         formula: calculator.formula,
-        external_articles: calculator.externalArticles,
+        external_articles: externalArticlesJson,
+        featured_image: calculator.featuredImage || null,
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'id'
