@@ -26,6 +26,7 @@ const CalculatorEditorForm: React.FC<CalculatorEditorProps> = ({
     handleRichTextChange,
     handleSEOUpdate,
     handleRelatedContentChange,
+    handleExternalArticlesChange,
     addField,
     updateField,
     removeField,
@@ -103,6 +104,7 @@ const CalculatorEditorForm: React.FC<CalculatorEditorProps> = ({
             formData={formData}
             handleInputChange={handleInputChange}
             handleRelatedContentChange={handleRelatedContentChange}
+            handleExternalArticlesChange={handleExternalArticlesChange}
           />
         </TabsContent>
 
