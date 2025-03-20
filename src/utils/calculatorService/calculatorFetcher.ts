@@ -4,6 +4,7 @@ import { Calculator, CalculatorField, ExternalArticle } from '../calculatorTypes
 import { LucideIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { calculators as localCalculators } from '../calculators'; // Import local calculator definitions for fallback
+import { Json } from '@/integrations/supabase/types';
 
 // Fetch all calculators
 export const fetchCalculators = async (): Promise<Calculator[]> => {
@@ -78,17 +79,25 @@ export const fetchCalculators = async (): Promise<Calculator[]> => {
           ?.filter(item => item.related_type === 'article')
           .map(item => item.related_id) || [];
 
-        // Parse external articles from the database
-        // Use a proper type assertion and provide a fallback empty array
-        const externalArticles: ExternalArticle[] = 
-          calc.external_articles ? (calc.external_articles as ExternalArticle[]) : [];
+        // Parse external articles from the database with proper type handling
+        let externalArticles: ExternalArticle[] = [];
+        if (calc.external_articles) {
+          try {
+            // First cast to unknown, then to ExternalArticle[] to satisfy TypeScript
+            const articlesData = calc.external_articles as unknown;
+            if (Array.isArray(articlesData)) {
+              externalArticles = articlesData as ExternalArticle[];
+            }
+          } catch (err) {
+            console.error("Error parsing external articles:", err);
+          }
+        }
 
         // Get the icon from Lucide
         const iconName = calc.icon as keyof typeof LucideIcons;
         const icon = LucideIcons[iconName] || LucideIcons.Calculator;
 
         // Handle the tags property - it may not exist in the database schema
-        // This fixes the TypeScript error by explicitly checking for the tags property
         const tags = Array.isArray(calc['tags']) ? calc['tags'] : [];
 
         return {

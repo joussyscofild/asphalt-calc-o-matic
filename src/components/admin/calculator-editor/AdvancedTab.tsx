@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { ExternalArticle, FormData } from './types';
+import { FormData } from './types';
+import { ExternalArticle } from '@/utils/calculatorTypes';
 import { Plus, Trash2, Link as LinkIcon } from 'lucide-react';
 
 interface AdvancedTabProps {
